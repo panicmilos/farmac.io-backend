@@ -1,12 +1,11 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace Farmacio_Tests
 {
-    public class Tests
+    public class Class1
     {
         [Fact]
-        public void Test1()
+        public void Test()
         {
             Assert.True(true);
         }
