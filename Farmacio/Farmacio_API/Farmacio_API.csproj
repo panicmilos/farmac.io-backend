@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Farmacio_Models\Farmacio_Models.csproj" />
+    <ProjectReference Include="..\Farmacio_Repositories\Farmacio_Repositories.csproj" />
+    <ProjectReference Include="..\Farmacio_Services\Farmacio_Services.csproj" />
+  </ItemGroup>
+
+
+</Project>
