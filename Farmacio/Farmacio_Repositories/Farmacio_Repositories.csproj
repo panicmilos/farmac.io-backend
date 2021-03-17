@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.13" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Farmacio_Models\Farmacio_Models.csproj" />
   </ItemGroup>
 

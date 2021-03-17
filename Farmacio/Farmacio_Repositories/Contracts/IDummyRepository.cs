@@ -8,5 +8,7 @@ namespace Farmacio_Repositories.Contracts
     public interface IDummyRepository
     {
         IEnumerable<WeatherForecast> Get();
+
+        WeatherForecast Get(Guid id);
     }
 }

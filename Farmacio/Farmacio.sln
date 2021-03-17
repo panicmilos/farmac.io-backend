@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Farmacio_Services", "Farmac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Farmacio_Repositories", "Farmacio_Repositories\Farmacio_Repositories.csproj", "{B29D6DCA-BAD3-4C88-80E1-A34EB19DBC19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmacio_Tests", "Farmacio_Tests\Farmacio_Tests.csproj", "{96AEED01-5A8A-4AB8-8D78-07A3A33ABBFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Farmacio_Tests", "Farmacio_Tests\Farmacio_Tests.csproj", "{96AEED01-5A8A-4AB8-8D78-07A3A33ABBFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
