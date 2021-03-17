@@ -1,0 +1,37 @@
+version: '3.6'
+services:
+
+  mariadb-data:
+    image: mariadb:10.5.8-focal
+    environment:
+      - MYSQL_DATABASE=${DATA_INIT_DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DATA_INIT_DB_PASSWORD}
+    ports:
+      - 3310:3306
+    volumes:
+      - ./farmacio_data:/var/lib/mysql
+
+  farmacio-backend:
+    image: cr.bjelicaluka.com/farmacio-backend
+    ports:
+      - 80
+    networks:
+      - default
+    volumes:
+      - ./config/backend/appsettings.json:/app/appsettings.json
+    
+  farmacio-http-proxy:
+    image: nginx:stable-alpine
+    volumes:
+      - ./config/proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - farmacio
+      - default
+    depends_on:
+      - farmacio-backend
+    ports:
+      - 80
+
+networks:
+  farmacio:
+    name: farmacio
