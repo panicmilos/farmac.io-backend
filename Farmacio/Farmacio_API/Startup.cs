@@ -1,5 +1,6 @@
 using Farmacio_API.Installers;
 using Farmacio_API.Settings;
+using GlobalExceptionHandler.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -47,12 +48,14 @@ namespace Farmacio_API
             app.UseRouting();
 
             app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+               .AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader());
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseGlobalExceptionHandler();
 
             app.UseEndpoints(endpoints =>
             {

@@ -5,6 +5,7 @@ using EmailService.Implementation;
 using EmailService.Models;
 using Farmacio_API.Contracts.Requests;
 using Farmacio_Models.Domain;
+using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -76,6 +77,15 @@ namespace Farmacio_API.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [HttpGet("testGEH")]
+        public IActionResult Test()
+        {
+            var throwingService = new ThrowingService();
+            throwingService.Throw();
+
+            return Ok();
         }
     }
 }
