@@ -2,10 +2,12 @@
 
 namespace EmailService.Constracts
 {
-    public interface ITemplatesProvider<T>
+    public interface ITemplatesProvider
     {
         void AddTemplate(string templateName, Type templateType);
 
-        T FromTemplate(string templateName, params object[] templateParams);
+        void AddTemplate(string templateName, string template);
+
+        T FromTemplate<T>(string templateName, object templateParams = null);
     }
 }

@@ -29,8 +29,11 @@ namespace Farmacio_API.Installers
                        .EnableSsl();
             });
 
-            _services.AddTemplateProvider<TextOptions>(typeof(Startup));
-            _services.AddTemplateProvider<Email>(typeof(Startup));
+            _services.AddTemplateProvider(options =>
+            {
+                options.SetAssemblyType(typeof(Startup))
+                       .AddFileWithTemplates("templates.json");
+            });
         }
     }
 }

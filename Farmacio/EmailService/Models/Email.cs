@@ -10,5 +10,11 @@ namespace EmailService.Models
         public List<string> Recipients { get; set; }
         public string Body { get; set; }
         public Dictionary<string, AttachmentType> Attachments { get; set; }
+
+        public Email()
+        {
+            Recipients = new List<string>();
+            Attachments = new Dictionary<string, AttachmentType>();
+        }
     }
 }

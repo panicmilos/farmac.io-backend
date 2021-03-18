@@ -88,13 +88,18 @@ namespace EmailService.Implementation
             return this;
         }
 
-        public IBodyBuilder AddImageFromUrl(string imageUrl)
+        public IBodyBuilder AddImage(string imageUrl)
         {
             _bodyBuilder.AppendLine();
             _bodyBuilder.Append($"<img src={imageUrl}></img>");
             _bodyBuilder.AppendLine();
 
             return this;
+        }
+
+        public IBodyBuilder AddImage(EmailImage image)
+        {
+            return AddImage(image.Source);
         }
 
         public string Build()

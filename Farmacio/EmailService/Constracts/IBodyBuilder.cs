@@ -15,7 +15,9 @@ namespace EmailService.Constracts
 
         IBodyBuilder AddUnorderedList(IList<string> items);
 
-        IBodyBuilder AddImageFromUrl(string imageUrl);
+        IBodyBuilder AddImage(string imageUrl);
+
+        IBodyBuilder AddImage(EmailImage image);
 
         IBodyBuilder AddNewLine();
     }

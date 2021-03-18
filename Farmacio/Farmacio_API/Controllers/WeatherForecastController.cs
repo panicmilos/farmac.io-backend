@@ -18,11 +18,11 @@ namespace Farmacio_API.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly IEmailDispatcher _emailDispatcher;
-        private readonly ITemplatesProvider<Email> _templatesProvider;
+        private readonly ITemplatesProvider _templatesProvider;
         private readonly IDummyService _dummyService;
         private readonly IMapper _mapper;
 
-        public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider<Email> templatesProvider, IDummyService dummyService, IMapper mapper)
+        public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider, IDummyService dummyService, IMapper mapper)
         {
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
@@ -33,7 +33,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("sendEmail")]
         public Email SendEmail()
         {
-            var email = _templatesProvider.FromTemplate("Email1", "panic.milos99@gmail.com", "Milos");
+            var email = _templatesProvider.FromTemplate<Email>("Email3", new { to = "panic.milos99@gmail.com", name = "Milos" });
             _emailDispatcher.Dispatch(email);
 
             return email;

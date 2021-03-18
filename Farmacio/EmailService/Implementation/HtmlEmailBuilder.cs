@@ -61,6 +61,11 @@ namespace EmailService.Implementation
             return this;
         }
 
+        public IEmailBuilder AddAttachment(EmailAttachment attachment)
+        {
+            return AddAttachment(attachment.Source, attachment.Type);
+        }
+
         public Email Build()
         {
             return new Email

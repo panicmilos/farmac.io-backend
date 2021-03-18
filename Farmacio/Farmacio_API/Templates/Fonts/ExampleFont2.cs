@@ -8,7 +8,7 @@ namespace Farmacio_API.Templates.Fonts
     {
         public string Name { get; } = "Font2";
 
-        public TextOptions GetTemplate(params object[] templateParams)
+        public TextOptions GetTemplate()
         {
             return new TextOptions
             {

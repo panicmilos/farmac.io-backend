@@ -4,6 +4,6 @@
     {
         string Name { get; }
 
-        T GetTemplate(params object[] templateParams);
+        T GetTemplate();
     }
 }

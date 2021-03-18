@@ -18,5 +18,7 @@ namespace EmailService.Contracts
         IBodyBuilder AddBody();
 
         IEmailBuilder AddAttachment(string attachmentPath, AttachmentType type);
+
+        IEmailBuilder AddAttachment(EmailAttachment attachment);
     }
 }
