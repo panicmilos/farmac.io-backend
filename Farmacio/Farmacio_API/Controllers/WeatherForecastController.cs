@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EmailService.Constracts;
+using EmailService.Enums;
 using EmailService.Implementation;
 using EmailService.Models;
 using Farmacio_API.Contracts.Requests;
@@ -30,17 +31,24 @@ namespace Farmacio_API.Controllers
         [HttpGet("sendEmail")]
         public Email SendEmail()
         {
-            Email email = new Email
-            {
-                Subject = "Test",
-                From = "panic.milos99@gmail.com",
-                Recipients = new List<string> { "panic.milos99@gmail.com" },
-                Body = "CAO"
-            };
+            var emailBuilder = new HtmlEmailBuilder();
 
-            _emailDispatcher.Dispatch(email);
+            emailBuilder
+                .AddSubject("Testiram web klijent")
+                .AddFrom("panic.milos99@gmail.com")
+                .AddTo("panic.milos99@gmail.com")
+                .AddAttachment(@"C:\Users\panic\OneDrive\Desktop\semasenzora.jpg", AttachmentType.Jpeg)
+                .AddAttachment(@"C:\Users\panic\OneDrive\Desktop\testzip.zip", AttachmentType.Zip)
+                .AddAttachment(@"C:\Users\panic\OneDrive\Desktop\vju.txt", AttachmentType.PlainText)
+                .AddBody()
+                .AddText($"Postovani Milos", options => options.SetBold().SetSize(HtmlHSize.H2).SetUnderline())
+                .AddImageFromUrl("https://img.cdn-cnj.si/img/250/250/6U/6UriUZmyd0t")
+                .AddNewLine()
+                .AddUnorderedList(new List<string>() { "Pas", "Na Svetu" });
 
-            return email;
+            _emailDispatcher.Dispatch(emailBuilder.Build());
+
+            return emailBuilder.Build();
         }
 
         [HttpGet]

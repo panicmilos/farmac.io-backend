@@ -1,5 +1,7 @@
 ﻿using EmailService.Constracts;
 using EmailService.Models;
+using EmailService.Utils;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 
@@ -35,6 +37,8 @@ namespace EmailService.Implementation
             mailMessage.From = new MailAddress(email.From);
             email.Recipients.ForEach(recipientMail => mailMessage.To.Add(recipientMail));
             mailMessage.Body = email.Body;
+            var attachments = email.Attachments.Select(keyValuePair => new Attachment(keyValuePair.Key, AttachmentsToMediaTypeMapper.Map(keyValuePair.Value))).ToList();
+            attachments.ForEach(attachment => mailMessage.Attachments.Add(attachment));
 
             return mailMessage;
         }

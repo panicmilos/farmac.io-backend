@@ -29,7 +29,7 @@ namespace Farmacio_API
                 new SwaggerInstaller(services),
                 new AutoMapperInstaller(services),
                 new FluentValidationInstaller(services),
-                new EmailServiceInstaller(services)
+                new EmailServiceInstaller(services, Configuration)
             );
             installerCollection.Install();
         }
