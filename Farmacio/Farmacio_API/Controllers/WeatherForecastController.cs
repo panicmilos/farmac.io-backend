@@ -18,12 +18,14 @@ namespace Farmacio_API.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly IEmailDispatcher _emailDispatcher;
+        private readonly ITemplatesProvider<Email> _templatesProvider;
         private readonly IDummyService _dummyService;
         private readonly IMapper _mapper;
 
-        public WeatherForecastController(IEmailDispatcher emailDispatcher, IDummyService dummyService, IMapper mapper)
+        public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider<Email> templatesProvider, IDummyService dummyService, IMapper mapper)
         {
             _emailDispatcher = emailDispatcher;
+            _templatesProvider = templatesProvider;
             _dummyService = dummyService;
             _mapper = mapper;
         }
@@ -31,24 +33,10 @@ namespace Farmacio_API.Controllers
         [HttpGet("sendEmail")]
         public Email SendEmail()
         {
-            var emailBuilder = new HtmlEmailBuilder();
+            var email = _templatesProvider.FromTemplate("Email1", "panic.milos99@gmail.com", "Milos");
+            _emailDispatcher.Dispatch(email);
 
-            emailBuilder
-                .AddSubject("Testiram web klijent")
-                .AddFrom("panic.milos99@gmail.com")
-                .AddTo("panic.milos99@gmail.com")
-                .AddAttachment(@"C:\Users\panic\OneDrive\Desktop\semasenzora.jpg", AttachmentType.Jpeg)
-                .AddAttachment(@"C:\Users\panic\OneDrive\Desktop\testzip.zip", AttachmentType.Zip)
-                .AddAttachment(@"C:\Users\panic\OneDrive\Desktop\vju.txt", AttachmentType.PlainText)
-                .AddBody()
-                .AddText($"Postovani Milos", options => options.SetBold().SetSize(HtmlHSize.H2).SetUnderline())
-                .AddImageFromUrl("https://img.cdn-cnj.si/img/250/250/6U/6UriUZmyd0t")
-                .AddNewLine()
-                .AddUnorderedList(new List<string>() { "Pas", "Na Svetu" });
-
-            _emailDispatcher.Dispatch(emailBuilder.Build());
-
-            return emailBuilder.Build();
+            return email;
         }
 
         [HttpGet]
