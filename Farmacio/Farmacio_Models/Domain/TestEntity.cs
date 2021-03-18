@@ -1,4 +1,6 @@
-﻿namespace Farmacio_Models.Domain
+﻿using System;
+
+namespace Farmacio_Models.Domain
 {
     public class TestEntity : BaseEntity
     {

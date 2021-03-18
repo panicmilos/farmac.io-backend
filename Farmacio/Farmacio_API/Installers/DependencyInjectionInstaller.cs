@@ -1,4 +1,5 @@
 ﻿using Farmacio_Repositories.Contracts;
+using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation;
@@ -19,6 +20,7 @@ namespace Farmacio_API.Installers
         {
             _services.AddScoped<IDummyService, DummyService>();
             _services.AddScoped<IDummyRepository, DummyRepository>();
+            _services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         }
     }
 }

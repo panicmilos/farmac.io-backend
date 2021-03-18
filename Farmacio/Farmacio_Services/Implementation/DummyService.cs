@@ -17,12 +17,12 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<WeatherForecast> Get()
         {
-            return _dummyRepository.Get();
+            return _dummyRepository.Read();
         }
 
         public WeatherForecast Get(Guid id)
         {
-            return _dummyRepository.Get(id);
+            return _dummyRepository.Read(id);
         }
     }
 }

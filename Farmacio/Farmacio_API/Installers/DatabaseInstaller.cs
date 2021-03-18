@@ -1,5 +1,5 @@
 ﻿using Farmacio_API.Settings;
-using Farmacio_Repositories;
+using Farmacio_Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

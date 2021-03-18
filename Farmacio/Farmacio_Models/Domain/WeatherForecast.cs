@@ -3,9 +3,8 @@ using System;
 
 namespace Farmacio_API
 {
-    public class WeatherForecast
+    public class WeatherForecast : BaseEntity
     {
-        public Guid Id { get; set; }
         public DateTime Date { get; set; }
 
         public int TemperatureC { get; set; }
