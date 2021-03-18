@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using EmailService.Constracts;
+using EmailService.Implementation;
+using EmailService.Models;
 using Farmacio_API.Contracts.Requests;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -14,15 +16,31 @@ namespace Farmacio_API.Controllers
     [Produces("application/json")]
     public class WeatherForecastController : ControllerBase
     {
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IEmailDispatcher _emailDispatcher;
         private readonly IDummyService _dummyService;
         private readonly IMapper _mapper;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IDummyService dummyService, IMapper mapper)
+        public WeatherForecastController(IEmailDispatcher emailDispatcher, IDummyService dummyService, IMapper mapper)
         {
-            _logger = logger;
+            _emailDispatcher = emailDispatcher;
             _dummyService = dummyService;
             _mapper = mapper;
+        }
+
+        [HttpGet("sendEmail")]
+        public Email SendEmail()
+        {
+            Email email = new Email
+            {
+                Subject = "Test",
+                From = "panic.milos99@gmail.com",
+                Recipients = new List<string> { "panic.milos99@gmail.com" },
+                Body = "CAO"
+            };
+
+            _emailDispatcher.Dispatch(email);
+
+            return email;
         }
 
         [HttpGet]

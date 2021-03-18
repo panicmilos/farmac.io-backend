@@ -1,4 +1,3 @@
-using Farmacio_API.Extensions;
 using Farmacio_API.Installers;
 using Farmacio_API.Settings;
 using Microsoft.AspNetCore.Builder;
@@ -29,7 +28,8 @@ namespace Farmacio_API
                 new DatabaseInstaller(services, Configuration),
                 new SwaggerInstaller(services),
                 new AutoMapperInstaller(services),
-                new FluentValidationInstaller(services)
+                new FluentValidationInstaller(services),
+                new EmailServiceInstaller(services)
             );
             installerCollection.Install();
         }

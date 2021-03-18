@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EmailService\EmailService.csproj" />
     <ProjectReference Include="..\Farmacio_Models\Farmacio_Models.csproj" />
     <ProjectReference Include="..\Farmacio_Repositories\Farmacio_Repositories.csproj" />
     <ProjectReference Include="..\Farmacio_Services\Farmacio_Services.csproj" />
