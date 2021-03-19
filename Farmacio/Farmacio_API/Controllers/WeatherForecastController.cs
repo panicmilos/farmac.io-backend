@@ -22,13 +22,16 @@ namespace Farmacio_API.Controllers
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IDummyService _dummyService;
         private readonly IMapper _mapper;
+        private readonly IWeatherForecastService _weatherForecastService;
 
-        public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider, IDummyService dummyService, IMapper mapper)
+        public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider, IDummyService dummyService, IMapper mapper,
+            IWeatherForecastService weatherForecastService)
         {
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
             _dummyService = dummyService;
             _mapper = mapper;
+            _weatherForecastService = weatherForecastService;
         }
 
         [HttpGet("sendEmail")]
@@ -43,7 +46,7 @@ namespace Farmacio_API.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
-            return _dummyService.Get();
+            return _weatherForecastService.Read();
         }
 
         /// <summary>
