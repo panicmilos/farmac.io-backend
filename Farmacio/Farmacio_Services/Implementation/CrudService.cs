@@ -21,18 +21,6 @@ namespace Farmacio_Services.Implementation
             return _repository.Create(entity);
         }
 
-        public virtual T Delete(Guid id)
-        {
-            var entityForDeletion = Read(id);
-            if(entityForDeletion == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            entityForDeletion.Active = false;
-            return _repository.Update(entityForDeletion);
-        }
-
         public IEnumerable<T> Read()
         {
             return _repository.Read();
@@ -50,6 +38,17 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException();
             return entityForUpdate;
 
+        }
+
+        public virtual T Delete(Guid id)
+        {
+            var entityForDeletion = _repository.Delete(id);
+            if (entityForDeletion == null)
+            {
+                throw new MissingEntityException();
+            }
+
+            return entityForDeletion;
         }
     }
 }

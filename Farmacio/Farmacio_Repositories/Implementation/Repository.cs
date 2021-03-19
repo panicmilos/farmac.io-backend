@@ -55,14 +55,14 @@ namespace Farmacio_Repositories.Implementation
 
         public virtual T Delete(Guid id)
         {
-            var entityForDelete = Read(id);
-            if (entityForDelete != null)
+            var entityForDeletion = Read(id);
+            if (entityForDeletion != null)
             {
-                _context.Remove(entityForDelete);
-                _context.SaveChanges();
+                entityForDeletion.Active = false;
+                Update(entityForDeletion);
             }
 
-            return entityForDelete;
+            return entityForDeletion;
         }
     }
 }

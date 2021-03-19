@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Farmacio_Services.Implementation
 {
-    public class WeatherForecastService : CrudService<WeatherForecast>
+    public class WeatherForecastService : CrudService<WeatherForecast>, IWeatherForecastService
     {
         public WeatherForecastService(IDummyRepository repository):
             base(repository)

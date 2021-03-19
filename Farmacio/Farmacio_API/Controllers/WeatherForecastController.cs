@@ -82,6 +82,13 @@ namespace Farmacio_API.Controllers
             }
         }
 
+        [ProducesResponseType(typeof(WeatherForecast), 200)]
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            return Ok(_weatherForecastService.Delete(id));
+        }
+
         [HttpGet("testGEH")]
         public IActionResult Test()
         {
