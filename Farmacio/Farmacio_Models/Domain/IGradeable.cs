@@ -1,7 +1,10 @@
-﻿namespace Farmacio_Models.Domain
+﻿using System.Collections.Generic;
+
+namespace Farmacio_Models.Domain
 {
     public interface IGradeable
     {
-        int Grade { get; set; }
+        int AverageGrade { get; set; }
+        List<Grade> Grades { get; set; }
     }
 }

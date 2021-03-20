@@ -11,6 +11,8 @@ namespace Farmacio_Models.Domain
         public List<Dermatologist> Dermatologists { get; set; }
         public PharmacyPriceList PriceList { get; set; }
         public List<PharmacyOrder> Orders { get; set; }
-        public int Grade { get; set; }
+        public List<Promotion> Promotions { get; set; }
+        public int AverageGrade { get; set; }
+        public List<Grade> Grades { get; set; }
     }
 }

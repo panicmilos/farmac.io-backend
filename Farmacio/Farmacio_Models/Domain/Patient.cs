@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Farmacio_Models.Domain
 {
     public class Patient : User
     {
-        public int LoyalityPoints { get; set; }
+        public int Points { get; set; }
         public int NegativePoints { get; set; }
+        public LoyaltyProgram LoyaltyProgram { get; set; }
         public List<Appointment> Appointments { get; set; }
         public List<Pharmacy> FollowedPharmacies { get; set; }
         public List<Ingredient> Allergies { get; set; }

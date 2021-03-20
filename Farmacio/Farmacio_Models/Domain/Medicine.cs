@@ -15,7 +15,8 @@ namespace Farmacio_Models.Domain
         public string RecommendedDose { get; set; }
         public List<MedicineIngredient> MedicineIngredients { get; set; }
         public List<Medicine> Replacements { get; set; }
-        public int Grade { get; set; }
+        public int AverageGrade { get; set; }
+        public List<Grade> Grades { get; set; }
     }
 
     public enum MedicineForm

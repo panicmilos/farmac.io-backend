@@ -1,9 +1,13 @@
-﻿namespace Farmacio_Models.Domain
+﻿using System.Collections.Generic;
+
+namespace Farmacio_Models.Domain
 {
     public class Complaint : BaseEntity
     {
         public Patient Writer { get; set; }
         public string Text { get; set; }
+        public bool IsAboutPharmacy { get; set; }
+        public List<ComplaintAnswer> Answers { get; set; }
     }
 
     public class ComplaintAnswer : BaseEntity
