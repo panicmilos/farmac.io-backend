@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Farmacio_API.Migrations
 {
-    public partial class initialdatabase : Migration
+    public partial class testingmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,6 +12,8 @@ namespace Farmacio_API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
                     Text = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -24,6 +26,8 @@ namespace Farmacio_API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
                     Date = table.Column<DateTime>(nullable: false),
                     TemperatureC = table.Column<int>(nullable: false),
                     Summary = table.Column<string>(nullable: true),

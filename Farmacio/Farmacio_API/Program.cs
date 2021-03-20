@@ -1,5 +1,5 @@
 using Farmacio_API.Extensions;
-using Farmacio_Repositories;
+using Farmacio_Repositories.Implementation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 

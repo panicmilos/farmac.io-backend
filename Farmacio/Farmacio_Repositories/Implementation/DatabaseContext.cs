@@ -4,13 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Farmacio_Repositories
+namespace Farmacio_Repositories.Implementation
 {
     public class DatabaseContext : DbContext
     {
         public DbSet<WeatherForecast> Weather { get; set; }
+        public DatabaseContext(DbContextOptions<DatabaseContext> options):
+            base(options)
+        {
 
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
-        { }
+        }
     }
 }

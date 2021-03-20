@@ -6,21 +6,20 @@ using System.Linq;
 
 namespace Farmacio_Repositories.Implementation
 {
-    public class DummyRepository : IDummyRepository
+    public class DummyRepository : Repository<WeatherForecast>, IDummyRepository
     {
-        private readonly DatabaseContext _context;
 
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        public DummyRepository(DatabaseContext context)
+        public DummyRepository(DatabaseContext context) :
+            base(context)
         {
-            _context = context;
         }
 
-        public IEnumerable<WeatherForecast> Get()
+        public override IEnumerable<WeatherForecast> Read()
         {
             var rng = new Random();
             var weathers = Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -31,16 +30,11 @@ namespace Farmacio_Repositories.Implementation
                 Test = new Farmacio_Models.Domain.TestEntity()
             })
             .ToArray();
-            _context.Add(weathers[0]);
-            _context.SaveChanges();
-            LoadNotLoadedRefferences(weathers[0]);
+
+            //LoadNotLoadedRefferences(weathers[0]);
+            var weather = base.Create(weathers[0]);
 
             return weathers;
-        }
-
-        public WeatherForecast Get(Guid id)
-        {
-            return _context.Weather.Find(id);
         }
 
         private void LoadNotLoadedRefferences(WeatherForecast entity)

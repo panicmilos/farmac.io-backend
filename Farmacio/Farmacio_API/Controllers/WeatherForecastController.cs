@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using EmailService.Constracts;
+using EmailService.Enums;
 using EmailService.Implementation;
 using EmailService.Models;
 using Farmacio_API.Contracts.Requests;
 using Farmacio_Models.Domain;
+using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -17,27 +19,25 @@ namespace Farmacio_API.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly IEmailDispatcher _emailDispatcher;
+        private readonly ITemplatesProvider _templatesProvider;
         private readonly IDummyService _dummyService;
         private readonly IMapper _mapper;
+        private readonly IWeatherForecastService _weatherForecastService;
 
-        public WeatherForecastController(IEmailDispatcher emailDispatcher, IDummyService dummyService, IMapper mapper)
+        public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider, IDummyService dummyService, IMapper mapper,
+            IWeatherForecastService weatherForecastService)
         {
             _emailDispatcher = emailDispatcher;
+            _templatesProvider = templatesProvider;
             _dummyService = dummyService;
             _mapper = mapper;
+            _weatherForecastService = weatherForecastService;
         }
 
         [HttpGet("sendEmail")]
         public Email SendEmail()
         {
-            Email email = new Email
-            {
-                Subject = "Test",
-                From = "panic.milos99@gmail.com",
-                Recipients = new List<string> { "panic.milos99@gmail.com" },
-                Body = "CAO"
-            };
-
+            var email = _templatesProvider.FromTemplate<Email>("Email3", new { to = "panic.milos99@gmail.com", name = "Milos" });
             _emailDispatcher.Dispatch(email);
 
             return email;
@@ -46,7 +46,7 @@ namespace Farmacio_API.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
-            return _dummyService.Get();
+            return _weatherForecastService.Read();
         }
 
         /// <summary>
@@ -80,6 +80,22 @@ namespace Farmacio_API.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [ProducesResponseType(typeof(WeatherForecast), 200)]
+        [HttpDelete("delete/{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            return Ok(_weatherForecastService.Delete(id));
+        }
+
+        [HttpGet("testGEH")]
+        public IActionResult Test()
+        {
+            var throwingService = new ThrowingService();
+            throwingService.Throw();
+
+            return Ok();
         }
     }
 }

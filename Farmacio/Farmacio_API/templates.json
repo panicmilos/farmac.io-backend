@@ -1,0 +1,29 @@
+{
+  "templates": [
+    {
+      "type": "EmailImage",
+      "name": "Image1",
+      "template": {
+        "source": "https://img.cdn-cnj.si/img/250/250/6U/6UriUZmyd0t"
+      }
+    },
+    {
+      "type": "EmailAttachment",
+      "name": "Attachment2",
+      "template": {
+        "source": "C:\\Users\\panic\\OneDrive\\Desktop\\vju.txt",
+        "type": 1
+      }
+    },
+    {
+      "type": "Email",
+      "name": "Email3",
+      "template": {
+        "Subject": "Test email",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "Samo testiram da li ovo radi, {{name}}"
+      }
+    }
+  ]
+}
