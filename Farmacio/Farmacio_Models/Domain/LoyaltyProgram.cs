@@ -1,6 +1,6 @@
 ﻿namespace Farmacio_Models.Domain
 {
-    public class LoyaltyProgram
+    public class LoyaltyProgram : BaseEntity
     {
         public LoyaltyProgramType Type { get; set; }
         public int MinPoints { get; set; }

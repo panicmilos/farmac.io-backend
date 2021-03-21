@@ -1,6 +1,6 @@
 ﻿namespace Farmacio_Models.Domain
 {
-    public class Address
+    public class Address : BaseEntity
     {
         public string StreetName { get; set; }
         public string StreetNumber { get; set; }

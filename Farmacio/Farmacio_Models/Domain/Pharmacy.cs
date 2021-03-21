@@ -2,7 +2,7 @@
 
 namespace Farmacio_Models.Domain
 {
-    public class Pharmacy : BaseEntity, IGradeable
+    public class Pharmacy : BaseEntity
     {
         public string Name { get; set; }
         public virtual Address Address { get; set; }

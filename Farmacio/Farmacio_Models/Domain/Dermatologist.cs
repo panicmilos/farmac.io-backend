@@ -7,7 +7,7 @@ namespace Farmacio_Models.Domain
         public virtual List<DermatologistWorkPlace> WorkPlaces { get; set; }
     }
 
-    public class DermatologistWorkPlace
+    public class DermatologistWorkPlace : BaseEntity
     {
         public virtual WorkTime WorkTime { get; set; }
         public virtual Pharmacy Pharmacy { get; set; }

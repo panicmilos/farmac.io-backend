@@ -2,7 +2,7 @@
 
 namespace Farmacio_Models.Domain
 {
-    public abstract class MedicalStaff : User, IGradeable
+    public abstract class MedicalStaff : User
     {
         public virtual List<Appointment> Appointments { get; set; }
         public virtual List<AbsenceRequest> AbsenceRequests { get; set; }

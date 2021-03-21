@@ -2,7 +2,7 @@
 
 namespace Farmacio_Models.Domain
 {
-    public class Medicine : BaseEntity, IGradeable
+    public class Medicine : BaseEntity
     {
         public string UniqueId { get; set; }
         public string Name { get; set; }

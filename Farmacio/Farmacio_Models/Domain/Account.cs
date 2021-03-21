@@ -1,6 +1,6 @@
 ﻿namespace Farmacio_Models.Domain
 {
-    public class Account
+    public class Account : BaseEntity
     {
         public string Username { get; set; }
         public string Password { get; set; }
