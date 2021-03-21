@@ -3,6 +3,8 @@ services:
 
   farmacio-backend:
     image: cr.bjelicaluka.com/farmac.io-backend
+    environment:
+      - JwtSecret=${JWT_SECRET}
     ports:
       - 80
     networks:
