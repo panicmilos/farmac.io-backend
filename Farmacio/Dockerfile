@@ -6,6 +6,8 @@ COPY Farmacio_API/Farmacio_API.csproj ./Farmacio_API/
 COPY Farmacio_Models/Farmacio_Models.csproj ./Farmacio_Models/
 COPY Farmacio_Repositories/Farmacio_Repositories.csproj ./Farmacio_Repositories/
 COPY Farmacio_Services/Farmacio_Services.csproj ./Farmacio_Services/
+COPY GlobalExceptionHandler/GlobalExceptionHandler.csproj ./GlobalExceptionHandler/
+COPY EmailService/EmailService.csproj ./EmailService/
 COPY Farmacio_Tests/Farmacio_Tests.csproj ./Farmacio_Tests/
 
 COPY Farmacio.sln .

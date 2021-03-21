@@ -7,6 +7,7 @@ using Farmacio_API.Contracts.Requests;
 using Farmacio_Models.Domain;
 using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -23,15 +24,17 @@ namespace Farmacio_API.Controllers
         private readonly IDummyService _dummyService;
         private readonly IMapper _mapper;
         private readonly IWeatherForecastService _weatherForecastService;
+        private readonly ITokenService _tokenService;
 
         public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider, IDummyService dummyService, IMapper mapper,
-            IWeatherForecastService weatherForecastService)
+            IWeatherForecastService weatherForecastService, ITokenService tokenService)
         {
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
             _dummyService = dummyService;
             _mapper = mapper;
             _weatherForecastService = weatherForecastService;
+            _tokenService = tokenService;
         }
 
         [HttpGet("sendEmail")]
@@ -95,6 +98,26 @@ namespace Farmacio_API.Controllers
             var throwingService = new ThrowingService();
             throwingService.Throw();
 
+            return Ok();
+        }
+
+        [HttpGet("getToken")]
+        public IActionResult getToken(Role role)
+        {
+            Account account = new Account
+            {
+                Id = new Guid("40f229d5-5394-436a-89ee-6823ab0aae9f"),
+                Role = role
+            };
+            var token = _tokenService.GenerateFor(account);
+
+            return Ok(token);
+        }
+
+        [Authorize(Roles = "Patient,Dermatologist")]
+        [HttpGet("patientOnly")]
+        public IActionResult patientOnly()
+        {
             return Ok();
         }
     }

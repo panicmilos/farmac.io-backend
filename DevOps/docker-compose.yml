@@ -2,7 +2,7 @@ version: '3.6'
 services:
 
   farmacio-backend:
-    image: cr.bjelicaluka.com/farmacio-backend
+    image: cr.bjelicaluka.com/farmac.io-backend
     ports:
       - 80
     networks:
