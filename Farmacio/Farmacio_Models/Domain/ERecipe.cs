@@ -7,13 +7,13 @@ namespace Farmacio_Models.Domain
     {
         public string UniqueId { get; set; }
         public DateTime IssuingDate { get; set; }
-        public Patient Patient { get; set; }
-        public List<ERecipeMedicine> Medicines { get; set; }
+        public virtual Patient Patient { get; set; }
+        public virtual List<ERecipeMedicine> Medicines { get; set; }
     }
 
     public class ERecipeMedicine : BaseEntity
     {
-        public Medicine Medicine { get; set; }
+        public virtual Medicine Medicine { get; set; }
         public int Quantity { get; set; }
     }
 }

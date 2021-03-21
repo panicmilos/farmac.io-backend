@@ -4,27 +4,27 @@ namespace Farmacio_Models.Domain
 {
     public class Complaint : BaseEntity
     {
-        public Patient Writer { get; set; }
+        public virtual Patient Writer { get; set; }
         public string Text { get; set; }
         public bool IsAboutPharmacy { get; set; }
-        public List<ComplaintAnswer> Answers { get; set; }
+        public virtual List<ComplaintAnswer> Answers { get; set; }
     }
 
     public class ComplaintAnswer : BaseEntity
     {
         public string Text { get; set; }
-        public SystemAdmin Writer { get; set; }
-        public Complaint Complaint { get; set; }
+        public virtual SystemAdmin Writer { get; set; }
+        public virtual Complaint Complaint { get; set; }
     }
 
     public class ComplaintAboutPharmacy : Complaint
     {
-        public Pharmacy Pharmacy { get; set; }
+        public virtual Pharmacy Pharmacy { get; set; }
     }
     
     public class ComplaintAboutStaff : Complaint
     {
-        public MedicalStaff Staff { get; set; }
+        public virtual MedicalStaff Staff { get; set; }
     }
 }
 

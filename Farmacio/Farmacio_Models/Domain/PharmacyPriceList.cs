@@ -7,13 +7,13 @@ namespace Farmacio_Models.Domain
     {
         public float ExaminationPrice { get; set; }
         public float ConsultationPrice { get; set; }
-        public List<MedicinePrice> MedicinePriceList { get; set; }
+        public virtual List<MedicinePrice> MedicinePriceList { get; set; }
     }
 
     public class MedicinePrice : BaseEntity
     {
         public float Price { get; set; }
         public DateTime ActiveFrom { get; set; }
-        public Medicine Medicine { get; set; }
+        public virtual Medicine Medicine { get; set; }
     }
 }

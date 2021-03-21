@@ -5,14 +5,14 @@ namespace Farmacio_Models.Domain
     public class Pharmacy : BaseEntity, IGradeable
     {
         public string Name { get; set; }
-        public Address Address { get; set; }
+        public virtual Address Address { get; set; }
         public string Description { get; set; }
-        public List<Pharmacist> Pharmacists { get; set; }
-        public List<Dermatologist> Dermatologists { get; set; }
-        public PharmacyPriceList PriceList { get; set; }
-        public List<PharmacyOrder> Orders { get; set; }
-        public List<Promotion> Promotions { get; set; }
+        public virtual List<Pharmacist> Pharmacists { get; set; }
+        public virtual List<Dermatologist> Dermatologists { get; set; }
+        public virtual PharmacyPriceList PriceList { get; set; }
+        public virtual List<PharmacyOrder> Orders { get; set; }
+        public virtual List<Promotion> Promotions { get; set; }
         public int AverageGrade { get; set; }
-        public List<Grade> Grades { get; set; }
+        public virtual List<Grade> Grades { get; set; }
     }
 }

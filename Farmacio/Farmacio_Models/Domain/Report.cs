@@ -4,6 +4,6 @@
     {
         public string Notes { get; set; }
         public int TherapyDurationInDays { get; set; }
-        public ERecipe Recipe { get; set; }
+        public virtual ERecipe Recipe { get; set; }
     }
 }

@@ -2,6 +2,6 @@
 {
     public class PharmacyAdmin : User
     {
-        public Pharmacy Pharmacy { get; set; }
+        public virtual Pharmacy Pharmacy { get; set; }
     }
 }

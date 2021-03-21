@@ -2,7 +2,7 @@
 {
     public class Pharmacist : MedicalStaff
     {
-        public Pharmacy Pharmacy { get; set; }
-        public WorkTime WorkTime { get; set; }
+        public virtual Pharmacy Pharmacy { get; set; }
+        public virtual WorkTime WorkTime { get; set; }
     }
 }

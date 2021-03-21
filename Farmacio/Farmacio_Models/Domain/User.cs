@@ -9,7 +9,7 @@ namespace Farmacio_Models.Domain
         public DateTime DateOfBirth { get; set; }
         public string PID { get; set; } //?
         public string PhoneNumber { get; set; }
-        public Account Account { get; set; }
-        public Address Address { get; set; }
+        public virtual Account Account { get; set; }
+        public virtual Address Address { get; set; }
     }
 }

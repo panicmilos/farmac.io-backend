@@ -6,9 +6,9 @@ namespace Farmacio_Models.Domain
     {
         public int Points { get; set; }
         public int NegativePoints { get; set; }
-        public LoyaltyProgram LoyaltyProgram { get; set; }
-        public List<Appointment> Appointments { get; set; }
-        public List<Pharmacy> FollowedPharmacies { get; set; }
-        public List<Ingredient> Allergies { get; set; }
+        public virtual LoyaltyProgram LoyaltyProgram { get; set; }
+        public virtual List<Appointment> Appointments { get; set; }
+        public virtual List<Pharmacy> FollowedPharmacies { get; set; }
+        public virtual List<Ingredient> Allergies { get; set; }
     }
 }

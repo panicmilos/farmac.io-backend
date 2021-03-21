@@ -9,7 +9,7 @@
         public Role Role { get; set; }
         public bool IsVerified { get; set; }
         public bool ShouldChangePassword { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
     }
 
     public enum Role
