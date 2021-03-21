@@ -25,14 +25,15 @@ namespace Farmacio_API.Installers
         private void AddRepositories()
         {
             _services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-           // _services.AddScoped<IDummyRepository, DummyRepository>();
+            _services.AddScoped<IDummyRepository, DummyRepository>();
         }
 
         private void AddServices()
         {
             _services.AddScoped(typeof(ICrudService<>), typeof(CrudService<>));
-           // _services.AddScoped<IDummyService, DummyService>();
-           // _services.AddScoped(typeof(IWeatherForecastService), typeof(WeatherForecastService));
+            _services.AddScoped<IDummyService, DummyService>();
+            _services.AddScoped(typeof(IWeatherForecastService), typeof(WeatherForecastService));
+            _services.AddScoped(typeof(ITokenService), typeof(TokenService));
         }
     }
 }
