@@ -120,5 +120,11 @@ namespace Farmacio_API.Controllers
         {
             return Ok();
         }
+
+        [HttpGet("devopsTest")]
+        public IActionResult isThisDeployedOnServer()
+        {
+            return Ok("YES");
+        }
     }
 }
