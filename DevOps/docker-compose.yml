@@ -5,6 +5,7 @@ services:
     image: cr.bjelicaluka.com/farmac.io-backend
     environment:
       - JwtSecret=${JWT_SECRET}
+      - EmailSecret=${EMAIL_SECRET}
     ports:
       - 80
     networks:

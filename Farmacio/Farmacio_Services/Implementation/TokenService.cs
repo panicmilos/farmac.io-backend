@@ -26,7 +26,7 @@ namespace Farmacio_Services.Implementation
 
         public string GenerateEmailTokenFor(Account account)
         {
-            return GenerateTokenFor(account, _emailSecret, 1);
+            return GenerateTokenFor(account, _emailSecret, 24 * 60);
         }
 
         private string GenerateTokenFor(Account account, string secret, int expiresFor)
