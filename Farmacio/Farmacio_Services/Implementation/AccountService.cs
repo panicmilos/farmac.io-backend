@@ -9,9 +9,12 @@ namespace Farmacio_Services.Implementation
 {
     public class AccountService : CrudService<Account>, IAccountService
     {
-        public AccountService(IRepository<Account> repository) :
+        private readonly IEmailVerificationService _emailVerificationService;
+
+        public AccountService(IEmailVerificationService emailVerificationService, IRepository<Account> repository) :
             base(repository)
         {
+            _emailVerificationService = emailVerificationService;
         }
 
         public override Account Create(Account account)
@@ -26,10 +29,12 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("Email is already taken.");
             }
 
-            account.Salt = CryptographyUtils.GetRandomSalt(); ;
+            account.Salt = CryptographyUtils.GetRandomSalt();
             account.Password = CryptographyUtils.GetSaltedAndHashedPassword(account.Password, account.Salt);
+            var createdAccount = base.Create(account);
+            _emailVerificationService.SendTo(account.Email);
 
-            return base.Create(account);
+            return createdAccount;
         }
 
         private bool IsUsernameTaken(string username)

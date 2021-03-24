@@ -24,6 +24,16 @@
         "Recipients": [ "{{to}}" ],
         "Body": "Samo testiram da li ovo radi, {{name}}"
       }
+    },
+    {
+      "type": "Email",
+      "name": "EmailVerification",
+      "template": {
+        "Subject": "Email verification for Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "Please click on this link to verify you account: https://farmac-io.bjelicaluka.com/email-verification/verify?token={{token}}."
+      }
     }
   ]
 }

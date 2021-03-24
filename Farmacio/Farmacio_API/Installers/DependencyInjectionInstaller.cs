@@ -25,6 +25,7 @@ namespace Farmacio_API.Installers
         private void AddRepositories()
         {
             _services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
             _services.AddScoped<IDummyRepository, DummyRepository>();
         }
 
@@ -32,9 +33,11 @@ namespace Farmacio_API.Installers
         {
             _services.AddScoped(typeof(ICrudService<>), typeof(CrudService<>));
             _services.AddScoped(typeof(IAccountService), typeof(AccountService));
+            _services.AddScoped(typeof(IEmailVerificationService), typeof(EmailVerificationService));
+            _services.AddScoped(typeof(ITokenService), typeof(TokenService));
+
             _services.AddScoped<IDummyService, DummyService>();
             _services.AddScoped(typeof(IWeatherForecastService), typeof(WeatherForecastService));
-            _services.AddScoped(typeof(ITokenService), typeof(TokenService));
         }
     }
 }

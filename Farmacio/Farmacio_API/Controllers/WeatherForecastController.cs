@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using EmailService.Constracts;
-using EmailService.Enums;
-using EmailService.Implementation;
 using EmailService.Models;
 using Farmacio_API.Contracts.Requests;
 using Farmacio_Models.Domain;
@@ -101,15 +99,15 @@ namespace Farmacio_API.Controllers
             return Ok();
         }
 
-        [HttpGet("getToken")]
-        public IActionResult getToken(Role role)
+        [HttpGet("getJwtToken")]
+        public IActionResult getJwtToken(Role role)
         {
             Account account = new Account
             {
                 Id = new Guid("40f229d5-5394-436a-89ee-6823ab0aae9f"),
                 Role = role
             };
-            var token = _tokenService.GenerateFor(account);
+            var token = _tokenService.GenerateAuthTokenFor(account);
 
             return Ok(token);
         }
@@ -119,12 +117,6 @@ namespace Farmacio_API.Controllers
         public IActionResult patientOnly()
         {
             return Ok();
-        }
-
-        [HttpGet("devopsTest")]
-        public IActionResult isThisDeployedOnServer()
-        {
-            return Ok("YES");
         }
     }
 }
