@@ -31,6 +31,7 @@ namespace Farmacio_API.Installers
         private void AddServices()
         {
             _services.AddScoped(typeof(ICrudService<>), typeof(CrudService<>));
+            _services.AddScoped(typeof(IAccountService), typeof(AccountService));
             _services.AddScoped<IDummyService, DummyService>();
             _services.AddScoped(typeof(IWeatherForecastService), typeof(WeatherForecastService));
             _services.AddScoped(typeof(ITokenService), typeof(TokenService));
