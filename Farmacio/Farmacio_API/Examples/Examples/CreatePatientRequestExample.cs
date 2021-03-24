@@ -15,13 +15,13 @@ namespace Farmacio_API.Examples.Examples
                 {
                     Email = "panic.milos99@gmail.com",
                     Username = "panic",
-                    Password = "panic123"
+                    Password = "p@nic123"
                 },
                 User = new CreatePatientUserRequest
                 {
                     FirstName = "Milos",
                     LastName = "Panic",
-                    DateOfBirth = DateTime.Now,
+                    DateOfBirth = DateTime.Now.AddYears(-21),
                     PID = "1231231231234",
                     PhoneNumber = "0692506099",
                     Address = new CreateAddressRequest
