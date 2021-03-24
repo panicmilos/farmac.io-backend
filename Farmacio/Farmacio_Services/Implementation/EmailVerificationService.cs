@@ -29,7 +29,7 @@ namespace Farmacio_Services.Implementation
             var account = GetAccountByEmail(email);
             if (account == null)
             {
-                throw new MissingEntityException($"Account with {email} does not exist in the system.");
+                throw new MissingEntityException($"Account with email {email} does not exist in the system.");
             }
             if (account.IsVerified)
             {
