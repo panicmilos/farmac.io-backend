@@ -1,9 +1,11 @@
 using Farmacio_Models.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class SeedDb
 {
@@ -18,8 +20,9 @@ public static class SeedDb
             {
                 Seed(context);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -53,8 +56,6 @@ public static class SeedDb
         Address address3 = new Address
         {
             Id = new Guid("ea68b7cd-271e-40e6-a4c9-b2382411d421"),
-            CreatedAt = DateTime.Now,
-            Active = true,
             StreetName = "Bulevar Oslobodjenja",
             StreetNumber = "71a",
             City = "Novi Sad",
@@ -62,6 +63,10 @@ public static class SeedDb
             Lat = 45.254410f,
             Lng = 19.842550f
         };
+
+        context.Add(address1);
+        context.Add(address2);
+        context.Add(address3);
 
         PharmacyPriceList priceList1 = new PharmacyPriceList
         {
@@ -86,6 +91,10 @@ public static class SeedDb
             ConsultationPrice = 750f,
             MedicinePriceList = new List<MedicinePrice>()
         };
+
+        context.Add(priceList1);
+        context.Add(priceList2);
+        context.Add(priceList3);
 
         Pharmacy pharmacy1 = new Pharmacy
         {
@@ -133,11 +142,17 @@ public static class SeedDb
             Grades = new List<Grade>()
         };
 
+        context.Add(pharmacy1);
+        context.Add(pharmacy2);
+        context.Add(pharmacy3);
+
         MedicineType medicineType1 = new MedicineType
         {
             Id = new Guid("699fec99-9fd3-4354-ad27-3e75a0816890"),
             TypeName = "Analgetik"
         };
+
+        context.Add(medicineType1);
 
         MedicineIngredient medicineIngridient1 = new MedicineIngredient
         {
@@ -197,6 +212,11 @@ public static class SeedDb
         ingredients1.Add(medicineIngridient3);
         ingredients1.Add(medicineIngridient4);
 
+        context.Add(medicineIngridient1);
+        context.Add(medicineIngridient2);
+        context.Add(medicineIngridient3);
+        context.Add(medicineIngridient4);
+
         Medicine medicine1 = new Medicine
         {
             Id = new Guid("ce512ff8-3927-43cf-8ae9-33a441b98ea1"),
@@ -254,12 +274,14 @@ public static class SeedDb
             Grades = new List<Grade>()
         };
 
+        context.Add(medicine1);
+        context.Add(medicine2);
+        context.Add(medicine3);
+
         List<Ingredient> allergies1 = new List<Ingredient>();
         allergies1.Add(new Ingredient
         {
             Id = new Guid("00537083-519d-460e-9d4e-c37ed100a3b4"),
-            CreatedAt = DateTime.Now,
-            Active = true,
             Name = "ibuprofena"
         });
 
@@ -537,5 +559,23 @@ public static class SeedDb
             ShouldChangePassword = false,
             User = dermatologist2
         };
+
+        context.Add(patient1);
+        context.Add(patient2);
+        context.Add(patient3);
+        context.Add(systemAdmin1);
+        context.Add(pharmacyAdmin1);
+        context.Add(pharmacist1);
+        context.Add(pharmacist2);
+        context.Add(dermatologist1);
+        context.Add(dermatologist2);
+        context.Add(account4);
+        context.Add(account5);
+        context.Add(account6);
+        context.Add(account7);
+        context.Add(account8);
+        context.Add(account9);
+
+        context.SaveChanges();
     }
 }

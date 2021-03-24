@@ -20,7 +20,7 @@ namespace Farmacio_Repositories.Implementation
         public DbSet<ERecipe> ERecipes { get; set; }
         public DbSet<Complaint> Complaints { get; set; }
         public DbSet<LoyaltyPoints> LoyaltyPoints { get; set; }
-
+    
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
     }
 }
