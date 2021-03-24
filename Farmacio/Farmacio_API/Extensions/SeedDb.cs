@@ -261,5 +261,104 @@ public static class SeedDb
             AverageGrade = 0,
             Grades = new List<Grade>()
         };
+
+        List<Ingredient> allergies1 = new List<Ingredient>();
+        allergies1.Add(new Ingredient
+        {
+            Id = new Guid("00537083-519d-460e-9d4e-c37ed100a3b4"),
+            CreatedAt = DateTime.Now,
+            Active = true,
+            Name = "ibuprofena"
+        });
+
+        Patient patient1 = new Patient
+        {
+            Id = new Guid("2133bc63-1505-4835-9a40-124993d53be2"),
+            FirstName = "Pera",
+            LastName = "Peric",
+            DateOfBirth = DateTime.Now,
+            PID = "1234567891234",
+            PhoneNumber = "06456987412",
+            Address = address1,
+            Points = 0,
+            NegativePoints = 0,
+            LoyaltyProgram = null,
+            FollowedPharmacies = new List<Pharmacy>(),
+            Appointments = new List<Appointment>(),
+            Allergies = allergies1
+        };
+
+        Account account1 = new Account
+        {
+            Id = new Guid("d1cb8425-c01f-4552-8660-75910e0def59"),
+            Username = "pera",
+            Password = "pera123",
+            Salt = "",
+            Email = "pera.peric@gmail.com",
+            Role = Role.Patient,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = patient1
+        };
+
+        Patient patient2 = new Patient
+        {
+            Id = new Guid("25bcb39f-8059-4200-b1c2-a09410d42fa3"),
+            FirstName = "Mikic",
+            LastName = "Mikic",
+            DateOfBirth = DateTime.Now,
+            PID = "7894561233216",
+            PhoneNumber = "06145789631",
+            Address = address2,
+            Points = 0,
+            NegativePoints = 1,
+            LoyaltyProgram = null,
+            FollowedPharmacies = new List<Pharmacy>(),
+            Appointments = new List<Appointment>(),
+            Allergies = new List<Ingredient>()
+        };
+
+        Account account2 = new Account
+        {
+            Id = new Guid("4056ba01-8b87-4319-8e32-ebc1471e3810"),
+            Username = "mika",
+            Password = "mika123",
+            Salt = "",
+            Email = "mika.mika@gmail.com",
+            Role = Role.Patient,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = patient2
+        };
+
+        Patient patient3 = new Patient
+        {
+            Id = new Guid("1311e2b4-536f-4f95-aa6c-1f7547e00f28"),
+            FirstName = "Janko",
+            LastName = "Jankovic",
+            DateOfBirth = DateTime.Now,
+            PID = "4561239874561",
+            PhoneNumber = "0654789123",
+            Address = address3,
+            Points = 0,
+            NegativePoints = 0,
+            LoyaltyProgram = null,
+            FollowedPharmacies = new List<Pharmacy>(),
+            Appointments = new List<Appointment>(),
+            Allergies = new List<Ingredient>()
+        };
+
+        Account account3 = new Account
+        {
+            Id = new Guid("be7abcbc-4eaa-4596-965d-7c97c2fcbaf3"),
+            Username = "janko",
+            Password = "janko123",
+            Salt = "",
+            Email = "janko.jankovic@gmail.com",
+            Role = Role.Patient,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = patient3
+        };
     }
 }
