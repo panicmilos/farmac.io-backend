@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,18 +16,23 @@ public static class SeedDb
         {
             var services = scope.ServiceProvider;
             var context = services.GetService<TContext>();
+            var logger = services.GetRequiredService<ILogger<TContext>>();
 
-            try
-            {
-                Seed(context);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            logger.LogInformation($"Seeding database associated with context {typeof(TContext).Name}");
+            Seed(context);
+            logger.LogInformation($"Finished seeding database associated with context {typeof(TContext).Name}");
         }
 
         return host;
+    }
+
+    private static void AddIFNotDuplicate<T>(DbContext context, T entity) where T : BaseEntity
+    {
+
+        if(context.Find<T>(entity.Id) == null)
+        {
+            context.Add(entity);
+        }
     }
 
     private static void Seed<TContext>(TContext context) where TContext : DbContext
@@ -64,9 +70,9 @@ public static class SeedDb
             Lng = 19.842550f
         };
 
-        context.Add(address1);
-        context.Add(address2);
-        context.Add(address3);
+        AddIFNotDuplicate(context, address1);
+        AddIFNotDuplicate(context, address2);
+        AddIFNotDuplicate(context, address3);
 
         PharmacyPriceList priceList1 = new PharmacyPriceList
         {
@@ -92,9 +98,9 @@ public static class SeedDb
             MedicinePriceList = new List<MedicinePrice>()
         };
 
-        context.Add(priceList1);
-        context.Add(priceList2);
-        context.Add(priceList3);
+        AddIFNotDuplicate(context, priceList1);
+        AddIFNotDuplicate(context, priceList2);
+        AddIFNotDuplicate(context, priceList3);
 
         Pharmacy pharmacy1 = new Pharmacy
         {
@@ -142,9 +148,9 @@ public static class SeedDb
             Grades = new List<Grade>()
         };
 
-        context.Add(pharmacy1);
-        context.Add(pharmacy2);
-        context.Add(pharmacy3);
+        AddIFNotDuplicate(context, pharmacy1);
+        AddIFNotDuplicate(context, pharmacy2);
+        AddIFNotDuplicate(context, pharmacy3);
 
         MedicineType medicineType1 = new MedicineType
         {
@@ -152,7 +158,7 @@ public static class SeedDb
             TypeName = "Analgetik"
         };
 
-        context.Add(medicineType1);
+        AddIFNotDuplicate(context, medicineType1);
 
         MedicineIngredient medicineIngridient1 = new MedicineIngredient
         {
@@ -212,10 +218,10 @@ public static class SeedDb
         ingredients1.Add(medicineIngridient3);
         ingredients1.Add(medicineIngridient4);
 
-        context.Add(medicineIngridient1);
-        context.Add(medicineIngridient2);
-        context.Add(medicineIngridient3);
-        context.Add(medicineIngridient4);
+        AddIFNotDuplicate(context, medicineIngridient1);
+        AddIFNotDuplicate(context, medicineIngridient2);
+        AddIFNotDuplicate(context, medicineIngridient3);
+        AddIFNotDuplicate(context, medicineIngridient4);
 
         Medicine medicine1 = new Medicine
         {
@@ -274,9 +280,9 @@ public static class SeedDb
             Grades = new List<Grade>()
         };
 
-        context.Add(medicine1);
-        context.Add(medicine2);
-        context.Add(medicine3);
+        AddIFNotDuplicate(context, medicine1);
+        AddIFNotDuplicate(context, medicine2);
+        AddIFNotDuplicate(context, medicine3);
 
         List<Ingredient> allergies1 = new List<Ingredient>();
         allergies1.Add(new Ingredient
@@ -560,21 +566,24 @@ public static class SeedDb
             User = dermatologist2
         };
 
-        context.Add(patient1);
-        context.Add(patient2);
-        context.Add(patient3);
-        context.Add(systemAdmin1);
-        context.Add(pharmacyAdmin1);
-        context.Add(pharmacist1);
-        context.Add(pharmacist2);
-        context.Add(dermatologist1);
-        context.Add(dermatologist2);
-        context.Add(account4);
-        context.Add(account5);
-        context.Add(account6);
-        context.Add(account7);
-        context.Add(account8);
-        context.Add(account9);
+        AddIFNotDuplicate(context, patient1);
+        AddIFNotDuplicate(context, patient2);
+        AddIFNotDuplicate(context, patient3);
+        AddIFNotDuplicate(context, systemAdmin1);
+        AddIFNotDuplicate(context, pharmacyAdmin1);
+        AddIFNotDuplicate(context, pharmacist1);
+        AddIFNotDuplicate(context, pharmacist2);
+        AddIFNotDuplicate(context, dermatologist1);
+        AddIFNotDuplicate(context, dermatologist2);
+        AddIFNotDuplicate(context, account1);
+        AddIFNotDuplicate(context, account2);
+        AddIFNotDuplicate(context, account3);
+        AddIFNotDuplicate(context, account4);
+        AddIFNotDuplicate(context, account5);
+        AddIFNotDuplicate(context, account6);
+        AddIFNotDuplicate(context, account7);
+        AddIFNotDuplicate(context, account8);
+        AddIFNotDuplicate(context, account9);
 
         context.SaveChanges();
     }
