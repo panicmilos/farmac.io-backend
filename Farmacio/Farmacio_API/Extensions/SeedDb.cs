@@ -145,8 +145,6 @@ public static class SeedDb
             Ingredient = new Ingredient
             {
                 Id = new Guid("d3442f20-dd12-4620-906d-7acb83ee5492"),
-                CreatedAt = DateTime.Now,
-                Active = true,
                 Name = "kroskarmeloza-natrijum"
             },
             MassInMilligramms = 1
@@ -158,8 +156,6 @@ public static class SeedDb
             Ingredient = new Ingredient
             {
                 Id = new Guid("3fa1a6a0-7e99-4329-88c3-a8fdb6957821"),
-                CreatedAt = DateTime.Now,
-                Active = true,
                 Name = "paracetamol"
             },
             MassInMilligramms = 500
@@ -175,8 +171,6 @@ public static class SeedDb
             Ingredient = new Ingredient
             {
                 Id = new Guid("b09bb567-7d98-484a-9634-a0120cf0a952"),
-                CreatedAt = DateTime.Now,
-                Active = true,
                 Name = "ibuprofena"
             },
             MassInMilligramms = 400
@@ -188,8 +182,6 @@ public static class SeedDb
             Ingredient = new Ingredient
             {
                 Id = new Guid("39b6c5ac-7df0-4c5b-89b6-a1b81b211b2a"),
-                CreatedAt = DateTime.Now,
-                Active = true,
                 Name = "laktoza"
             },
             MassInMilligramms = 10
@@ -350,7 +342,7 @@ public static class SeedDb
 
         Account account3 = new Account
         {
-            Id = new Guid("be7abcbc-4eaa-4596-965d-7c97c2fcbaf3"),
+            Id = new Guid("38bf9e22-6604-4063-a354-d8e0d7d4c06c"),
             Username = "janko",
             Password = "janko123",
             Salt = "",
@@ -359,6 +351,191 @@ public static class SeedDb
             IsVerified = true,
             ShouldChangePassword = false,
             User = patient3
+        };
+
+        SystemAdmin systemAdmin1 = new SystemAdmin
+        {
+            Id = new Guid("38f7bc38-f900-4bbf-91ea-f65272498bca"),
+            FirstName = "Sistemko",
+            LastName = "Adminic",
+            DateOfBirth = DateTime.Now.AddYears(-35),
+            PID = "9852356231569",
+            PhoneNumber = "0641236547",
+            Address = address2,
+        };
+
+        Account account4 = new Account
+        {
+            Id = new Guid("e1444625-7f0f-45d5-afbe-0738d8a5cf49"),
+            Username = "sysadmin",
+            Password = "admin123",
+            Salt = "",
+            Email = "sistem.admin@gmail.com",
+            Role = Role.SystemAdmin,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = systemAdmin1
+        };
+
+        PharmacyAdmin pharmacyAdmin1 = new PharmacyAdmin
+        {
+            Id = new Guid("10ef9b01-abfe-427d-8b0b-ef8f5ea90450"),
+            FirstName = "Farmaci",
+            LastName = "Adminic",
+            DateOfBirth = DateTime.Now.AddYears(-36),
+            PID = "9842358961589",
+            PhoneNumber = "0647984523",
+            Address = address1,
+            Pharmacy = pharmacy1
+        };
+
+        Account account5 = new Account
+        {
+            Id = new Guid("5328353c-532a-4eeb-ac66-291267e8813c"),
+            Username = "pharmadmin",
+            Password = "phadmin123",
+            Salt = "",
+            Email = "pharmacy1admin@gmail.com",
+            Role = Role.PharmacyAdmin,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = pharmacyAdmin1
+        };
+
+        Pharmacist pharmacist1 = new Pharmacist
+        {
+            Id = new Guid("40f82145-8297-43f9-bcb8-f47685afcc6a"),
+            FirstName = "Petar",
+            LastName = "Petrovic",
+            DateOfBirth = DateTime.Now.AddYears(-39),
+            PID = "9822359563218",
+            PhoneNumber = "0648521694",
+            Address = address2,
+            Pharmacy = pharmacy1,
+            WorkTime = new WorkTime
+            {
+                Id = new Guid("12f70fd4-1899-45e7-8687-85e740f588c8"),
+                From = new DateTime(2020, 1, 1, 7, 0, 0),
+                To = new DateTime(2020, 1, 1, 13, 0, 0),
+            },
+            AbsenceRequests = new List<AbsenceRequest>(),
+            Appointments = new List<Appointment>(),
+            AverageGrade = 0,
+            Grades = new List<Grade>()
+        };
+
+        Account account6 = new Account
+        {
+            Id = new Guid("b471c7a4-cad5-40ba-8929-d3c8bc850378"),
+            Username = "ppetar",
+            Password = "petrovic123",
+            Salt = "",
+            Email = "petar82petrovic@gmail.com",
+            Role = Role.Pharmacist,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = pharmacist1
+        };
+
+        Pharmacist pharmacist2 = new Pharmacist
+        {
+            Id = new Guid("ed7dd486-9976-4de3-923a-e9d4c2ac84a8"),
+            FirstName = "Jelena",
+            LastName = "Petrovic",
+            DateOfBirth = DateTime.Now.AddYears(-27),
+            PID = "9912125626598",
+            PhoneNumber = "0647512493",
+            Address = address3,
+            Pharmacy = null,
+            WorkTime = null,
+            AbsenceRequests = new List<AbsenceRequest>(),
+            Appointments = new List<Appointment>(),
+            AverageGrade = 0,
+            Grades = new List<Grade>()
+        };
+
+        Account account7 = new Account
+        {
+            Id = new Guid("2290c110-a476-4b51-9978-741dd200f65f"),
+            Username = "pjelena",
+            Password = "jelena123",
+            Salt = "",
+            Email = "jelpetrovic@gmail.com",
+            Role = Role.Pharmacist,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = pharmacist2
+        };
+
+        Dermatologist dermatologist1 = new Dermatologist
+        {
+            Id = new Guid("105ac38f-988b-4508-b4fa-9e49720c9f15"),
+            FirstName = "Milica",
+            LastName = "Mikic",
+            DateOfBirth = DateTime.Now.AddYears(-35),
+            PID = "9872125346751",
+            PhoneNumber = "0649467315",
+            Address = address2,
+            AbsenceRequests = new List<AbsenceRequest>(),
+            Appointments = new List<Appointment>(),
+            AverageGrade = 0,
+            Grades = new List<Grade>(),
+            WorkPlaces = new List<DermatologistWorkPlace>
+            {
+                new DermatologistWorkPlace
+                {
+                    WorkTime = new WorkTime
+                    {
+                        Id = new Guid("b2d27c26-0ed4-4f7e-8c21-88df75766bed"),
+                        From = new DateTime(2020, 1, 1, 8, 0, 0),
+                        To = new DateTime(2020, 1, 1, 11, 0, 0),
+                    },
+                    Id = new Guid("23a9f826-b8f6-4146-895a-0197ae1c681d"),
+                    Pharmacy = pharmacy2
+                },
+            }
+        };
+
+        Account account8 = new Account
+        {
+            Id = new Guid("47e70b60-8d7f-4931-a120-07da93d62085"),
+            Username = "mmilica",
+            Password = "milica123",
+            Salt = "",
+            Email = "milicamikic@gmail.com",
+            Role = Role.Dermatologist,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = dermatologist1
+        };
+
+        Dermatologist dermatologist2 = new Dermatologist
+        {
+            Id = new Guid("58714578-0ced-44ee-a1b2-2b924964fbb1"),
+            FirstName = "Milos",
+            LastName = "Mikic",
+            DateOfBirth = DateTime.Now.AddYears(-37),
+            PID = "9852346197521",
+            PhoneNumber = "0649467312",
+            Address = address1,
+            AbsenceRequests = new List<AbsenceRequest>(),
+            Appointments = new List<Appointment>(),
+            AverageGrade = 0,
+            Grades = new List<Grade>(),
+            WorkPlaces = new List<DermatologistWorkPlace>()
+        };
+
+        Account account9 = new Account
+        {
+            Id = new Guid("1284ac82-a194-448f-86ea-113a9f81e324"),
+            Username = "mmilos",
+            Password = "milos123",
+            Salt = "",
+            Email = "milosmikic85@gmail.com",
+            Role = Role.Dermatologist,
+            IsVerified = true,
+            ShouldChangePassword = false,
+            User = dermatologist2
         };
     }
 }
