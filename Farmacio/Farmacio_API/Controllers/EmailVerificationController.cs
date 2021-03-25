@@ -11,16 +11,19 @@ namespace Farmacio_API.Controllers
     public class EmailVerificationController : ControllerBase
     {
         private readonly IEmailVerificationService _emailVerificationService;
+        private readonly IAccountService _accountService;
 
-        public EmailVerificationController(IEmailVerificationService emailVerificationService)
+        public EmailVerificationController(IEmailVerificationService emailVerificationService, IAccountService accountService)
         {
             _emailVerificationService = emailVerificationService;
+            _accountService = accountService;
         }
 
         [HttpGet]
         public IActionResult GetVerificationMail(string email)
         {
-            _emailVerificationService.SendTo(email);
+            var account = _accountService.ReadByEmail(email);
+            _emailVerificationService.SendTo(account);
 
             return Ok();
         }
@@ -30,9 +33,9 @@ namespace Farmacio_API.Controllers
         public IActionResult VerifyAccount()
         {
             var accountId = new Guid(HttpContext.Request.Headers["accountId"]);
-            _emailVerificationService.Verify(accountId);
+            var verifiedAccount = _accountService.Verify(accountId);
 
-            return Ok();
+            return Ok(verifiedAccount);
         }
     }
 }

@@ -12,11 +12,11 @@ namespace Farmacio_API.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IAccountService _accountService;
+        private readonly IPatientService _patientService;
 
-        public AccountsController(IAccountService accountService, IMapper mapper)
+        public AccountsController(IPatientService patientService, IMapper mapper)
         {
-            _accountService = accountService;
+            _patientService = patientService;
             _mapper = mapper;
         }
 
@@ -29,7 +29,7 @@ namespace Farmacio_API.Controllers
         public IActionResult CreatePatient(CreatePatientRequest request)
         {
             var patient = _mapper.Map<Account>(request);
-            _accountService.Create(patient);
+            _patientService.Create(patient);
 
             return Ok(patient);
         }

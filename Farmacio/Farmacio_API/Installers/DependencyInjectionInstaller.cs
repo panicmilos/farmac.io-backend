@@ -33,6 +33,7 @@ namespace Farmacio_API.Installers
         {
             _services.AddScoped(typeof(ICrudService<>), typeof(CrudService<>));
             _services.AddScoped(typeof(IAccountService), typeof(AccountService));
+            _services.AddScoped(typeof(IPatientService), typeof(PatientService));
             _services.AddScoped(typeof(IEmailVerificationService), typeof(EmailVerificationService));
             _services.AddScoped(typeof(ITokenService), typeof(TokenService));
 

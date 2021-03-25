@@ -3,6 +3,7 @@ using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
+using System;
 using System.Linq;
 
 namespace Farmacio_Services.Implementation
@@ -32,15 +33,38 @@ namespace Farmacio_Services.Implementation
             account.Salt = CryptographyUtils.GetRandomSalt();
             account.Password = CryptographyUtils.GetSaltedAndHashedPassword(account.Password, account.Salt);
             var createdAccount = base.Create(account);
-            _emailVerificationService.SendTo(account.Email);
+            _emailVerificationService.SendTo(createdAccount);
 
             return createdAccount;
+        }
+
+        public Account ReadByEmail(string email)
+        {
+            var foundEmail = _repository.Read()
+                                        .FirstOrDefault(account => account.Email == email);
+
+            return foundEmail;
+        }
+
+        public Account Verify(Guid accountId)
+        {
+            var account = _repository.Read(accountId);
+            if (account == null)
+            {
+                throw new MissingEntityException($"Account does not exist in the system.");
+            }
+            if (account.IsVerified)
+            {
+                throw new BadLogicException("Account is already verified.");
+            }
+
+            account.IsVerified = true;
+            return _repository.Update(account);
         }
 
         private bool IsUsernameTaken(string username)
         {
             var foundAccount = _repository.Read()
-                                          .ToList()
                                           .FirstOrDefault(account => account.Username == username);
 
             return foundAccount != default;
@@ -48,9 +72,7 @@ namespace Farmacio_Services.Implementation
 
         private bool IsEmailTaken(string email)
         {
-            var foundEmail = _repository.Read()
-                                          .ToList()
-                                          .FirstOrDefault(account => account.Email == email);
+            var foundEmail = ReadByEmail(email);
 
             return foundEmail != default;
         }

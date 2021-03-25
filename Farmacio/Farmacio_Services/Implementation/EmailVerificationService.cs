@@ -14,37 +14,16 @@ namespace Farmacio_Services.Implementation
         private readonly ITokenService _tokenService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
-        private readonly IRepository<Account> _accountRepository;
 
-        public EmailVerificationService(ITokenService tokenService, IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider, IRepository<Account> accountRepository)
+        public EmailVerificationService(ITokenService tokenService, IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider)
         {
             _tokenService = tokenService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
-            _accountRepository = accountRepository;
         }
 
-        public void SendTo(string email)
+        public void SendTo(Account account)
         {
-            var account = GetAccountByEmail(email);
-            if (account == null)
-            {
-                throw new MissingEntityException($"Account with email {email} does not exist in the system.");
-            }
-            if (account.IsVerified)
-            {
-                throw new BadLogicException("Account is already verified.");
-            }
-
-            var verificationToken = _tokenService.GenerateEmailTokenFor(account);
-
-            var verificationEmail = _templatesProvider.FromTemplate<Email>("EmailVerification", new { To = email, Token = verificationToken });
-            _emailDispatcher.Dispatch(verificationEmail);
-        }
-
-        public void Verify(Guid accountId)
-        {
-            var account = _accountRepository.Read(accountId);
             if (account == null)
             {
                 throw new MissingEntityException($"Account does not exist in the system.");
@@ -54,15 +33,10 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("Account is already verified.");
             }
 
-            account.IsVerified = true;
-            _accountRepository.Update(account);
-        }
+            var verificationToken = _tokenService.GenerateEmailTokenFor(account);
 
-        private Account GetAccountByEmail(string email)
-        {
-            return _accountRepository.Read()
-                                     .ToList()
-                                     .FirstOrDefault(account => account.Email == email);
+            var verificationEmail = _templatesProvider.FromTemplate<Email>("EmailVerification", new { To = account.Email, Token = verificationToken });
+            _emailDispatcher.Dispatch(verificationEmail);
         }
     }
 }
