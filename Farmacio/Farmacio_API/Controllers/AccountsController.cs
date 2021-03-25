@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Farmacio_API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("accounts")]
     [Produces("application/json")]
     public class AccountsController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Created patient.</response>
         /// <response code="401">Username or email is already taken.</response>
-        [HttpPost("/create-patient")]
+        [HttpPost("create-patient")]
         public IActionResult CreatePatient(CreatePatientRequest request)
         {
             var patient = _mapper.Map<Account>(request);
