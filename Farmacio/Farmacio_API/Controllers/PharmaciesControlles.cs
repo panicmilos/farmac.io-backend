@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.Pharmacies;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Farmacio_API.Controllers
 {
@@ -24,13 +26,23 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns all pharmacies from the system..
+        /// Returns all pharmacies from the system.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
         [HttpGet]
         public IEnumerable<Pharmacy> ReadPharmacies()
         {
             return _pharmacyService.Read();
+        }
+
+        /// <summary>
+        /// Returns all pharmacies from the system for home page with less information.
+        /// </summary>
+        /// <response code="200">Returns list of small pharmacy objects.</response>
+        [HttpGet("home")]
+        public IEnumerable<SmallPharmacyDTO> ReadForHomePage()
+        {
+            return _pharmacyService.ReadForHomePage();
         }
 
         /// <summary>
