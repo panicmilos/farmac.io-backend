@@ -58,6 +58,9 @@ namespace Farmacio_API.Installers
             });
 
             _services.AddSwaggerExamplesFromAssemblyOf<Startup>();
+
+            _services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
     }
 }
