@@ -17,7 +17,6 @@ namespace Farmacio_API.Examples.Examples
                 },
                 User = new UpdatePharmacistUserRequest
                 {
-                    Id = new Guid("40f82145-8297-43f9-bcb8-f47685afcc6a"),
                     FirstName = "Luka",
                     LastName = "Bjelica",
                     DateOfBirth = DateTime.Now.AddYears(-21),
@@ -25,7 +24,6 @@ namespace Farmacio_API.Examples.Examples
                     PhoneNumber = "0648556699",
                     Address = new UpdateAddressRequest
                     {
-                        Id = new Guid("3e8fb8d6-c5be-4c39-acc5-11734d5ac15c"),
                         City = "Zrenjanin",
                         State = "Srbija",
                         StreetName = "Sarajevska",

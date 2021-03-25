@@ -8,8 +8,7 @@ namespace Farmacio_API.Validations.Accounts
         public UpdatePharmacistRequestValidator()
         {
             RuleFor(request => request.Account).SetValidator(new UpdateAccountRequestValidator()).WithMessage("Valid account must be provided.");
-            RuleFor(request => request.User).SetValidator(new UpdatePharmacistUserRequestValidator())
-                .WithMessage("Valid Pharmacist must be provided.");
+            RuleFor(request => request.User).SetValidator(new UpdatePharmacistUserRequestValidator()).WithMessage("Valid Pharmacist must be provided.");
         }
     }
 }

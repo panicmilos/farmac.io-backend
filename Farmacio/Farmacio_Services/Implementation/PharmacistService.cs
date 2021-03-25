@@ -10,9 +10,9 @@ namespace Farmacio_Services.Implementation
 {
     public class PharmacistService : AccountService, IPharmacistService
     {
-        private readonly ICrudService<Pharmacy> _pharmacyService;
-        
-        public PharmacistService(IEmailVerificationService emailVerificationService, ICrudService<Pharmacy> pharmacyService,
+        private readonly IPharmacyService _pharmacyService;
+
+        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService,
             IRepository<Account> repository) :
             base(emailVerificationService, repository)
         {
@@ -27,20 +27,26 @@ namespace Farmacio_Services.Implementation
         public override Account Read(Guid id)
         {
             var account = base.Read(id);
+
             return account?.Role == Role.Pharmacist ? account : null;
         }
 
         public override Account Create(Account account)
         {
             ValidatePharmacyId(account);
+
             return base.Create(account);
         }
 
         public override Account Update(Account account)
         {
             ValidatePharmacyId(account);
-
             var pharmacist = Read(account.Id);
+            if (pharmacist == null)
+            {
+                throw new MissingEntityException();
+            }
+
             pharmacist.User.FirstName = account.User.FirstName;
             pharmacist.User.LastName = account.User.LastName;
             pharmacist.User.PhoneNumber = account.User.PhoneNumber;
@@ -53,13 +59,13 @@ namespace Farmacio_Services.Implementation
             pharmacist.User.Address.StreetNumber = account.User.Address.StreetNumber;
             pharmacist.User.Address.Lat = account.User.Address.Lat;
             pharmacist.User.Address.Lng = account.User.Address.Lng;
-            
+
             return base.Update(pharmacist);
         }
-        
+
         private void ValidatePharmacyId(Account account)
         {
-            if (_pharmacyService.Read(((Pharmacist) account.User).PharmacyId) == null)
+            if (_pharmacyService.Read(((Pharmacist)account.User).PharmacyId) == null)
                 throw new MissingEntityException("Pharmacy with the provided id does not exist.");
         }
     }
