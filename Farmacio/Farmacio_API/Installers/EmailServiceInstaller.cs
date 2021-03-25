@@ -1,5 +1,4 @@
 ﻿using EmailService.Extensions;
-using EmailService.Models;
 using Farmacio_API.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

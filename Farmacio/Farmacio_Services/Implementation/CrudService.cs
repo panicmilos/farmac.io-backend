@@ -4,29 +4,29 @@ using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Farmacio_Services.Implementation
 {
     public class CrudService<T> : ICrudService<T> where T : BaseEntity
     {
         protected readonly IRepository<T> _repository;
+
         public CrudService(IRepository<T> repository)
         {
             _repository = repository;
         }
 
-        public T Create(T entity)
+        public virtual T Create(T entity)
         {
             return _repository.Create(entity);
         }
 
-        public IEnumerable<T> Read()
+        public virtual IEnumerable<T> Read()
         {
             return _repository.Read();
         }
 
-        public T Read(Guid id)
+        public virtual T Read(Guid id)
         {
             return _repository.Read(id);
         }
@@ -35,9 +35,11 @@ namespace Farmacio_Services.Implementation
         {
             var entityForUpdate = _repository.Update(entity);
             if (entityForUpdate == null)
+            {
                 throw new MissingEntityException();
-            return entityForUpdate;
+            }
 
+            return entityForUpdate;
         }
 
         public virtual T Delete(Guid id)
