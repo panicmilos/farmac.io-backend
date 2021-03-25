@@ -31,12 +31,12 @@ namespace Farmacio_Repositories.Implementation
         {
             var allEntities = _entities.Where(entity => entity.Active);
 
-            return allEntities.AsEnumerable();
+            return allEntities;
         }
 
         public virtual T Read(Guid id)
         {
-            var entity = _entities.Where(entity => entity.Id == id && entity.Active).FirstOrDefault();
+            var entity = _entities.FirstOrDefault(e => e.Id == id && e.Active);
 
             return entity;
         }
