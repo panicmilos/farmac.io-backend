@@ -35,7 +35,6 @@ namespace Farmacio_API.Controllers
         /// Reads an existing pharmacist in the system.
         /// </summary>
         /// <response code="200">Read pharmacist.</response>
-        /// <response code="404">Pharmacist not found.</response>
         [HttpGet("{id}")]
         public IActionResult GetPharmacist(Guid id)
         {

@@ -56,6 +56,18 @@ namespace Farmacio_Services.Implementation
             
             return base.Update(pharmacist);
         }
+
+        public IEnumerable<Account> ReadForPharmacy(Guid pharmacyId)
+        {
+            return Read().Where(p => ((Pharmacist) p.User).PharmacyId == pharmacyId);
+        }
+
+        public Account ReadForPharmacy(Guid pharmacyId, Guid pharmacistId)
+        {
+            var account = Read(pharmacistId);
+            var pharmacist = (Pharmacist) account?.User;
+            return pharmacist?.PharmacyId == pharmacistId ? account : null;
+        }
         
         private void ValidatePharmacyId(Account account)
         {

@@ -7,5 +7,7 @@ namespace Farmacio_Services.Contracts
 {
     public interface IPharmacistService : IAccountService
     {
+        IEnumerable<Account> ReadForPharmacy(Guid pharmacyId);
+        Account ReadForPharmacy(Guid pharmacyId, Guid pharmacistId);
     }
 }
