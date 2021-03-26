@@ -74,83 +74,7 @@ public static class SeedDb
         AddIFNotDuplicate(context, address2);
         AddIFNotDuplicate(context, address3);
 
-        PharmacyPriceList priceList1 = new PharmacyPriceList
-        {
-            Id = new Guid("4f4b8d6b-999f-4342-8054-00c382bb2155"),
-            ExaminationPrice = 1500f,
-            ConsultationPrice = 800f,
-            MedicinePriceList = new List<MedicinePrice>()
-        };
 
-        PharmacyPriceList priceList2 = new PharmacyPriceList
-        {
-            Id = new Guid("04ebe74c-92aa-4130-8569-92a5cbcc8eb9"),
-            ExaminationPrice = 1200f,
-            ConsultationPrice = 600f,
-            MedicinePriceList = new List<MedicinePrice>()
-        };
-
-        PharmacyPriceList priceList3 = new PharmacyPriceList
-        {
-            Id = new Guid("d74fecbd-f907-4827-99fa-73fe63d49e3e"),
-            ExaminationPrice = 1300f,
-            ConsultationPrice = 750f,
-            MedicinePriceList = new List<MedicinePrice>()
-        };
-
-        AddIFNotDuplicate(context, priceList1);
-        AddIFNotDuplicate(context, priceList2);
-        AddIFNotDuplicate(context, priceList3);
-
-        Pharmacy pharmacy1 = new Pharmacy
-        {
-            Id = new Guid("874282f3-3df9-4ee0-bf7e-33d9ba3ec456"),
-            Name = "BENU Apoteka",
-            Address = address1,
-            Description = "Apotekarska ustanova BENU je najveci lanac apoteka u Srbiji i deo je velike medjunarodne kompanije PHOENIX iz Nemacke.",
-            Pharmacists = new List<Pharmacist>(),
-            Dermatologists = new List<Dermatologist>(),
-            PriceList = priceList1,
-            Orders = new List<PharmacyOrder>(),
-            Promotions = new List<Promotion>(),
-            AverageGrade = 0,
-            Grades = new List<Grade>()
-        };
-
-        Pharmacy pharmacy2 = new Pharmacy
-        {
-            Id = new Guid("1f833fb4-445b-4a87-bfc7-9b83bb788259"),
-            Name = "Viva Farm",
-            Address = address2,
-            Description = "Tu smo da zajedno sa vama utièemo na oèuvanje dobog zdravlja i spreèavanje razvoja bolesti za koje postoji rizik ili predispozicija.",
-            Pharmacists = new List<Pharmacist>(),
-            Dermatologists = new List<Dermatologist>(),
-            PriceList = priceList2,
-            Orders = new List<PharmacyOrder>(),
-            Promotions = new List<Promotion>(),
-            AverageGrade = 0,
-            Grades = new List<Grade>()
-        };
-
-        Pharmacy pharmacy3 = new Pharmacy
-        {
-            Id = new Guid("3eb2dfab-1b1c-4ff4-98cf-8fd2fb3201d7"),
-            Name = "Dr.Max",
-            Address = address3,
-            Description = "Dr.Max je meðunarodni lanac apoteka, koji je prisutan u 6 " +
-            "zemalja Centralno Istoène Evrope sa preko 2000 apoteka i 12000 zaposlenih. Od 2017. godine, Dr.Max je prisutan i na tržištu Srbije.",
-            Pharmacists = new List<Pharmacist>(),
-            Dermatologists = new List<Dermatologist>(),
-            PriceList = priceList3,
-            Orders = new List<PharmacyOrder>(),
-            Promotions = new List<Promotion>(),
-            AverageGrade = 0,
-            Grades = new List<Grade>()
-        };
-
-        AddIFNotDuplicate(context, pharmacy1);
-        AddIFNotDuplicate(context, pharmacy2);
-        AddIFNotDuplicate(context, pharmacy3);
 
         MedicineType medicineType1 = new MedicineType
         {
@@ -283,6 +207,168 @@ public static class SeedDb
         AddIFNotDuplicate(context, medicine1);
         AddIFNotDuplicate(context, medicine2);
         AddIFNotDuplicate(context, medicine3);
+
+        MedicinePrice medicinePrice1 = new MedicinePrice
+        {
+            Id = new Guid("dad2881e-4f39-4867-bd7d-a575b4691624"),
+            Medicine = medicine1,
+            Price = 200,
+            ActiveFrom = DateTime.Now
+        };
+
+        MedicinePrice medicinePrice2 = new MedicinePrice
+        {
+            Id = new Guid("53b6c610-c2db-4762-a9a8-a2f4da168635"),
+            Medicine = medicine2,
+            Price = 300,
+            ActiveFrom = DateTime.Now
+        };
+
+        List<MedicinePrice> medicinePrices1 = new List<MedicinePrice>();
+        medicinePrices1.Add(medicinePrice1);
+        medicinePrices1.Add(medicinePrice2);
+
+        AddIFNotDuplicate(context, medicinePrice1);
+        AddIFNotDuplicate(context, medicinePrice2);
+
+        MedicinePrice medicinePrice3 = new MedicinePrice
+        {
+            Id = new Guid("6c658f53-6fd3-4c0e-b907-47edfc9bb8dd"),
+            Medicine = medicine1,
+            Price = 235,
+            ActiveFrom = DateTime.Now
+        };
+
+        MedicinePrice medicinePrice4 = new MedicinePrice
+        { 
+            Id = new Guid("24b46554-4f34-4164-b410-163738fb50ff"),
+            Medicine = medicine3,
+            Price = 350,
+            ActiveFrom = DateTime.Now
+        };
+
+        List<MedicinePrice> medicinePrices2 = new List<MedicinePrice>();
+        medicinePrices2.Add(medicinePrice3);
+        medicinePrices2.Add(medicinePrice4);
+
+        AddIFNotDuplicate(context, medicinePrice3);
+        AddIFNotDuplicate(context, medicinePrice4);
+
+        MedicinePrice medicinePrice5 = new MedicinePrice
+        {
+            Id = new Guid("55590901-521e-4045-8b97-bb024f3bd00f"),
+            Medicine = medicine2,
+            Price = 290,
+            ActiveFrom = DateTime.Now
+        };
+
+        MedicinePrice medicinePrice6 = new MedicinePrice
+        {
+            Id = new Guid("d13000fe-aa89-4c21-8c21-9c7760cf3fc9"),
+            Medicine = medicine3,
+            Price = 375,
+            ActiveFrom = DateTime.Now
+        };
+
+        List<MedicinePrice> medicinePrices3 = new List<MedicinePrice>();
+        medicinePrices3.Add(medicinePrice5);
+        medicinePrices3.Add(medicinePrice6);
+
+        AddIFNotDuplicate(context, medicinePrice5);
+        AddIFNotDuplicate(context, medicinePrice6);
+
+        PharmacyPriceList priceList1 = new PharmacyPriceList
+        {
+            Id = new Guid("4f4b8d6b-999f-4342-8054-00c382bb2155"),
+            ExaminationPrice = 1500f,
+            ConsultationPrice = 800f,
+            MedicinePriceList = medicinePrices1
+        };
+
+        PharmacyPriceList priceList2 = new PharmacyPriceList
+        {
+            Id = new Guid("04ebe74c-92aa-4130-8569-92a5cbcc8eb9"),
+            ExaminationPrice = 1200f,
+            ConsultationPrice = 600f,
+            MedicinePriceList = medicinePrices2
+        };
+
+        PharmacyPriceList priceList3 = new PharmacyPriceList
+        {
+            Id = new Guid("d74fecbd-f907-4827-99fa-73fe63d49e3e"),
+            ExaminationPrice = 1300f,
+            ConsultationPrice = 750f,
+            MedicinePriceList = medicinePrices3
+        };
+
+        AddIFNotDuplicate(context, priceList1);
+        AddIFNotDuplicate(context, priceList2);
+        AddIFNotDuplicate(context, priceList3);
+
+        Pharmacy pharmacy1 = new Pharmacy
+        {
+            Id = new Guid("874282f3-3df9-4ee0-bf7e-33d9ba3ec456"),
+            Name = "BENU Apoteka",
+            Address = address1,
+            Description = "Apotekarska ustanova BENU je najveci lanac apoteka u Srbiji i deo je velike medjunarodne kompanije PHOENIX iz Nemacke.",
+            Pharmacists = new List<Pharmacist>(),
+            Dermatologists = new List<Dermatologist>(),
+            PriceList = priceList1,
+            Stock = new List<PharmacyMedicine>()
+            {
+                new PharmacyMedicine() { MedicineId = medicine1.Id, Quantity = 4},
+                new PharmacyMedicine() { MedicineId = medicine2.Id, Quantity = 5},
+            },
+            Orders = new List<PharmacyOrder>(),
+            Promotions = new List<Promotion>(),
+            AverageGrade = 0,
+            Grades = new List<Grade>()
+        };
+
+        Pharmacy pharmacy2 = new Pharmacy
+        {
+            Id = new Guid("1f833fb4-445b-4a87-bfc7-9b83bb788259"),
+            Name = "Viva Farm",
+            Address = address2,
+            Description = "Tu smo da zajedno sa vama utièemo na oèuvanje dobog zdravlja i spreèavanje razvoja bolesti za koje postoji rizik ili predispozicija.",
+            Pharmacists = new List<Pharmacist>(),
+            Dermatologists = new List<Dermatologist>(),
+            PriceList = priceList2,
+            Stock = new List<PharmacyMedicine>()
+            {
+                new PharmacyMedicine() { MedicineId = medicine1.Id, Quantity = 2},
+                new PharmacyMedicine() { MedicineId = medicine3.Id, Quantity = 1},
+            },
+            Orders = new List<PharmacyOrder>(),
+            Promotions = new List<Promotion>(),
+            AverageGrade = 0,
+            Grades = new List<Grade>()
+        };
+
+        Pharmacy pharmacy3 = new Pharmacy
+        {
+            Id = new Guid("3eb2dfab-1b1c-4ff4-98cf-8fd2fb3201d7"),
+            Name = "Dr.Max",
+            Address = address3,
+            Description = "Dr.Max je meðunarodni lanac apoteka, koji je prisutan u 6 " +
+            "zemalja Centralno Istoène Evrope sa preko 2000 apoteka i 12000 zaposlenih. Od 2017. godine, Dr.Max je prisutan i na tržištu Srbije.",
+            Pharmacists = new List<Pharmacist>(),
+            Dermatologists = new List<Dermatologist>(),
+            PriceList = priceList3,
+            Stock = new List<PharmacyMedicine>()
+            {
+                new PharmacyMedicine() { MedicineId = medicine2.Id, Quantity = 2},
+                new PharmacyMedicine() { MedicineId = medicine3.Id, Quantity = 7},
+            },
+            Orders = new List<PharmacyOrder>(),
+            Promotions = new List<Promotion>(),
+            AverageGrade = 0,
+            Grades = new List<Grade>()
+        };
+
+        AddIFNotDuplicate(context, pharmacy1);
+        AddIFNotDuplicate(context, pharmacy2);
+        AddIFNotDuplicate(context, pharmacy3);
 
         List<Ingredient> allergies1 = new List<Ingredient>();
         allergies1.Add(new Ingredient
