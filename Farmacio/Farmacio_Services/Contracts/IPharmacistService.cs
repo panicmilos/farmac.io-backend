@@ -9,5 +9,6 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<Account> ReadForPharmacy(Guid pharmacyId);
         Account ReadForPharmacy(Guid pharmacyId, Guid pharmacistId);
+        IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name);
     }
 }
