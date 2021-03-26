@@ -15,7 +15,7 @@ namespace Farmacio_API.Validations.Accounts
             RuleFor(request => request.DateOfBirth).NotNull().Must(dateOfBirth => dateOfBirth.AddYears(13) < DateTime.Now).WithMessage("User must be at least 13 years old.");
             RuleFor(request => request.PID).NotNull().Length(13).Must(pid => pid.All(charInPid => '0' <= charInPid && charInPid <= '9')).WithMessage("Pid must be 13 digits.");
             RuleFor(request => request.PhoneNumber).NotNull().NotEmpty().WithMessage("Phone number must be provided.");
-            RuleFor(request => request.Address).SetValidator(new CreateAddressRequestValidator()).WithMessage("Valid address must be provided.");
+            RuleFor(request => request.Address).NotNull().SetValidator(new CreateAddressRequestValidator()).WithMessage("Valid address must be provided.");
         }
     }
 }
