@@ -11,5 +11,6 @@ namespace Farmacio_Models.DTO
         public String Name { get; set; }
         public MedicineType Type { get; set; }
         public int AverageGrade { get; set; }
+        public String Manufacturer { get; set; }
     }
 }

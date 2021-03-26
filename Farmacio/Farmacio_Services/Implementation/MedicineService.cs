@@ -25,7 +25,8 @@ namespace Farmacio_Services.Implementation
                     Id = medicine.Id,
                     Name = medicine.Name,
                     Type = medicine.Type,
-                    AverageGrade = medicine.AverageGrade
+                    AverageGrade = medicine.AverageGrade,
+                    Manufacturer = medicine.Manufacturer
                 });
         }
     }
