@@ -2,6 +2,7 @@ using AutoMapper;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
 namespace Farmacio_API.Controllers
@@ -12,11 +13,13 @@ namespace Farmacio_API.Controllers
     public class MedicinesController : ControllerBase
     {
         private readonly IMedicineService _medicineService;
+        private readonly IPharmacyService _pharmacyService;
         private readonly IMapper _mapper;
 
-        public MedicinesController(IMedicineService medicineService, IMapper mapper)
+        public MedicinesController(IMedicineService medicineService, IPharmacyService pharmacyService, IMapper mapper)
         {
             _medicineService = medicineService;
+            _pharmacyService = pharmacyService;
             _mapper = mapper;
         }
 
@@ -28,6 +31,12 @@ namespace Farmacio_API.Controllers
         public IEnumerable<SmallMedicineDTO> ReadForHomePage()
         {
             return _medicineService.ReadForDisplay();
+        }
+
+        [HttpGet("getPharmacies/{id}")]
+        public IEnumerable<PharmaciesOfMedicineDTO> GetPharmacies(Guid id)
+        {
+            return _pharmacyService.MedicineInPharmacies(id);
         }
     }
 }
