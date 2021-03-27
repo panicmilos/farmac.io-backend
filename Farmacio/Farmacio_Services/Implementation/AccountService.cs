@@ -4,6 +4,7 @@ using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Farmacio_Services.Implementation
@@ -60,6 +61,13 @@ namespace Farmacio_Services.Implementation
 
             account.IsVerified = true;
             return _repository.Update(account);
+        }
+
+        public IEnumerable<Account> SearchByName(string name)
+        {
+            return Read().Where(a =>
+                a.User.FirstName.ToLower().Contains(name.ToLower()) ||
+                a.User.LastName.ToLower().Contains(name.ToLower()));
         }
 
         private bool IsUsernameTaken(string username)
