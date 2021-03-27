@@ -1,5 +1,7 @@
 ﻿using Farmacio_Models.Domain;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Farmacio_Services.Contracts
 {
@@ -8,5 +10,6 @@ namespace Farmacio_Services.Contracts
         Account ReadByEmail(string email);
 
         Account Verify(Guid id);
+        IEnumerable<Account> SearchByName(string name);
     }
 }

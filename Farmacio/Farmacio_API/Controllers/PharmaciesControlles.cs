@@ -16,11 +16,13 @@ namespace Farmacio_API.Controllers
     public class PharmaciesControlles : ControllerBase
     {
         private readonly IPharmacyService _pharmacyService;
+        private readonly IPharmacistService _pharmacistService;
         private readonly IMapper _mapper;
 
-        public PharmaciesControlles(IPharmacyService pharmacyService, IMapper mapper)
+        public PharmaciesControlles(IPharmacyService pharmacyService, IPharmacistService pharmacistService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
+            _pharmacistService = pharmacistService;
             _mapper = mapper;
         }
 
@@ -59,6 +61,36 @@ namespace Farmacio_API.Controllers
             }
 
             return Ok(pharmacy);
+        }
+        
+        /// <summary>
+        /// Reads all existing pharmacists employed in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read pharmacists from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/pharmacists")]
+        public IActionResult GetPharmacists(Guid pharmacyId)
+        {
+            return Ok(_pharmacistService.ReadForPharmacy(pharmacyId));
+        }
+        
+        /// <summary>
+        /// Search all existing pharmacists in the pharmacy.
+        /// </summary>
+        /// <response code="200">Searched pharmacists.</response>
+        [HttpGet("{pharmacyId}/pharmacists/search")]
+        public IActionResult SearchPharmacists(Guid pharmacyId, string name)
+        {
+            return Ok(_pharmacistService.SearchByNameForPharmacy(pharmacyId, name));
+        }
+        
+        /// <summary>
+        /// Reads an existing pharmacist employed in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read pharmacist from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/pharmacists/{pharmacistId}")]
+        public IActionResult GetPharmacist(Guid pharmacyId, Guid pharmacistId)
+        {
+            return Ok(_pharmacistService.ReadForPharmacy(pharmacyId, pharmacistId));
         }
 
         /// <summary>

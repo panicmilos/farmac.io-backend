@@ -63,10 +63,32 @@ namespace Farmacio_Services.Implementation
             return base.Update(pharmacist);
         }
 
+        public IEnumerable<Account> ReadForPharmacy(Guid pharmacyId)
+        {
+            return FilterByPharmacyId(Read(), pharmacyId);
+        }
+
+        public Account ReadForPharmacy(Guid pharmacyId, Guid pharmacistId)
+        {
+            var account = Read(pharmacistId);
+            var pharmacist = (Pharmacist) account?.User;
+            return pharmacist?.PharmacyId == pharmacistId ? account : null;
+        }
+
+        public IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name)
+        {
+            return FilterByPharmacyId(SearchByName(name), pharmacyId);
+        }
+
         private void ValidatePharmacyId(Account account)
         {
             if (_pharmacyService.Read(((Pharmacist)account.User).PharmacyId) == null)
                 throw new MissingEntityException("Pharmacy with the provided id does not exist.");
+        }
+
+        private static IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
+        {
+            return accounts.Where(p => ((Pharmacist) p.User).PharmacyId == pharmacyId);
         }
     }
 }
