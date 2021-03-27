@@ -17,12 +17,15 @@ namespace Farmacio_API.Controllers
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IPharmacistService _pharmacistService;
+        private readonly IDermatologistService _dermatologistService;
         private readonly IMapper _mapper;
 
-        public PharmaciesControlles(IPharmacyService pharmacyService, IPharmacistService pharmacistService, IMapper mapper)
+        public PharmaciesControlles(IPharmacyService pharmacyService, IPharmacistService pharmacistService
+            , IDermatologistService dermatologistService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
+            _dermatologistService = dermatologistService;
             _mapper = mapper;
         }
 
@@ -91,6 +94,36 @@ namespace Farmacio_API.Controllers
         public IActionResult GetPharmacist(Guid pharmacyId, Guid pharmacistId)
         {
             return Ok(_pharmacistService.ReadForPharmacy(pharmacyId, pharmacistId));
+        }
+        
+        /// <summary>
+        /// Reads all existing dermatologists employed in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read dermatologists from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/dermatologists")]
+        public IActionResult GetDermatologists(Guid pharmacyId)
+        {
+            return Ok(_dermatologistService.ReadForPharmacy(pharmacyId));
+        }
+        
+        /// <summary>
+        /// Search all existing dermatologists in the pharmacy.
+        /// </summary>
+        /// <response code="200">Searched dermatologists.</response>
+        [HttpGet("{pharmacyId}/dermatologists/search")]
+        public IActionResult SearchDermatologists(Guid pharmacyId, string name)
+        {
+            return Ok(_dermatologistService.SearchByNameForPharmacy(pharmacyId, name));
+        }
+        
+        /// <summary>
+        /// Reads an existing dermatologist employed in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read dermatologist from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/dermatologists/{dermatologistId}")]
+        public IActionResult GetDermatologist(Guid pharmacyId, Guid dermatologistId)
+        {
+            return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
         }
 
         /// <summary>

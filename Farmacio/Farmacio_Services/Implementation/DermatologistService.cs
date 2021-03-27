@@ -27,17 +27,27 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Account> ReadForPharmacy(Guid pharmacyId)
         {
-            throw new NotImplementedException();
+            return FilterByPharmacyId(Read(), pharmacyId);
         }
 
-        public Account ReadForPharmacy(Guid pharmacyId, Guid pharmacistId)
+        public Account ReadForPharmacy(Guid pharmacyId, Guid dermatologistId)
         {
-            throw new NotImplementedException();
+            var account = Read(dermatologistId);
+            var dermatologist = (Dermatologist) account?.User;
+            return dermatologist?.WorkPlaces.FirstOrDefault(wp => wp.Pharmacy.Id == pharmacyId) != null
+                ? account
+                : null;
         }
 
         public IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name)
         {
-            throw new NotImplementedException();
+            return FilterByPharmacyId(SearchByName(name), pharmacyId);
+        }
+
+        private static IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
+        {
+            return accounts.Where(d =>
+                ((Dermatologist) d.User).WorkPlaces.FirstOrDefault(wp => wp.Pharmacy.Id == pharmacyId) != null);
         }
     }
 }

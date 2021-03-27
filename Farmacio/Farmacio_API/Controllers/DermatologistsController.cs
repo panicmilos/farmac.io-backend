@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Farmacio_API.Controllers
 {
     [ApiController]
-    [Route("pharmacists")]
+    [Route("dermatologists")]
     [Produces("application/json")]
     public class DermatologistsController : ControllerBase
     {
