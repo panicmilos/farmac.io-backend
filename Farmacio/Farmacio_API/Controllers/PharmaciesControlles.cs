@@ -75,7 +75,7 @@ namespace Farmacio_API.Controllers
         }
         
         /// <summary>
-        /// Search all existing pharmacists in the system.
+        /// Search all existing pharmacists in the pharmacy.
         /// </summary>
         /// <response code="200">Searched pharmacists.</response>
         [HttpGet("{pharmacyId}/pharmacists/search")]
