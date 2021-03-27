@@ -7,7 +7,6 @@ namespace Farmacio_API.Validations.Addresses
     {
         public UpdateAddressRequestValidator()
         {
-            RuleFor(request => request.Id).NotNull().WithMessage("Address Id can't be null.");
             RuleFor(request => request.City).NotNull().NotEmpty().WithMessage("City must be provided.");
             RuleFor(request => request.State).NotNull().NotEmpty().WithMessage("State must be provided.");
             RuleFor(request => request.StreetName).NotNull().NotEmpty().WithMessage("Street name must be provided.");

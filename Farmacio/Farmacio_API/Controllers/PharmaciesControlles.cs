@@ -7,7 +7,6 @@ using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Farmacio_API.Controllers
 {
@@ -108,7 +107,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Deleted pharmacy specified by id.
+        /// Deletes pharmacy specified by id.
         /// </summary>
         /// <response code="200">Returns deleted pharmacy.</response>
         /// <response code="401">Unable to delete pharmacy because it does not exist in the system.</response>
