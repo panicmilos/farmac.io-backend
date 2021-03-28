@@ -8,6 +8,7 @@ namespace Farmacio_Models.Domain
         public string UniqueId { get; set; }
         public ReservationState State { get; set; }
         public DateTime PickupDeadline { get; set; }
+        public Guid PharmacyId { get; set; }
         public virtual Pharmacy Pharmacy { get; set; }
         public virtual Patient Patient { get; set; }
         public virtual List<ReservedMedicine> Medicines { get; set; }
