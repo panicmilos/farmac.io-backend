@@ -66,6 +66,7 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<Account> SearchByName(string name)
         {
             return Read().Where(a =>
+                name == null ||
                 a.User.FirstName.ToLower().Contains(name.ToLower()) ||
                 a.User.LastName.ToLower().Contains(name.ToLower()));
         }
