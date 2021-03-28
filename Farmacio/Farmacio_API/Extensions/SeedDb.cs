@@ -710,6 +710,10 @@ public static class SeedDb
         AddIFNotDuplicate(context, account8);
         AddIFNotDuplicate(context, account9);
 
+        AddIFNotDuplicate(context, appointment1);
+        AddIFNotDuplicate(context, appointment2);
+        AddIFNotDuplicate(context, appointment3);
+
         context.SaveChanges();
     }
 }
