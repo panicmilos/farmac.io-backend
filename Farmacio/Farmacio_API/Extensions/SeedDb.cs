@@ -537,5 +537,44 @@ public static class SeedDb
             ShouldChangePassword = false,
             User = dermatologist2
         };
+
+        Appointment appointment1 = new Appointment
+        {
+            Id = new Guid("15f0ba36-e215-4e76-9ae0-9885a0345de2"),
+            DateTime = DateTime.Now,
+            Duration = 30,
+            MedicalStaff = dermatologist1,
+            IsReserved = true,
+            Patient = patient1,
+            Pharmacy = pharmacy2,
+            Price = 1200,
+            Report = null
+        };
+
+        Appointment appointment2 = new Appointment
+        {
+            Id = new Guid("067c7eb2-970d-40bf-b0fe-439b1cea687a"),
+            DateTime = DateTime.Now.AddDays(-1),
+            Duration = 30,
+            MedicalStaff = dermatologist1,
+            IsReserved = true,
+            Patient = patient2,
+            Pharmacy = pharmacy2,
+            Price = 1200,
+            Report = null
+        };
+
+        Appointment appointment3 = new Appointment
+        {
+            Id = new Guid("6a134a59-901c-4918-bfc8-e427a4c85e8a"),
+            DateTime = DateTime.Now.AddDays(-2),
+            Duration = 30,
+            MedicalStaff = dermatologist1,
+            IsReserved = true,
+            Patient = patient3,
+            Pharmacy = pharmacy2,
+            Price = 1200,
+            Report = null
+        };
     }
 }
