@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
@@ -19,7 +20,7 @@ namespace Farmacio_Services.Implementation
         {
             _pharmacyService = pharmacyService;
         }
-        
+
         public override IEnumerable<Account> Read()
         {
             return base.Read().Where(account => account.Role == Role.Dermatologist).ToList();
@@ -132,5 +133,31 @@ namespace Farmacio_Services.Implementation
             });
             return overlap == null;
         }
+
+        public IEnumerable<PatientDTO> GetPatients(Guid dermatologistId)
+        {
+            var account = base.Read(dermatologistId);
+            var dermatologist = (Dermatologist)account?.User;
+            if (dermatologist == null)
+                throw new MissingEntityException();
+            List<PatientDTO> patients = new List<PatientDTO>();
+            foreach (var appointment in dermatologist?.Appointments)
+            {
+                var patient = appointment.Patient;
+                if (patient == null) continue;
+                patients.Add(new PatientDTO
+                {
+                    Id = patient.Id,
+                    FirstName = patient.FirstName,
+                    LastName = patient.LastName,
+                    DateOfBirth = patient.DateOfBirth,
+                    Address = patient.Address,
+                    PhoneNumber = patient.PhoneNumber,
+                    AppointmentDate = appointment.DateTime
+                });
+            }
+            return patients;
+        }
+
     }
 }
