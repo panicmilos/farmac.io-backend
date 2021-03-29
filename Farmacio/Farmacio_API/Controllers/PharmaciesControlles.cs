@@ -17,12 +17,15 @@ namespace Farmacio_API.Controllers
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IPharmacistService _pharmacistService;
+        private readonly IDermatologistService _dermatologistService;
         private readonly IMapper _mapper;
 
-        public PharmaciesControlles(IPharmacyService pharmacyService, IPharmacistService pharmacistService, IMapper mapper)
+        public PharmaciesControlles(IPharmacyService pharmacyService, IPharmacistService pharmacistService
+            , IDermatologistService dermatologistService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
+            _dermatologistService = dermatologistService;
             _mapper = mapper;
         }
 
@@ -92,7 +95,61 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.ReadForPharmacy(pharmacyId, pharmacistId));
         }
-
+        
+        /// <summary>
+        /// Reads all existing dermatologists employed in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read dermatologists from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/dermatologists")]
+        public IActionResult GetDermatologists(Guid pharmacyId)
+        {
+            return Ok(_dermatologistService.ReadForPharmacy(pharmacyId));
+        }
+        
+        /// <summary>
+        /// Search all existing dermatologists in the pharmacy.
+        /// </summary>
+        /// <response code="200">Searched dermatologists.</response>
+        [HttpGet("{pharmacyId}/dermatologists/search")]
+        public IActionResult SearchDermatologists(Guid pharmacyId, string name)
+        {
+            return Ok(_dermatologistService.SearchByNameForPharmacy(pharmacyId, name));
+        }
+        
+        /// <summary>
+        /// Reads an existing dermatologist employed in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read dermatologist from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/dermatologists/{dermatologistId}")]
+        public IActionResult GetDermatologist(Guid pharmacyId, Guid dermatologistId)
+        {
+            return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
+        }
+        
+        /// <summary>
+        /// Add an existing dermatologist to the pharmacy.
+        /// </summary>
+        /// <response code="200">Added dermatologist.</response>
+        /// <response code="404">Dermatologist or Pharmacy not found.</response>
+        /// <response code="400">Dermatologist already employed in the Pharmacy, work time invalid or overlaps with and existing one.</response>
+        [HttpPost("{pharmacyId}/dermatologists/{dermatologistId}")]
+        public IActionResult AddDermatologistToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime)
+        {
+            return Ok(_dermatologistService.AddToPharmacy(pharmacyId, dermatologistId, workTime));
+        }
+        
+        /// <summary>
+        /// Remove dermatologist from the pharmacy.
+        /// </summary>
+        /// <response code="200">Removed dermatologist.</response>
+        /// <response code="404">Dermatologist not found.</response>
+        /// <response code="400">Dermatologist not employed in the pharmacy.</response>
+        [HttpDelete("{pharmacyId}/dermatologists/{dermatologistId}")]
+        public IActionResult RemoveDermatologistFromPharmacy(Guid pharmacyId, Guid dermatologistId)
+        {
+            return Ok(_dermatologistService.RemoveFromPharmacy(pharmacyId, dermatologistId));
+        }
+        
         /// <summary>
         /// Creates a new pharmacy in the system.
         /// </summary>
