@@ -14,6 +14,7 @@ namespace Farmacio_Models.Domain
     {
         public float Price { get; set; }
         public DateTime ActiveFrom { get; set; }
+        public Guid MedicineId { get; set; }
         public virtual Medicine Medicine { get; set; }
     }
 }
