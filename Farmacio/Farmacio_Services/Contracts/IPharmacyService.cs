@@ -8,6 +8,11 @@ namespace Farmacio_Services.Contracts
     public interface IPharmacyService : ICrudService<Pharmacy>
     {
         IEnumerable<SmallPharmacyDTO> ReadForHomePage();
+
         IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid Id);
+
+        MedicineInPharmacyDTO ReadMedicine(Guid pharmacyId, Guid medicineId);
+
+        void ChangeStockFor(Guid pharmacyId, Guid medicineId, int changeFor);
     }
 }

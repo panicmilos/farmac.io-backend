@@ -33,7 +33,11 @@ namespace Farmacio_API.Controllers
             return _medicineService.ReadForDisplay();
         }
 
-        [HttpGet("getPharmacies/{id}")]
+        /// <summary>
+        /// Returns all pharmacies where the medicine is available.
+        /// </summary>
+        /// <response code="200">Returns list of small pharmaciesOfMedicine objects</response>
+        [HttpGet("{id}/pharmacies")]
         public IEnumerable<PharmaciesOfMedicineDTO> GetPharmacies(Guid id)
         {
             return _pharmacyService.MedicineInPharmacies(id);

@@ -27,7 +27,7 @@ namespace Farmacio_Services.Implementation
         public override Account Read(Guid id)
         {
             var account = base.Read(id);
-            return account.Role == Role.Patient ? account : null;
+            return account?.Role == Role.Patient ? account : null;
         }
 
         public override Account Update(Account account)
