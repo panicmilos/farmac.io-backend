@@ -39,6 +39,13 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("Given patient does not exist in the system.");
             }
+
+            var patient = (Patient)patientAccount.User;
+            if(patient.NegativePoints >= 3)
+            {
+                throw new BadLogicException("You have 3 negative points, so you cannot reserve a medicine.");
+            }
+
             reservation.PatientId = patientAccount.User.Id;
 
             if (DateTime.Now.AddHours(36) > reservation.PickupDeadline)
