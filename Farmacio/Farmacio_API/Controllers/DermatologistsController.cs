@@ -51,6 +51,7 @@ namespace Farmacio_API.Controllers
             return Ok(_dermatologistService.Read(id));
         }
 
+
         /// <summary>
         /// Reads all dermatologist's patients.
         /// </summary>

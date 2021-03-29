@@ -1,8 +1,11 @@
 using AutoMapper;
 using Farmacio_API.Contracts.Requests.Reservations;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 
 namespace Farmacio_API.Controllers
 {
@@ -26,6 +29,19 @@ namespace Farmacio_API.Controllers
             var reservation = _mapper.Map<Reservation>(request);
             _reservationService.Create(reservation);
 
+            return Ok();
+        }
+
+        [HttpGet("futureReservations/{patientId}")]
+        public IEnumerable<SmallReservationDTO> GetPatientsFutureReservations(Guid patientId)
+        {
+            return _reservationService.ReadPatientReservations(patientId);
+        } 
+
+        [HttpDelete("cancel/{reservationId}")]
+        public IActionResult CancelMedicineReservation(Guid reservationId)
+        {
+            _reservationService.CancelMedicineReservation(reservationId);
             return Ok();
         }
     }
