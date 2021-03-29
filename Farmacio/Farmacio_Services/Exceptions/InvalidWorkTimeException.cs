@@ -1,11 +1,10 @@
 ﻿using System.Net;
+using GlobalExceptionHandler.Exceptions;
 
-namespace GlobalExceptionHandler.Exceptions
+namespace Farmacio_Services.Exceptions
 {
-    public class InvalidWorkTimeException : HandlableException
+    public class InvalidWorkTimeException : BadLogicException
     {
-        public override HttpStatusCode Code { get; set; } = HttpStatusCode.BadRequest;
-
         public InvalidWorkTimeException()
         {
         }

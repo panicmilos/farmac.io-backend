@@ -4,6 +4,7 @@ using System.Linq;
 using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Exceptions;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
