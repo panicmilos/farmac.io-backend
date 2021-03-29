@@ -34,6 +34,16 @@
         "Recipients": [ "{{to}}" ],
         "Body": "Please click on this link to verify you account: https://farmac-io.bjelicaluka.com/email-verification?token={{token}}."
       }
+    },
+    {
+      "type": "Email",
+      "name": "Reservation",
+      "template": {
+        "Subject": "Successfull Reservation on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "panic.milos99@gmail.com" ],
+        "Body": "<p>Dear {{name}},</p><p>You reservation with id {{id}} is successfully created. Please pickup your reservation until: {{deadline}}.</p>"
+      }
     }
   ]
 }
