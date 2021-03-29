@@ -1,5 +1,8 @@
 ﻿using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
+﻿using EmailService.Constracts;
+using EmailService.Models;
+using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
@@ -14,12 +17,17 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IPatientService _patientService;
+        private readonly IEmailDispatcher _emailDispatcher;
+        private readonly ITemplatesProvider _templatesProvider;
 
-        public ReservationService(IPharmacyService pharmacyService, IPatientService patientService, IRepository<Reservation> repository) :
+        public ReservationService(IPharmacyService pharmacyService, IPatientService patientService, IEmailDispatcher emailDispatcher,
+            ITemplatesProvider templatesProvider, IRepository<Reservation> repository) :
             base(repository)
         {
             _pharmacyService = pharmacyService;
             _patientService = patientService;
+            _emailDispatcher = emailDispatcher;
+            _templatesProvider = templatesProvider;
         }
 
         public Reservation CancelMedicineReservation(Guid reservationId)
@@ -68,6 +76,13 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("Given patient does not exist in the system.");
             }
+
+            var patient = (Patient)patientAccount.User;
+            if(patient.NegativePoints >= 3)
+            {
+                throw new BadLogicException("You have 3 negative points, so you cannot reserve a medicine.");
+            }
+
             reservation.PatientId = patientAccount.User.Id;
 
             if (DateTime.Now.AddHours(36) > reservation.PickupDeadline)
@@ -88,8 +103,12 @@ namespace Farmacio_Services.Implementation
                 reservedMedicine.Price = medicineInPharmacy.Price;
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity * -1);
             }
+            
+            var createdReservation = base.Create(reservation);
+            var email = _templatesProvider.FromTemplate<Email>("Reservation", new { Name = patientAccount.User.FirstName, Id = reservation.UniqueId, Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm") });
+            _emailDispatcher.Dispatch(email);
 
-            return base.Create(reservation);
+            return createdReservation;
         }
 
         public IEnumerable<SmallReservationDTO> ReadPatientReservations(Guid patientId)

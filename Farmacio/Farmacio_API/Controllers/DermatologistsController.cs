@@ -50,5 +50,16 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.Read(id));
         }
+
+
+        /// <summary>
+        /// Reads all dermatologist's patients.
+        /// </summary>
+        /// <response code="200">Read patients.</response>
+        [HttpGet("{id}/patients")]
+        public IActionResult GetPatients(Guid id)
+        {
+            return Ok(_dermatologistService.GetPatients(id));
+        }
     }
 }
