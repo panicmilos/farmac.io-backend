@@ -10,7 +10,7 @@ namespace Farmacio_API.Validations.Pharmacies
         {
             RuleFor(request => request.Name).NotNull().NotEmpty().WithMessage("Name must be provided.");
             RuleFor(request => request.Description).NotNull().NotEmpty().WithMessage("Description must be provided.");
-            RuleFor(request => request.Address).SetValidator(new CreateAddressRequestValidator()).WithMessage("Valid address must be provided");
+            RuleFor(request => request.Address).NotNull().SetValidator(new CreateAddressRequestValidator()).WithMessage("Valid address must be provided");
         }
     }
 }

@@ -3,9 +3,10 @@ using FluentValidation;
 
 namespace Farmacio_API.Validations.Accounts
 {
-    public class UpdatePharmacistUserRequestValidator : UpdateUserRequestValidator<UpdatePharmacistUserRequest>
+    public class UpdatePharmacyAdminUserRequestValidator : UpdateUserRequestValidator<UpdatePharmacyAdminUserRequest>
     {
-        public UpdatePharmacistUserRequestValidator() : base()
+        public UpdatePharmacyAdminUserRequestValidator() :
+            base()
         {
             RuleFor(request => request.PharmacyId).NotNull().WithMessage("PharmacyId must be provided.");
         }
