@@ -93,7 +93,7 @@ namespace Farmacio_Services.Implementation
             var workPlace = dermatologist.WorkPlaces.FirstOrDefault(wp => wp.Pharmacy.Id == pharmacyId);
             
             if(workPlace == null)
-                throw new MissingEntityException("Dermatologist is not employed in the given pharmacy.");
+                throw new NotEmployedInPharmacyException("Dermatologist is not employed in the given pharmacy.");
             
             dermatologist.WorkPlaces.Remove(workPlace);
             return Update(account);

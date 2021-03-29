@@ -130,11 +130,8 @@ namespace Farmacio_API.Controllers
         /// Add an existing dermatologist to the pharmacy.
         /// </summary>
         /// <response code="200">Added dermatologist.</response>
-        /// <response code="404">Dermatologist not found.</response>
-        /// <response code="404">Pharmacy not found.</response>
-        /// <response code="400">Dermatologist already employed in the pharmacy.</response>
-        /// <response code="400">Invalid work time.</response>
-        /// <response code="400">Work time overlaps with another for the given dermatologist.</response>
+        /// <response code="404">Dermatologist or Pharmacy not found.</response>
+        /// <response code="400">Dermatologist already employed in the Pharmacy, work time invalid or overlaps with and existing one.</response>
         [HttpPost("{pharmacyId}/dermatologists/{dermatologistId}")]
         public IActionResult AddDermatologistToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime)
         {
@@ -146,7 +143,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Removed dermatologist.</response>
         /// <response code="404">Dermatologist not found.</response>
-        /// <response code="404">Dermatologist not employed in the pharmacy.</response>
+        /// <response code="400">Dermatologist not employed in the pharmacy.</response>
         [HttpDelete("{pharmacyId}/dermatologists/{dermatologistId}")]
         public IActionResult RemoveDermatologistFromPharmacy(Guid pharmacyId, Guid dermatologistId)
         {
