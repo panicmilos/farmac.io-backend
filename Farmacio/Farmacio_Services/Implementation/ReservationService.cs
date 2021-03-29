@@ -1,9 +1,11 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Farmacio_Services.Implementation
@@ -18,6 +20,40 @@ namespace Farmacio_Services.Implementation
         {
             _pharmacyService = pharmacyService;
             _patientService = patientService;
+        }
+
+        public Reservation CancelMedicineReservation(Guid reservationId)
+        {
+            var reservation = base.Read(reservationId);
+            if (reservation == null)
+            {
+                throw new MissingEntityException("Given reservation does not exist in the system.");
+            }
+
+            if(reservation.State == ReservationState.Cancelled)
+            {
+                throw new BadLogicException("The reservation has already been canceled.");
+            }
+
+            if(reservation.State == ReservationState.Done)
+            {
+                throw new BadLogicException("The reservation has already been picked up");
+            }
+
+            if(DateTime.Now.AddHours(24) > reservation.PickupDeadline)
+            {
+                throw new BadLogicException("It is not possible to cancel a reservation if there are less than 24 left until pickup medicines.");
+            }
+
+            reservation.State = ReservationState.Cancelled;
+
+            foreach(ReservedMedicine reservedMedicine in reservation.Medicines)
+            {
+                _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity);
+            }
+
+            return base.Update(reservation);
+
         }
 
         public override Reservation Create(Reservation reservation)
@@ -56,6 +92,17 @@ namespace Farmacio_Services.Implementation
             return base.Create(reservation);
         }
 
+        public IEnumerable<SmallReservationDTO> ReadPatientReservations(Guid patientId)
+        {
+            return base.Read()
+                .Where(reservation => reservation.State == ReservationState.Reserved && reservation.PatientId == patientId)
+                .Select(reservation => new SmallReservationDTO
+                {
+                    ReservationId = reservation.Id,
+                    PickupDeadline = reservation.PickupDeadline
+                });
+        }
+
         private string GetUniqueId()
         {
             string uniqueId;
@@ -71,5 +118,6 @@ namespace Farmacio_Services.Implementation
         {
             return Read().FirstOrDefault(reservation => reservation.UniqueId == id) == default;
         }
+
     }
 }
