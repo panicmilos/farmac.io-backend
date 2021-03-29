@@ -32,10 +32,19 @@ namespace Farmacio_API.Controllers
         }
         
         /// <summary>
+        /// Search all existing pharmacists in the system.
+        /// </summary>
+        /// <response code="200">Searched pharmacists.</response>
+        [HttpGet("search")]
+        public IActionResult SearchPharmacists(string name)
+        {
+            return Ok(_pharmacistService.SearchByName(name));
+        }
+        
+        /// <summary>
         /// Reads an existing pharmacist in the system.
         /// </summary>
         /// <response code="200">Read pharmacist.</response>
-        /// <response code="404">Pharmacist not found.</response>
         [HttpGet("{id}")]
         public IActionResult GetPharmacist(Guid id)
         {

@@ -21,7 +21,7 @@ namespace Farmacio_Services.Implementation
 
         public override IEnumerable<Account> Read()
         {
-            return base.Read().Where(account => account.Role == Role.Patient);
+            return base.Read().Where(account => account.Role == Role.Patient).ToList();
         }
 
         public override Account Read(Guid id)

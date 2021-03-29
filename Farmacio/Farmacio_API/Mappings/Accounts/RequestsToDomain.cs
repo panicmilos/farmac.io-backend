@@ -15,6 +15,7 @@ namespace Farmacio_API.Mappings.Accounts
 
             AddPatientMapping();
             AddPharmacistMapping();
+            AddPharmacyAdminMapping();
         }
 
         private void AddPatientMapping()
@@ -28,7 +29,7 @@ namespace Farmacio_API.Mappings.Accounts
                 .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Patient))
                 .ForMember(dst => dst.ShouldChangePassword, opts => opts.MapFrom(src => false));
         }
-        
+
         private void AddPharmacistMapping()
         {
             CreateMap<CreatePharmacistUserRequest, Pharmacist>();
@@ -42,8 +43,25 @@ namespace Farmacio_API.Mappings.Accounts
                 .ForMember(dst => dst.ShouldChangePassword, opts => opts.MapFrom(src => true));
 
             CreateMap<UpdatePharmacistRequest, Account>()
-                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Pharmacist))
-                .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id));
+                .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Pharmacist));
+        }
+
+        private void AddPharmacyAdminMapping()
+        {
+            CreateMap<CreatePharmacyAdminUserRequest, PharmacyAdmin>();
+            CreateMap<UpdatePharmacyAdminUserRequest, PharmacyAdmin>();
+
+            CreateMap<CreatePharmacyAdminRequest, Account>()
+                .ForMember(dst => dst.Username, opts => opts.MapFrom(src => src.Account.Username))
+                .ForMember(dst => dst.Password, opts => opts.MapFrom(src => src.Account.Password))
+                .ForMember(dst => dst.Email, opts => opts.MapFrom(src => src.Account.Email))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.PharmacyAdmin))
+                .ForMember(dst => dst.ShouldChangePassword, opts => opts.MapFrom(src => true));
+
+            CreateMap<UpdatePharmacyAdminRequest, Account>()
+                .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.PharmacyAdmin));
         }
     }
 }

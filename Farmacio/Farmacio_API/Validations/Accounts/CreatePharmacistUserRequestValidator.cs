@@ -7,7 +7,7 @@ namespace Farmacio_API.Validations.Accounts
     {
         public CreatePharmacistUserRequestValidator() : base()
         {
-            RuleFor(request => request.PharmacyId).NotNull().WithMessage("Pharmacy Id can't be null.");
+            RuleFor(request => request.PharmacyId).NotNull().WithMessage("PharmacyId must be provided.");
         }
     }
 }
