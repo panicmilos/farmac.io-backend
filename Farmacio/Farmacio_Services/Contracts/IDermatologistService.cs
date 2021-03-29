@@ -11,5 +11,7 @@ namespace Farmacio_Services.Contracts
         Account ReadForPharmacy(Guid pharmacyId, Guid dermatologistId);
         IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name);
         IEnumerable<PatientDTO> GetPatients(Guid dermatologistId);
+        Account AddToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime);
+        Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistId);
     }
 }
