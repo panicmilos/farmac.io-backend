@@ -5,13 +5,14 @@ using Microsoft.Extensions.Hosting;
 
 namespace Farmacio_API
 {
-    public class Program
+    public class SeedDb
     {
         public static void Main(string[] args)
         {
             CreateHostBuilder(args)
                 .Build()
                 .MigrateDbContext<DatabaseContext>()
+                .SeedDbContext<DatabaseContext>()
                 .Run();
         }
 
