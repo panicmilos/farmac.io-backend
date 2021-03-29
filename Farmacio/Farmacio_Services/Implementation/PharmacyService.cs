@@ -18,17 +18,28 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid Id)
         {
-            return from pharmacy in base.Read().ToList()
-                   from medicinePriceList in pharmacy.PriceList.MedicinePriceList
-                   where medicinePriceList.Medicine.Id.Equals(Id)
-                   select new PharmaciesOfMedicineDTO
-                   {
-                       Name = pharmacy.Name,
-                       Id = pharmacy.Id,
-                       Address = pharmacy.Address,
-                       Description = pharmacy.Description,
-                       Price = medicinePriceList.Price
-                   };
+
+            var listOfPharmacies = new List<PharmaciesOfMedicineDTO>();
+            foreach(var pharmacy in base.Read().ToList())
+            {
+                var medicinePrice = pharmacy.PriceList
+                    .MedicinePriceList.Where(medicinePrice => medicinePrice.MedicineId == Id)
+                    .OrderByDescending(medicinePrice => medicinePrice.ActiveFrom)
+                   .FirstOrDefault();
+                
+                if (medicinePrice == null)
+                    continue;
+
+                listOfPharmacies.Add(new PharmaciesOfMedicineDTO()
+                {
+                    Name = pharmacy.Name,
+                    Id = pharmacy.Id,
+                    Address = pharmacy.Address,
+                    Description = pharmacy.Description,
+                    Price = medicinePrice.Price
+                });
+            }
+            return listOfPharmacies.AsEnumerable();
         }
 
         public IEnumerable<SmallPharmacyDTO> ReadForHomePage()
