@@ -14,7 +14,7 @@ namespace Farmacio_Services.Implementation.Utils
             var isBefore = secondTo.Hour < hoursFrom ||
                            (secondTo.Hour == hoursFrom && secondTo.Minute <= minutesFrom);
 
-            var isAfter = secondFrom.Hour >= hoursTo ||
+            var isAfter = secondFrom.Hour > hoursTo ||
                           (secondFrom.Hour == hoursTo && secondFrom.Minute >= minutesTo);
 
             return !(isBefore || isAfter);

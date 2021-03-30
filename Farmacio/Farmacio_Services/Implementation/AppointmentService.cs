@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
@@ -22,6 +23,11 @@ namespace Farmacio_Services.Implementation
             _pharmacyService = pharmacyService;
         }
 
+        public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
+        {
+            return Read().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
+        }
+
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment)
         {
             var pharmacy = _pharmacyService.Read(appointment.PharmacyId);
@@ -38,14 +44,9 @@ namespace Farmacio_Services.Implementation
             if (workPlace == null)
                 throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
             
-            var from = appointment.DateTime;
-            var to = from.AddMinutes(appointment.Duration);
-            if (!TimeIntervalUtils.TimeIntervalTimesOverlap(from, to, workPlace.WorkTime.From, workPlace.WorkTime.To))
-                throw new InvalidAppointmentDateTimeException(
-                    "The given date-time and duration do not overlap with dermatologist's work time.");
+            ValidateAppointmentDateTime(appointment, workPlace, dermatologist);
 
             var price = appointment.Price ?? 50.0f;
-
             if(price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
@@ -57,6 +58,29 @@ namespace Farmacio_Services.Implementation
                 Duration = appointment.Duration,
                 Price = price
             });
+        }
+
+        private void ValidateAppointmentDateTime(CreateAppointmentDTO appointment, DermatologistWorkPlace workPlace,
+            Dermatologist dermatologist)
+        {
+            var from = appointment.DateTime;
+            var to = @from.AddMinutes(appointment.Duration);
+            if (!TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, workPlace.WorkTime.From, workPlace.WorkTime.To))
+                throw new InvalidAppointmentDateTimeException(
+                    "The given date-time and duration do not overlap with dermatologist's work time.");
+
+            var overlap = ReadForMedicalStaff(dermatologist.Id).FirstOrDefault(a =>
+            {
+                var existingFrom = a.DateTime;
+                var existingTo = a.DateTime.AddMinutes(a.Duration);
+
+                var datesAreEqual = existingFrom.Date == @from.Date;
+                return datesAreEqual &&
+                       TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, existingFrom, existingTo);
+            });
+            if (overlap != null)
+                throw new InvalidAppointmentDateTimeException(
+                    "Dermatologist already has an appointment defined on the given date-time.");
         }
     }
 }
