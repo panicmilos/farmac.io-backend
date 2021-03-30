@@ -1,9 +1,9 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Farmacio_API.Controllers
 {
@@ -12,15 +12,15 @@ namespace Farmacio_API.Controllers
     [Produces("application/json")]
     public class DermatologistsController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly IDermatologistService _dermatologistService;
-        
+        private readonly IMapper _mapper;
+
         public DermatologistsController(IDermatologistService dermatologistService, IMapper mapper)
         {
             _dermatologistService = dermatologistService;
             _mapper = mapper;
         }
-        
+
         /// <summary>
         /// Reads all existing dermatologists in the system.
         /// </summary>
@@ -30,7 +30,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.Read());
         }
-        
+
         /// <summary>
         /// Search all existing dermatologists in the system.
         /// </summary>
@@ -40,7 +40,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.SearchByName(name));
         }
-        
+
         /// <summary>
         /// Reads an existing dermatologist in the system.
         /// </summary>
@@ -51,7 +51,6 @@ namespace Farmacio_API.Controllers
             return Ok(_dermatologistService.Read(id));
         }
 
-
         /// <summary>
         /// Reads all dermatologist's patients.
         /// </summary>
@@ -60,6 +59,47 @@ namespace Farmacio_API.Controllers
         public IActionResult GetPatients(Guid id)
         {
             return Ok(_dermatologistService.GetPatients(id));
+        }
+
+        /// <summary>
+        /// Creates a new dermatologist in the system.
+        /// </summary>
+        /// <response code="200">Returns created dermatologist.</response>
+        /// <response code="401">Unable to create dermatologist because username or email is already taken.</response>
+        [HttpPost]
+        public IActionResult CreateDermatologist(CreateDermatologistRequest request)
+        {
+            var dermatologist = _mapper.Map<Account>(request);
+            _dermatologistService.Create(dermatologist);
+
+            return Ok(dermatologist);
+        }
+
+        /// <summary>
+        /// Updates an existing dermatologist from the system.
+        /// </summary>
+        /// <response code="200">Returns updated dermatologist.</response>
+        /// <response code="404">Unable to update dermatologist because he does not exist.</response>
+        [HttpPut]
+        public IActionResult UpdateDermatologist(UpdateDermatologistRequest request)
+        {
+            var dermatologist = _mapper.Map<Account>(request);
+            var updatedDermatologist = _dermatologistService.Update(dermatologist);
+
+            return Ok(updatedDermatologist);
+        }
+
+        /// <summary>
+        /// Deletes dermatologist from the system.
+        /// </summary>
+        /// <response code="200">Returns deleted dermatologist.</response>
+        /// <response code="404">Unable to delete dermatologist because he does not exist.</response>
+        [HttpDelete("{id}")]
+        public IActionResult DeleteDermatologist(Guid id)
+        {
+            var deletedDermatologist = _dermatologistService.Delete(id);
+
+            return Ok(deletedDermatologist);
         }
     }
 }

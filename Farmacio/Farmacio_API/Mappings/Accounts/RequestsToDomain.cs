@@ -15,6 +15,7 @@ namespace Farmacio_API.Mappings.Accounts
 
             AddPatientMapping();
             AddPharmacistMapping();
+            AddDermatologistMapping();
             AddPharmacyAdminMapping();
         }
 
@@ -45,6 +46,23 @@ namespace Farmacio_API.Mappings.Accounts
             CreateMap<UpdatePharmacistRequest, Account>()
                 .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
                 .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Pharmacist));
+        }
+
+        private void AddDermatologistMapping()
+        {
+            CreateMap<CreateDermatologistUserRequest, Dermatologist>();
+            CreateMap<UpdateDermatologistUserRequest, Dermatologist>();
+
+            CreateMap<CreateDermatologistRequest, Account>()
+                .ForMember(dst => dst.Username, opts => opts.MapFrom(src => src.Account.Username))
+                .ForMember(dst => dst.Password, opts => opts.MapFrom(src => src.Account.Password))
+                .ForMember(dst => dst.Email, opts => opts.MapFrom(src => src.Account.Email))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Dermatologist))
+                .ForMember(dst => dst.ShouldChangePassword, opts => opts.MapFrom(src => true));
+
+            CreateMap<UpdateDermatologistRequest, Account>()
+                .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Dermatologist));
         }
 
         private void AddPharmacyAdminMapping()
