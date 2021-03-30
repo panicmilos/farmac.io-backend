@@ -3,24 +3,21 @@ using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Farmacio_API.Controllers
 {
     [ApiController]
     [Route("pharmacy-admins")]
     [Produces("application/json")]
-    public class PharmacyAdminController : ControllerBase
+    public class PharmacyAdminsController : ControllerBase
     {
         private readonly IPharmacyAdminService _pharmacyAdminService;
         private readonly IMapper _mapper;
 
-        public PharmacyAdminController(IPharmacyAdminService pharmacyAdminService, IMapper mapper)
+        public PharmacyAdminsController(IPharmacyAdminService pharmacyAdminService, IMapper mapper)
         {
             _pharmacyAdminService = pharmacyAdminService;
             _mapper = mapper;
