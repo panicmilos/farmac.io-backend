@@ -39,7 +39,7 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
             
             var from = appointment.DateTime;
-            var to = from.AddHours(appointment.Duration);
+            var to = from.AddMinutes(appointment.Duration);
             if (!TimeIntervalUtils.TimeIntervalTimesOverlap(from, to, workPlace.WorkTime.From, workPlace.WorkTime.To))
                 throw new InvalidAppointmentDateTimeException(
                     "The given date-time and duration do not overlap with dermatologist's work time.");
