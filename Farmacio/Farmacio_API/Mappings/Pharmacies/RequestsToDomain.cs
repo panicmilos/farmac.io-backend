@@ -9,6 +9,7 @@ namespace Farmacio_API.Mappings.Pharmacies
         public RequestsToDomain()
         {
             CreateMap<CreatePharmacyRequest, Pharmacy>();
+            CreateMap<UpdatePharmacyRequest, Pharmacy>();
         }
     }
 }
