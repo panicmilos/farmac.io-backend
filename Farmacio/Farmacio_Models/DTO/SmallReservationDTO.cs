@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Farmacio_Models.Domain;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,5 +9,7 @@ namespace Farmacio_Models.DTO
     {
         public Guid ReservationId { get; set; }
         public DateTime PickupDeadline { get; set; }
+        public Guid PharmacyId { get; set; }
+        public float Price { get; set; }
     }
 }
