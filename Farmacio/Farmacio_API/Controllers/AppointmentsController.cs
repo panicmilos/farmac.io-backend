@@ -11,15 +11,15 @@ using Farmacio_API.Contracts.Requests.Appointments;
 
 namespace Farmacio_API.Controllers
 {
-    [Route("appointment")]
+    [Route("appointments")]
     [ApiController]
     [Produces("application/json")]
-    public class AppointmentController : ControllerBase
+    public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
         private readonly IMapper _mapper;
 
-        public AppointmentController(IAppointmentService appointmentService, IMapper mapper)
+        public AppointmentsController(IAppointmentService appointmentService, IMapper mapper)
         {
             _appointmentService = appointmentService;
             _mapper = mapper;
