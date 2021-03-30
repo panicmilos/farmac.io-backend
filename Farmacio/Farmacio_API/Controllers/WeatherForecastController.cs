@@ -5,6 +5,7 @@ using Farmacio_API.Contracts.Requests;
 using Farmacio_Models.Domain;
 using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,10 +23,10 @@ namespace Farmacio_API.Controllers
         private readonly IDummyService _dummyService;
         private readonly IMapper _mapper;
         private readonly IWeatherForecastService _weatherForecastService;
-        private readonly ITokenService _tokenService;
+        private readonly ITokenProvider _tokenService;
 
         public WeatherForecastController(IEmailDispatcher emailDispatcher, ITemplatesProvider templatesProvider, IDummyService dummyService, IMapper mapper,
-            IWeatherForecastService weatherForecastService, ITokenService tokenService)
+            IWeatherForecastService weatherForecastService, ITokenProvider tokenService)
         {
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
@@ -47,6 +48,13 @@ namespace Farmacio_API.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            var salt1 = CryptographyUtils.GetRandomSalt();
+            var pw1 = CryptographyUtils.GetSaltedAndHashedPassword("@admin123", salt1);
+
+            var salt2 = CryptographyUtils.GetRandomSalt();
+            var pw2 = CryptographyUtils.GetSaltedAndHashedPassword("p@anic123", salt2);
+
+            Console.WriteLine(salt1 + " " + pw1 + " " + salt2 + " " + pw2);
             return _weatherForecastService.Read();
         }
 

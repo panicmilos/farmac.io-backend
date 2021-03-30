@@ -2,7 +2,7 @@
 
 namespace Farmacio_Services.Contracts
 {
-    public interface ITokenService
+    public interface ITokenProvider
     {
         string GenerateAuthTokenFor(Account account);
 
