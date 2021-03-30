@@ -43,14 +43,19 @@ namespace Farmacio_Services.Implementation
             if (!TimeIntervalUtils.TimeIntervalTimesOverlap(from, to, workPlace.WorkTime.From, workPlace.WorkTime.To))
                 throw new InvalidAppointmentDateTimeException(
                     "The given date-time and duration do not overlap with dermatologist's work time.");
-            
+
+            var price = appointment.Price ?? 50.0f;
+
+            if(price <= 0 || price > 999999)
+                throw new BadLogicException("Price must be a valid number between 0 and 999999.");
+
             return Create(new Appointment
             {
                 Pharmacy = pharmacy,
                 MedicalStaff = dermatologist,
                 DateTime = appointment.DateTime,
                 Duration = appointment.Duration,
-                Price = appointment.Price ?? 50.0f
+                Price = price
             });
         }
     }
