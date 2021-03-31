@@ -7,6 +7,7 @@ namespace Farmacio_Services.Contracts
 {
     public interface IAppointmentService : ICrudService<Appointment>
     {
+        IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId);
         IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId);
         Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment);
     }

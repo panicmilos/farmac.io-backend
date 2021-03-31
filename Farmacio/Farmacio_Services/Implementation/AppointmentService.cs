@@ -15,17 +15,29 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IDermatologistService _dermatologistService;
         private readonly IPharmacyService _pharmacyService;
+        private readonly IAccountService _accountService;
         
         public AppointmentService(IRepository<Appointment> repository, IDermatologistService dermatologistService
-            , IPharmacyService pharmacyService) : base(repository)
+            , IPharmacyService pharmacyService, IAccountService accountService) : base(repository)
         {
             _dermatologistService = dermatologistService;
             _pharmacyService = pharmacyService;
+            _accountService = accountService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
             return Read().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
+        }
+        
+        public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
+        {
+            return Read()
+                .ToList()
+                .Where(a => a.Pharmacy.Id == pharmacyId &&
+                            _accountService.Read().ToList()
+                                .FirstOrDefault(acc => acc.User.Id == a.MedicalStaff.Id)?.Role == Role.Dermatologist)
+                .ToList();
         }
 
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment)
