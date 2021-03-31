@@ -46,7 +46,7 @@ namespace Farmacio_Services.Implementation
             
             ValidateAppointmentDateTime(appointment, workPlace, dermatologist);
 
-            var price = appointment.Price ?? 50.0f;
+            var price = appointment.Price ?? pharmacy.PriceList.ExaminationPrice;
             if(price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
