@@ -2,7 +2,7 @@
 using Farmacio_Models.DTO;
 using EmailService.Constracts;
 using EmailService.Models;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;

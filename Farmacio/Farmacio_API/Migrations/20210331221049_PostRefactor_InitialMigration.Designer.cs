@@ -3,14 +3,16 @@ using System;
 using Farmacio_Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Farmacio_API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210331221049_PostRefactor_InitialMigration")]
+    partial class PostRefactor_InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -161,7 +163,7 @@ namespace Farmacio_API.Migrations
                     b.Property<Guid>("MedicalStaffId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("PatientId")
+                    b.Property<Guid>("PatientId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid>("PharmacyId")
@@ -170,7 +172,7 @@ namespace Farmacio_API.Migrations
                     b.Property<float>("Price")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("ReportId")
+                    b.Property<Guid>("ReportId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
@@ -509,39 +511,6 @@ namespace Farmacio_API.Migrations
                     b.ToTable("MedicinePoints");
                 });
 
-            modelBuilder.Entity("Farmacio_Models.Domain.MedicinePrice", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("ActiveFrom")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("MedicineId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("PharmacyPriceListId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<float>("Price")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MedicineId");
-
-                    b.HasIndex("PharmacyPriceListId");
-
-                    b.ToTable("MedicinePrices");
-                });
-
             modelBuilder.Entity("Farmacio_Models.Domain.MedicineReplacement", b =>
                 {
                     b.Property<Guid>("Id")
@@ -696,32 +665,6 @@ namespace Farmacio_API.Migrations
                     b.HasIndex("MedicineId");
 
                     b.ToTable("PharmacyMedicines");
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.PharmacyPriceList", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<float>("ConsultationPrice")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<float>("ExaminationPrice")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("PharmacyId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PharmacyPriceLists");
                 });
 
             modelBuilder.Entity("Farmacio_Models.Domain.Report", b =>
@@ -1000,7 +943,9 @@ namespace Farmacio_API.Migrations
 
                     b.HasOne("Farmacio_Models.Domain.Patient", "Patient")
                         .WithMany()
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Farmacio_Models.Domain.Pharmacy", "Pharmacy")
                         .WithMany()
@@ -1010,7 +955,9 @@ namespace Farmacio_API.Migrations
 
                     b.HasOne("Farmacio_Models.Domain.Report", "Report")
                         .WithMany()
-                        .HasForeignKey("ReportId");
+                        .HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Farmacio_Models.Domain.Complaint", b =>
@@ -1095,19 +1042,6 @@ namespace Farmacio_API.Migrations
                     b.HasOne("Farmacio_Models.Domain.LoyaltyPoints", null)
                         .WithMany("MedicinePointsList")
                         .HasForeignKey("LoyaltyPointsId");
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.MedicinePrice", b =>
-                {
-                    b.HasOne("Farmacio_Models.Domain.Medicine", "Medicine")
-                        .WithMany()
-                        .HasForeignKey("MedicineId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Farmacio_Models.Domain.PharmacyPriceList", null)
-                        .WithMany("MedicinePriceList")
-                        .HasForeignKey("PharmacyPriceListId");
                 });
 
             modelBuilder.Entity("Farmacio_Models.Domain.MedicineReplacement", b =>

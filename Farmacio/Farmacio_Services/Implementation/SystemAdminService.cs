@@ -1,5 +1,5 @@
 ﻿using Farmacio_Models.Domain;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;

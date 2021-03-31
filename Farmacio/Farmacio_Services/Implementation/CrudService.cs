@@ -1,9 +1,9 @@
 ﻿using Farmacio_Models.Domain;
-using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
+using Farmacio_Repositories.Contracts;
 
 namespace Farmacio_Services.Implementation
 {

@@ -1,6 +1,6 @@
-﻿using Farmacio_Models.Contracts.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Farmacio_Models.Contracts;
 
 namespace Farmacio_Services.Contracts
 {

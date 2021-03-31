@@ -1,6 +1,6 @@
 ﻿using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;
@@ -14,12 +14,17 @@ namespace Farmacio_Services.Implementation
     public class DermatologistService : AccountService, IDermatologistService
     {
         private readonly IPharmacyService _pharmacyService;
+        private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
+        private readonly IAppointmentService _appointmentService;
 
         public DermatologistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService
+            , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IAppointmentService appointmentService
             , IRepository<Account> repository)
             : base(emailVerificationService, repository)
         {
             _pharmacyService = pharmacyService;
+            _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
+            _appointmentService = appointmentService;
         }
 
         public override IEnumerable<Account> Read()
@@ -36,26 +41,26 @@ namespace Farmacio_Services.Implementation
 
         public override Account Update(Account account)
         {
-            var dermatologist = Read(account.Id);
-            if (dermatologist == null)
+            var dermatologistAccount = Read(account.Id);
+            if (dermatologistAccount == null)
             {
                 throw new MissingEntityException();
             }
 
-            dermatologist.User.FirstName = account.User.FirstName;
-            dermatologist.User.LastName = account.User.LastName;
-            dermatologist.User.PhoneNumber = account.User.PhoneNumber;
-            dermatologist.User.PID = account.User.PID;
-            dermatologist.User.DateOfBirth = account.User.DateOfBirth;
+            dermatologistAccount.User.FirstName = account.User.FirstName;
+            dermatologistAccount.User.LastName = account.User.LastName;
+            dermatologistAccount.User.PhoneNumber = account.User.PhoneNumber;
+            dermatologistAccount.User.PID = account.User.PID;
+            dermatologistAccount.User.DateOfBirth = account.User.DateOfBirth;
 
-            dermatologist.User.Address.State = account.User.Address.State;
-            dermatologist.User.Address.City = account.User.Address.City;
-            dermatologist.User.Address.StreetName = account.User.Address.StreetName;
-            dermatologist.User.Address.StreetNumber = account.User.Address.StreetNumber;
-            dermatologist.User.Address.Lat = account.User.Address.Lat;
-            dermatologist.User.Address.Lng = account.User.Address.Lng;
+            dermatologistAccount.User.Address.State = account.User.Address.State;
+            dermatologistAccount.User.Address.City = account.User.Address.City;
+            dermatologistAccount.User.Address.StreetName = account.User.Address.StreetName;
+            dermatologistAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
+            dermatologistAccount.User.Address.Lat = account.User.Address.Lat;
+            dermatologistAccount.User.Address.Lng = account.User.Address.Lng;
 
-            return base.Update(dermatologist);
+            return base.Update(dermatologistAccount);
         }
 
         public IEnumerable<Account> ReadForPharmacy(Guid pharmacyId)
@@ -63,12 +68,12 @@ namespace Farmacio_Services.Implementation
             return FilterByPharmacyId(Read(), pharmacyId);
         }
 
-        public Account ReadForPharmacy(Guid pharmacyId, Guid dermatologistId)
+        public Account ReadForPharmacy(Guid pharmacyId, Guid dermatologistAccountId)
         {
-            var account = Read(dermatologistId);
-            var dermatologist = (Dermatologist)account?.User;
-            return dermatologist?.WorkPlaces.FirstOrDefault(wp => wp.Pharmacy.Id == pharmacyId) != null
-                ? account
+            var dermatologistAccount = Read(dermatologistAccountId);
+            return _dermatologistWorkPlaceService
+                .GetDermatologistWorkPlaceInPharmacy(dermatologistAccount.UserId, pharmacyId) != null
+                ? dermatologistAccount
                 : null;
         }
 
@@ -77,25 +82,26 @@ namespace Farmacio_Services.Implementation
             return FilterByPharmacyId(SearchByName(name), pharmacyId);
         }
 
-        public Account AddToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime)
+        public Account AddToPharmacy(Guid pharmacyId, Guid dermatologistAccountId, WorkTime workTime)
         {
-            var account = Read(dermatologistId);
-            if (account == null)
+            var dermatologistAccount = Read(dermatologistAccountId);
+            if (dermatologistAccount == null)
                 throw new MissingEntityException("Dermatologist with the given Id not found.");
 
             var pharmacy = _pharmacyService.Read(pharmacyId);
             if (pharmacy == null)
                 throw new MissingEntityException("Pharmacy with the given Id not found.");
 
-            var dermatologist = (Dermatologist)account.User;
-            var workPlace = dermatologist.WorkPlaces.FirstOrDefault(wp => wp.Pharmacy.Id == pharmacyId);
+            var workPlace =
+                _dermatologistWorkPlaceService.GetDermatologistWorkPlaceInPharmacy(dermatologistAccount.UserId,
+                    pharmacyId);
 
             if (workPlace != null)
                 throw new AlreadyEmployedInPharmacyException("Dermatologist already employed in pharmacy.");
 
             ValidateWorkTime(workTime);
 
-            if (!IsWorkTimeForDermatologistValid(workTime, dermatologist))
+            if (!IsWorkTimeForDermatologistValid(workTime, dermatologistAccount.UserId))
                 throw new WorkTimesOverlapException("Work time overlaps with another.");
 
             var newWorkPlace = new DermatologistWorkPlace
@@ -104,31 +110,30 @@ namespace Farmacio_Services.Implementation
                 WorkTime = workTime
             };
 
-            dermatologist.WorkPlaces.Add(newWorkPlace);
+            _dermatologistWorkPlaceService.Create(newWorkPlace);
 
-            return Update(account);
+            return Update(dermatologistAccount);
         }
 
-        public Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistId)
+        public Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistAccountId)
         {
-            var account = Read(dermatologistId);
-            if (account == null)
+            var dermatologistAccount = Read(dermatologistAccountId);
+            if (dermatologistAccount == null)
                 throw new MissingEntityException("Dermatologist with the given Id not found.");
 
-            var dermatologist = (Dermatologist)account.User;
-            var workPlace = dermatologist.WorkPlaces.FirstOrDefault(wp => wp.Pharmacy.Id == pharmacyId);
-
+            var workPlace =
+                _dermatologistWorkPlaceService.GetDermatologistWorkPlaceInPharmacy(dermatologistAccount.UserId, pharmacyId);
             if (workPlace == null)
                 throw new NotEmployedInPharmacyException("Dermatologist is not employed in the given pharmacy.");
 
-            dermatologist.WorkPlaces.Remove(workPlace);
-            return Update(account);
+            _dermatologistWorkPlaceService.Delete(workPlace.Id);
+            return dermatologistAccount;
         }
 
-        private static IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
+        private IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
         {
-            return accounts.Where(d =>
-                ((Dermatologist)d.User).WorkPlaces.FirstOrDefault(wp => wp.Pharmacy.Id == pharmacyId) != null);
+            return accounts.Where(a =>
+                _dermatologistWorkPlaceService.GetDermatologistWorkPlaceInPharmacy(a.UserId, pharmacyId) != null);
         }
 
         private static void ValidateWorkTime(WorkTime workTime)
@@ -139,37 +144,34 @@ namespace Farmacio_Services.Implementation
                 throw new InvalidWorkTimeException("Work time must be minimum 1 hour and maximum 8 hours long.");
         }
 
-        private static bool IsWorkTimeForDermatologistValid(WorkTime workTime, Dermatologist dermatologist)
+        private bool IsWorkTimeForDermatologistValid(WorkTime workTime, Guid dermatologistId)
         {
-            var overlap = dermatologist.WorkPlaces.FirstOrDefault(wp =>
-                TimeIntervalUtils.TimeIntervalTimesOverlap(wp.WorkTime.From, wp.WorkTime.To, workTime.From,
-                    workTime.To));
+            var overlap = _dermatologistWorkPlaceService
+                .GetDermatologistWorkPlaces(dermatologistId)
+                .FirstOrDefault(wp => TimeIntervalUtils
+                    .TimeIntervalTimesOverlap(wp.WorkTime.From, wp.WorkTime.To, workTime.From, workTime.To));
             return overlap == null;
         }
 
-        public IEnumerable<PatientDTO> GetPatients(Guid dermatologistId)
+        public IEnumerable<PatientDTO> GetPatients(Guid dermatologistAccountId)
         {
-            var account = base.Read(dermatologistId);
-            var dermatologist = (Dermatologist)account?.User;
-            if (dermatologist == null)
-                throw new MissingEntityException();
-            List<PatientDTO> patients = new List<PatientDTO>();
-            foreach (var appointment in dermatologist?.Appointments)
-            {
-                var patient = appointment.Patient;
-                if (patient == null) continue;
-                patients.Add(new PatientDTO
+            var account = Read(dermatologistAccountId);
+            if (account == null)
+                throw new MissingEntityException("Dermatologist account not found.");
+
+            return _appointmentService
+                .ReadForMedicalStaff(account.UserId)
+                .Where(ap => ap.IsReserved && ap.PatientId != null)
+                .Select(ap => new PatientDTO
                 {
-                    Id = patient.Id,
-                    FirstName = patient.FirstName,
-                    LastName = patient.LastName,
-                    DateOfBirth = patient.DateOfBirth,
-                    Address = patient.Address,
-                    PhoneNumber = patient.PhoneNumber,
-                    AppointmentDate = appointment.DateTime
+                    Id = ap.PatientId.Value,
+                    FirstName = ap.Patient.FirstName,
+                    LastName = ap.Patient.LastName,
+                    DateOfBirth = ap.Patient.DateOfBirth,
+                    Address = ap.Patient.Address,
+                    PhoneNumber = ap.Patient.PhoneNumber,
+                    AppointmentDate = ap.DateTime
                 });
-            }
-            return patients;
         }
     }
 }

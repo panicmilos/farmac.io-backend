@@ -1,6 +1,6 @@
 ﻿using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
@@ -11,20 +11,25 @@ namespace Farmacio_Services.Implementation
 {
     public class PharmacyService : CrudService<Pharmacy>, IPharmacyService
     {
-        public PharmacyService(IRepository<Pharmacy> repository) :
+        private readonly IPharmacyPriceListService _pharmacyPriceListService;
+        private readonly IPharmacyStockService _pharmacyStockService;
+        public PharmacyService(IPharmacyPriceListService pharmacyPriceListService, IPharmacyStockService pharmacyStockService
+            , IRepository<Pharmacy> repository) :
             base(repository)
         {
+            _pharmacyPriceListService = pharmacyPriceListService;
+            _pharmacyStockService = pharmacyStockService;
         }
 
-        public IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid Id)
+        public IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid medicineId)
         {
 
             var listOfPharmacies = new List<PharmaciesOfMedicineDTO>();
             foreach(var pharmacy in base.Read().ToList())
             {
-                var medicinePrice = pharmacy.PriceList
-                    .MedicinePriceList.Where(medicinePrice => medicinePrice.MedicineId == Id)
-                    .OrderByDescending(medicinePrice => medicinePrice.ActiveFrom)
+                var medicinePrice = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id)
+                    .MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
+                    .OrderByDescending(mp => mp.ActiveFrom)
                    .FirstOrDefault();
                 
                 if (medicinePrice == null)
@@ -63,17 +68,19 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Given pharmacy does not exist in the system.");
             }
 
-            var medicineStock = pharmacy.Stock.FirstOrDefault(medicine => medicine.MedicineId == medicineId);
+            var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
             {
                 throw new MissingEntityException("Given pharmacy does not have wanted medicine.");
             }
 
-            var medicinePrice = pharmacy.PriceList
+            var medicinePrice = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id)
                 .MedicinePriceList
-                .Where(medicinePrice => medicinePrice.MedicineId == medicineId)
-                .OrderByDescending(medicinePrice => medicinePrice.ActiveFrom)
+                .Where(mp => mp.MedicineId == medicineId)
+                .OrderByDescending(mp => mp.ActiveFrom)
                 .FirstOrDefault();
+            if (medicinePrice == null)
+                throw new MissingEntityException("Medicine price not found.");
 
             return new MedicineInPharmacyDTO
             {
@@ -92,7 +99,7 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Given pharmacy does not exist in the system.");
             }
 
-            var medicineStock = pharmacy.Stock.FirstOrDefault(medicine => medicine.MedicineId == medicineId);
+            var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
             {
                 throw new MissingEntityException("Given pharmacy does not have wanted medicine.");

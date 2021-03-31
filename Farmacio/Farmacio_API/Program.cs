@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Farmacio_API
 {
-    public class SeedDb
+    public class Program
     {
         public static void Main(string[] args)
         {

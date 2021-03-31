@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Farmacio_Models.Domain
 {
@@ -11,7 +12,7 @@ namespace Farmacio_Models.Domain
 
     public class MedicinePoints : BaseEntity
     {
-        public virtual Medicine Medicine { get; set; }
+        public Guid MedicineId { get; set; }
         public int Points { get; set; }
     }
 }

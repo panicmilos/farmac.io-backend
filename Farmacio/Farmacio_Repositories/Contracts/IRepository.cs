@@ -1,9 +1,8 @@
-﻿using Farmacio_Models.Contracts.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Farmacio_Models.Contracts;
 
-namespace Farmacio_Repositories.Contracts.Repositories
+namespace Farmacio_Repositories.Contracts
 {
     public interface IRepository<T> where T : IEntity
     {
