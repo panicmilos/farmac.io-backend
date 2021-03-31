@@ -18,15 +18,17 @@ namespace Farmacio_API.Controllers
         private readonly IPharmacyService _pharmacyService;
         private readonly IPharmacistService _pharmacistService;
         private readonly IDermatologistService _dermatologistService;
+        private readonly IAppointmentService _appointmentService;
         private readonly IMapper _mapper;
 
         public PharmaciesControlles(IPharmacyService pharmacyService, IPharmacistService pharmacistService
-            , IDermatologistService dermatologistService, IMapper mapper)
+            , IDermatologistService dermatologistService, IAppointmentService appointmentService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
             _dermatologistService = dermatologistService;
             _mapper = mapper;
+            _appointmentService = appointmentService;
         }
 
         /// <summary>
@@ -148,6 +150,16 @@ namespace Farmacio_API.Controllers
         public IActionResult RemoveDermatologistFromPharmacy(Guid pharmacyId, Guid dermatologistId)
         {
             return Ok(_dermatologistService.RemoveFromPharmacy(pharmacyId, dermatologistId));
+        }
+        
+        /// <summary>
+        /// Reads all existing appointments in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read dermatologists from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/dermatologists/appointments")]
+        public IActionResult GetDermatologistAppointmentsForPharmacy(Guid pharmacyId)
+        {
+            return Ok(_appointmentService.ReadForDermatologistsInPharmacy(pharmacyId));
         }
         
         /// <summary>
