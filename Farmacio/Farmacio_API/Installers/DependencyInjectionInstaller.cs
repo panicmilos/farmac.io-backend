@@ -42,6 +42,7 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IReservationService), typeof(ReservationService));
             _services.AddScoped(typeof(IDermatologistService), typeof(DermatologistService));
             _services.AddScoped(typeof(IPharmacyAdminService), typeof(PharmacyAdminService));
+            _services.AddScoped(typeof(ISystemAdminService), typeof(SystemAdminService));
             _services.AddScoped(typeof(IEmailVerificationService), typeof(EmailVerificationService));
             _services.AddScoped(typeof(ITokenService), typeof(TokenService));
 

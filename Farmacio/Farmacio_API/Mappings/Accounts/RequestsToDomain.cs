@@ -16,6 +16,7 @@ namespace Farmacio_API.Mappings.Accounts
             AddPatientMapping();
             AddPharmacistMapping();
             AddPharmacyAdminMapping();
+            AddSystemAdminMapping();
         }
 
         private void AddPatientMapping()
@@ -62,6 +63,23 @@ namespace Farmacio_API.Mappings.Accounts
             CreateMap<UpdatePharmacyAdminRequest, Account>()
                 .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
                 .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.PharmacyAdmin));
+        }
+
+        private void AddSystemAdminMapping()
+        {
+            CreateMap<CreateSystemAdminUserRequest, SystemAdmin>();
+            CreateMap<UpdateSystemAdminUserRequest, SystemAdmin>();
+
+            CreateMap<CreateSystemAdminRequest, Account>()
+                .ForMember(dst => dst.Username, opts => opts.MapFrom(src => src.Account.Username))
+                .ForMember(dst => dst.Password, opts => opts.MapFrom(src => src.Account.Password))
+                .ForMember(dst => dst.Email, opts => opts.MapFrom(src => src.Account.Email))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.SystemAdmin))
+                .ForMember(dst => dst.ShouldChangePassword, opts => opts.MapFrom(src => true));
+
+            CreateMap<UpdateSystemAdminRequest, Account>()
+                .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.SystemAdmin));
         }
     }
 }
