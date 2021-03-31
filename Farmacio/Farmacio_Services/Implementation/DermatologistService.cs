@@ -3,6 +3,7 @@ using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -141,20 +142,8 @@ namespace Farmacio_Services.Implementation
         private static bool IsWorkTimeForDermatologistValid(WorkTime workTime, Dermatologist dermatologist)
         {
             var overlap = dermatologist.WorkPlaces.FirstOrDefault(wp =>
-            {
-                var hoursFrom = wp.WorkTime.From.Hour;
-                var minutesFrom = wp.WorkTime.From.Minute;
-                var hoursTo = wp.WorkTime.To.Hour;
-                var minutesTo = wp.WorkTime.To.Minute;
-
-                var isBefore = workTime.To.Hour < hoursFrom ||
-                               (workTime.To.Hour == hoursFrom && workTime.To.Minute <= minutesFrom);
-
-                var isAfter = workTime.From.Hour >= hoursTo ||
-                              (workTime.From.Hour == hoursTo && workTime.From.Minute >= minutesTo);
-
-                return !(isBefore || isAfter);
-            });
+                TimeIntervalUtils.TimeIntervalTimesOverlap(wp.WorkTime.From, wp.WorkTime.To, workTime.From,
+                    workTime.To));
             return overlap == null;
         }
 
