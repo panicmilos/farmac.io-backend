@@ -44,5 +44,11 @@ namespace Farmacio_API.Controllers
             _reservationService.CancelMedicineReservation(reservationId);
             return Ok();
         }
+
+        [HttpGet("reservedMedicines/{reservationId}")]
+        public IEnumerable<SmallReservedMedicineDTO> GetMedicinesForReservation(Guid reservationId)
+        {
+            return _reservationService.ReadMedicinesForReservation(reservationId);
+        }
     }
 }

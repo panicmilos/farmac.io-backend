@@ -109,15 +109,47 @@ namespace Farmacio_Services.Implementation
             return createdReservation;
         }
 
+        public IEnumerable<SmallReservedMedicineDTO> ReadMedicinesForReservation(Guid reservationId)
+        {
+            var reservation = base.Read(reservationId);
+            if(reservation == null)
+            {
+                throw new MissingEntityException("Given reservation does not exist in the system.");
+            }
+
+            List<SmallReservedMedicineDTO> reservedMedicines = new List<SmallReservedMedicineDTO>();
+            foreach(var reservedMedicine in reservation.Medicines)
+            {
+                reservedMedicines.Add(new SmallReservedMedicineDTO
+                {
+                    MedicineId = reservedMedicine.MedicineId,
+                    Price = reservedMedicine.Price,
+                    Quantity = reservedMedicine.Quantity
+                });
+            }
+
+            return reservedMedicines;
+        }
+
         public IEnumerable<SmallReservationDTO> ReadPatientReservations(Guid patientId)
         {
-            return base.Read()
-                .Where(reservation => reservation.State == ReservationState.Reserved && reservation.PatientId == patientId)
-                .Select(reservation => new SmallReservationDTO
+            var reservations = base.Read().ToList();
+            var patientReservations = new List<SmallReservationDTO>();
+            foreach(var reservation in reservations)
+            {
+                if(reservation.State == ReservationState.Reserved && reservation.PatientId == patientId && reservation.CreatedAt < DateTime.Now)
                 {
-                    ReservationId = reservation.Id,
-                    PickupDeadline = reservation.PickupDeadline
-                });
+                    float price = reservation.Medicines.ToList().Sum(medicine => medicine.Quantity * medicine.Price);
+                    patientReservations.Add(new SmallReservationDTO
+                    {
+                        ReservationId = reservation.Id,
+                        PickupDeadline = reservation.PickupDeadline,
+                        Price = price,
+                        PharmacyId = reservation.PharmacyId
+                    });
+                }
+            }
+            return patientReservations;
         }
 
         private string GetUniqueId()
