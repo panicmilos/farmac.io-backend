@@ -1,8 +1,7 @@
 ﻿using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
-﻿using EmailService.Constracts;
+using EmailService.Constracts;
 using EmailService.Models;
-using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
@@ -38,30 +37,29 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Given reservation does not exist in the system.");
             }
 
-            if(reservation.State == ReservationState.Cancelled)
+            if (reservation.State == ReservationState.Cancelled)
             {
                 throw new BadLogicException("The reservation has already been canceled.");
             }
 
-            if(reservation.State == ReservationState.Done)
+            if (reservation.State == ReservationState.Done)
             {
                 throw new BadLogicException("The reservation has already been picked up");
             }
 
-            if(DateTime.Now.AddHours(24) > reservation.PickupDeadline)
+            if (DateTime.Now.AddHours(24) > reservation.PickupDeadline)
             {
                 throw new BadLogicException("It is not possible to cancel a reservation if there are less than 24 left until pickup medicines.");
             }
 
             reservation.State = ReservationState.Cancelled;
 
-            foreach(ReservedMedicine reservedMedicine in reservation.Medicines)
+            foreach (ReservedMedicine reservedMedicine in reservation.Medicines)
             {
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity);
             }
 
             return base.Update(reservation);
-
         }
 
         public override Reservation Create(Reservation reservation)
@@ -78,7 +76,7 @@ namespace Farmacio_Services.Implementation
             }
 
             var patient = (Patient)patientAccount.User;
-            if(patient.NegativePoints >= 3)
+            if (patient.NegativePoints >= 3)
             {
                 throw new BadLogicException("You have 3 negative points, so you cannot reserve a medicine.");
             }
@@ -103,7 +101,7 @@ namespace Farmacio_Services.Implementation
                 reservedMedicine.Price = medicineInPharmacy.Price;
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity * -1);
             }
-            
+
             var createdReservation = base.Create(reservation);
             var email = _templatesProvider.FromTemplate<Email>("Reservation", new { Name = patientAccount.User.FirstName, Id = reservation.UniqueId, Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
@@ -137,6 +135,5 @@ namespace Farmacio_Services.Implementation
         {
             return Read().FirstOrDefault(reservation => reservation.UniqueId == id) == default;
         }
-
     }
 }
