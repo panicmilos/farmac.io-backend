@@ -102,5 +102,26 @@ namespace Farmacio_Services.Implementation
 
             base.Update(pharmacy);
         }
+
+        public override Pharmacy Update(Pharmacy entity)
+        {
+            var pharmacy = Read(entity.Id);
+            if (pharmacy == null)
+            {
+                throw new MissingEntityException("Given pharmacy does not exist in the system.");
+            }
+
+            pharmacy.Name = entity.Name;
+            pharmacy.Description = entity.Description;
+
+            pharmacy.Address.State = entity.Address.State;
+            pharmacy.Address.City = entity.Address.City;
+            pharmacy.Address.StreetName = entity.Address.StreetName;
+            pharmacy.Address.StreetNumber = entity.Address.StreetNumber;
+            pharmacy.Address.Lat = entity.Address.Lat;
+            pharmacy.Address.Lng = entity.Address.Lng;
+            
+            return base.Update(entity);
+        }
     }
 }

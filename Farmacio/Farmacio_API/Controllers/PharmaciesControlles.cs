@@ -162,6 +162,17 @@ namespace Farmacio_API.Controllers
 
             return Ok(pharmacy);
         }
+        
+        /// <summary>
+        /// Updates an existing pharmacy in the system.
+        /// </summary>
+        /// <response code="200">Updated pharmacy.</response>
+        [HttpPut]
+        public IActionResult UpdatePharmacy(UpdatePharmacyRequest request)
+        {
+            var pharmacy = _mapper.Map<Pharmacy>(request);
+            return Ok(_pharmacyService.Update(pharmacy));
+        }
 
         /// <summary>
         /// Deletes pharmacy specified by id.
