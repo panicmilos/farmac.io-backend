@@ -8,12 +8,12 @@ using System.Text;
 
 namespace Farmacio_Services.Implementation
 {
-    public class TokenService : ITokenService
+    public class TokenProvider : ITokenProvider
     {
         private readonly string _jwtSecret;
         private readonly string _emailSecret;
 
-        public TokenService()
+        public TokenProvider()
         {
             _jwtSecret = Environment.GetEnvironmentVariable("JwtSecret");
             _emailSecret = Environment.GetEnvironmentVariable("EmailSecret");
