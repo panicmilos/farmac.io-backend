@@ -559,19 +559,6 @@ public static class SeedDb
             AverageGrade = 0,
         };
 
-        var workPlace1 = new DermatologistWorkPlace
-        {
-            WorkTime = new WorkTime
-            {
-                From = new DateTime(2020, 1, 1, 8, 0, 0),
-                To = new DateTime(2020, 1, 1, 11, 0, 0),
-            },
-            DermatologistId = dermatologist1.Id,
-            Pharmacy = pharmacy2
-        };
-        
-        AddIFNotDuplicate(context, workPlace1);
-
         var account8 = new Account
         {
             Username = "mmilica",
@@ -662,6 +649,19 @@ public static class SeedDb
         AddIFNotDuplicate(context, appointment1);
         AddIFNotDuplicate(context, appointment2);
         AddIFNotDuplicate(context, appointment3);
+        
+        var workPlace1 = new DermatologistWorkPlace
+        {
+            WorkTime = new WorkTime
+            {
+                From = new DateTime(2020, 1, 1, 8, 0, 0),
+                To = new DateTime(2020, 1, 1, 11, 0, 0),
+            },
+            DermatologistId = dermatologist1.Id,
+            Pharmacy = pharmacy2
+        };
+        
+        AddIFNotDuplicate(context, workPlace1);
 
         context.SaveChanges();
     }

@@ -4,6 +4,8 @@ using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
+using Farmacio_API.Contracts.Responses.Dermatologists;
 
 namespace Farmacio_API.Controllers
 {
@@ -13,11 +15,15 @@ namespace Farmacio_API.Controllers
     public class DermatologistsController : ControllerBase
     {
         private readonly IDermatologistService _dermatologistService;
+        private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IMapper _mapper;
 
-        public DermatologistsController(IDermatologistService dermatologistService, IMapper mapper)
+        public DermatologistsController(IDermatologistService dermatologistService
+            , IDermatologistWorkPlaceService dermatologistWorkPlaceService
+            , IMapper mapper)
         {
             _dermatologistService = dermatologistService;
+            _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _mapper = mapper;
         }
 
@@ -39,6 +45,34 @@ namespace Farmacio_API.Controllers
         public IActionResult SearchDermatologists(string name)
         {
             return Ok(_dermatologistService.SearchByName(name));
+        }
+        
+        /// <summary>
+        /// Reads all existing dermatologists in the system with their work places.
+        /// </summary>
+        /// <response code="200">Read dermatologists with their work places.</response>
+        [HttpGet("with-work-places")]
+        public IActionResult GetDermatologistsWithWorkPlaces()
+        {
+            return Ok(_dermatologistService.Read().Select(da => new DermatologistWithWorkPlacesResponse
+            {
+                DermatologistAccount = da,
+                WorkPlaces = _dermatologistWorkPlaceService.GetDermatologistWorkPlaces(da.User.Id)
+            }));
+        }
+
+        /// <summary>
+        /// Search all existing dermatologists in the system with their work places.
+        /// </summary>
+        /// <response code="200">Searched dermatologists with their work places.</response>
+        [HttpGet("with-work-places/search")]
+        public IActionResult SearchDermatologistsWithWorkPlaces(string name)
+        {
+            return Ok(_dermatologistService.SearchByName(name).Select(da => new DermatologistWithWorkPlacesResponse
+            {
+                DermatologistAccount = da,
+                WorkPlaces = _dermatologistWorkPlaceService.GetDermatologistWorkPlaces(da.User.Id)
+            }));
         }
 
         /// <summary>

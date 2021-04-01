@@ -41,26 +41,7 @@ namespace Farmacio_Services.Implementation
         public override Account Update(Account account)
         {
             ValidatePharmacyId(account);
-            var pharmacyAdmin = Read(account.Id);
-            if (pharmacyAdmin == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            pharmacyAdmin.User.FirstName = account.User.FirstName;
-            pharmacyAdmin.User.LastName = account.User.LastName;
-            pharmacyAdmin.User.PhoneNumber = account.User.PhoneNumber;
-            pharmacyAdmin.User.PID = account.User.PID;
-            pharmacyAdmin.User.DateOfBirth = account.User.DateOfBirth;
-
-            pharmacyAdmin.User.Address.State = account.User.Address.State;
-            pharmacyAdmin.User.Address.City = account.User.Address.City;
-            pharmacyAdmin.User.Address.StreetName = account.User.Address.StreetName;
-            pharmacyAdmin.User.Address.StreetNumber = account.User.Address.StreetNumber;
-            pharmacyAdmin.User.Address.Lat = account.User.Address.Lat;
-            pharmacyAdmin.User.Address.Lng = account.User.Address.Lng;
-
-            return base.Update(pharmacyAdmin);
+            return base.Update(account);
         }
 
         private void ValidatePharmacyId(Account account)

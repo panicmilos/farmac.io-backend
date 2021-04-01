@@ -14,11 +14,6 @@ namespace Farmacio_Services.Implementation
         {
         }
 
-        public override Account Create(Account account)
-        {
-            return base.Create(account);
-        }
-
         public override IEnumerable<Account> Read()
         {
             return base.Read().Where(account => account.Role == Role.Patient).ToList();
@@ -28,16 +23,6 @@ namespace Farmacio_Services.Implementation
         {
             var account = base.Read(id);
             return account?.Role == Role.Patient ? account : null;
-        }
-
-        public override Account Update(Account account)
-        {
-            return base.Update(account);
-        }
-
-        public override Account Delete(Guid id)
-        {
-            return base.Delete(id);
         }
     }
 }

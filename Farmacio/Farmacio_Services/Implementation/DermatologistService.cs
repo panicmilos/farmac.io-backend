@@ -39,30 +39,6 @@ namespace Farmacio_Services.Implementation
             return account?.Role == Role.Dermatologist ? account : null;
         }
 
-        public override Account Update(Account account)
-        {
-            var dermatologistAccount = Read(account.Id);
-            if (dermatologistAccount == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            dermatologistAccount.User.FirstName = account.User.FirstName;
-            dermatologistAccount.User.LastName = account.User.LastName;
-            dermatologistAccount.User.PhoneNumber = account.User.PhoneNumber;
-            dermatologistAccount.User.PID = account.User.PID;
-            dermatologistAccount.User.DateOfBirth = account.User.DateOfBirth;
-
-            dermatologistAccount.User.Address.State = account.User.Address.State;
-            dermatologistAccount.User.Address.City = account.User.Address.City;
-            dermatologistAccount.User.Address.StreetName = account.User.Address.StreetName;
-            dermatologistAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
-            dermatologistAccount.User.Address.Lat = account.User.Address.Lat;
-            dermatologistAccount.User.Address.Lng = account.User.Address.Lng;
-
-            return base.Update(dermatologistAccount);
-        }
-
         public IEnumerable<Account> ReadForPharmacy(Guid pharmacyId)
         {
             return FilterByPharmacyId(Read(), pharmacyId);

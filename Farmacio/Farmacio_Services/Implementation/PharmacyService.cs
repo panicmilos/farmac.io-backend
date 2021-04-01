@@ -110,25 +110,25 @@ namespace Farmacio_Services.Implementation
             base.Update(pharmacy);
         }
 
-        public override Pharmacy Update(Pharmacy entity)
+        public override Pharmacy Update(Pharmacy pharmacy)
         {
-            var pharmacy = Read(entity.Id);
-            if (pharmacy == null)
+            var existingPharmacy = Read(pharmacy.Id);
+            if (existingPharmacy == null)
             {
                 throw new MissingEntityException("Given pharmacy does not exist in the system.");
             }
 
-            pharmacy.Name = entity.Name;
-            pharmacy.Description = entity.Description;
+            existingPharmacy.Name = pharmacy.Name;
+            existingPharmacy.Description = pharmacy.Description;
 
-            pharmacy.Address.State = entity.Address.State;
-            pharmacy.Address.City = entity.Address.City;
-            pharmacy.Address.StreetName = entity.Address.StreetName;
-            pharmacy.Address.StreetNumber = entity.Address.StreetNumber;
-            pharmacy.Address.Lat = entity.Address.Lat;
-            pharmacy.Address.Lng = entity.Address.Lng;
+            existingPharmacy.Address.State = pharmacy.Address.State;
+            existingPharmacy.Address.City = pharmacy.Address.City;
+            existingPharmacy.Address.StreetName = pharmacy.Address.StreetName;
+            existingPharmacy.Address.StreetNumber = pharmacy.Address.StreetNumber;
+            existingPharmacy.Address.Lat = pharmacy.Address.Lat;
+            existingPharmacy.Address.Lng = pharmacy.Address.Lng;
             
-            return base.Update(entity);
+            return base.Update(existingPharmacy);
         }
     }
 }

@@ -39,6 +39,30 @@ namespace Farmacio_Services.Implementation
             return createdAccount;
         }
 
+        public override Account Update(Account account)
+        {
+            var existingAccount = Read(account.Id);
+            if (existingAccount == null)
+            {
+                throw new MissingEntityException();
+            }
+
+            existingAccount.User.FirstName = account.User.FirstName;
+            existingAccount.User.LastName = account.User.LastName;
+            existingAccount.User.PhoneNumber = account.User.PhoneNumber;
+            existingAccount.User.PID = account.User.PID;
+            existingAccount.User.DateOfBirth = account.User.DateOfBirth;
+
+            existingAccount.User.Address.State = account.User.Address.State;
+            existingAccount.User.Address.City = account.User.Address.City;
+            existingAccount.User.Address.StreetName = account.User.Address.StreetName;
+            existingAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
+            existingAccount.User.Address.Lat = account.User.Address.Lat;
+            existingAccount.User.Address.Lng = account.User.Address.Lng;
+
+            return base.Update(existingAccount);
+        }
+
         public Account ReadByEmail(string email)
         {
             var foundEmail = _repository.Read()

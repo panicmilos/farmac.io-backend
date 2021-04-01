@@ -1,3 +1,4 @@
+using System;
 using Farmacio_API.Extensions;
 using Farmacio_Repositories.Implementation;
 using Microsoft.AspNetCore.Hosting;
@@ -7,13 +8,16 @@ namespace Farmacio_API
 {
     public class Program
     {
+        private static readonly bool RunMigrations = Environment.GetEnvironmentVariable("RunMigrations") == "true";
+        private static readonly bool SeedDatabase = Environment.GetEnvironmentVariable("SeedDatabase") == "true";
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args)
-                .Build()
-                .MigrateDbContext<DatabaseContext>()
-                .SeedDbContext<DatabaseContext>()
-                .Run();
+            var host = CreateHostBuilder(args).Build();
+            if (RunMigrations)
+                host.MigrateDbContext<DatabaseContext>();
+            if (SeedDatabase)
+                host.SeedDbContext<DatabaseContext>();
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)
