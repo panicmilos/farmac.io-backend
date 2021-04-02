@@ -3,6 +3,7 @@ using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,6 +42,24 @@ namespace Farmacio_Services.Implementation
             replacements.ForEach(replacement => _medicineReplacementService.Create(replacement));
 
             return fullMedicineDto;
+        }
+
+        public override Medicine Delete(Guid id)
+        {
+            var medicine = Read(id);
+            if (medicine == null)
+            {
+                throw new MissingEntityException();
+            }
+
+            medicine.Active = false;
+            medicine.Type.Active = false;
+            medicine.MedicineIngredients.ForEach(ingritient => ingritient.Active = false);
+            base.Update(medicine);
+
+            _medicineReplacementService.DeleteReplacementsFor(medicine.Id);
+
+            return medicine;
         }
 
         public IEnumerable<SmallMedicineDTO> ReadForDisplay()

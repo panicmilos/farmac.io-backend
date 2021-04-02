@@ -1,7 +1,9 @@
 using AutoMapper;
 using Farmacio_API.Contracts.Requests.Medicines;
+using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -25,6 +27,16 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns all medicines from the system.
+        /// </summary>
+        /// <response code="200">Returns list of medicines.</response>
+        [HttpGet]
+        public IEnumerable<Medicine> GetMedicines()
+        {
+            return _medicineService.Read();
+        }
+
+        /// <summary>
         /// Returns all medicines from the system for home page with less information.
         /// </summary>
         /// <response code="200">Returns list of small medicines objects.</response>
@@ -32,6 +44,23 @@ namespace Farmacio_API.Controllers
         public IEnumerable<SmallMedicineDTO> ReadForHomePage()
         {
             return _medicineService.ReadForDisplay();
+        }
+
+        /// <summary>
+        /// Returns medicine specified by id.
+        /// </summary>
+        /// <response code="200">Returns medicine.</response>
+        /// <response code="404">Unable to return medicine because it does not exist in the system.</response>
+        [HttpGet("{id}")]
+        public IActionResult GetMedicine(Guid id)
+        {
+            var medicine = _medicineService.Read(id);
+            if (medicine == null)
+            {
+                throw new MissingEntityException();
+            }
+
+            return Ok(medicine);
         }
 
         /// <summary>
@@ -57,6 +86,19 @@ namespace Farmacio_API.Controllers
             _medicineService.Create(fullMedicineDto);
 
             return Ok(fullMedicineDto);
+        }
+
+        /// <summary>
+        /// Deletes medicine from the system.
+        /// </summary>
+        /// <response code="200">Returns deleted medicine.</response>
+        /// <response code="404">Unable to delete medicine because it does not exist.</response>
+        [HttpDelete("{id}")]
+        public IActionResult DeleteMedicine(Guid id)
+        {
+            var deletedMedicine = _medicineService.Delete(id);
+
+            return Ok(deletedMedicine);
         }
     }
 }
