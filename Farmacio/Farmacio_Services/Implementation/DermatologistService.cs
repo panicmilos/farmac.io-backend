@@ -91,7 +91,9 @@ namespace Farmacio_Services.Implementation
 
             _dermatologistWorkPlaceService.Create(newWorkPlace);
 
-            return Update(dermatologistAccount);
+            var updatedAccount = Update(dermatologistAccount);
+            SaveChanges();
+            return updatedAccount;
         }
 
         public Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistAccountId)
@@ -104,6 +106,7 @@ namespace Farmacio_Services.Implementation
                 throw new NotEmployedInPharmacyException("Dermatologist is not employed in the given pharmacy.");
 
             _dermatologistWorkPlaceService.Delete(workPlace.Id);
+            SaveChanges();
             return dermatologistAccount;
         }
 

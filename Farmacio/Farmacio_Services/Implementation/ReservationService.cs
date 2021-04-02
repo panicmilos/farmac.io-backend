@@ -55,7 +55,9 @@ namespace Farmacio_Services.Implementation
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity);
             }
 
-            return base.Update(reservation);
+            var canceledMedicineReservation = base.Update(reservation);
+            SaveChanges();
+            return canceledMedicineReservation;
         }
 
         public override Reservation Create(Reservation reservation)
@@ -94,7 +96,7 @@ namespace Farmacio_Services.Implementation
             var createdReservation = Create(reservation);
             var email = _templatesProvider.FromTemplate<Email>("Reservation", new { Name = patientAccount.User.FirstName, Id = reservation.UniqueId, Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
-
+            SaveChanges();
             return createdReservation;
         }
 

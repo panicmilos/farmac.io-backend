@@ -52,18 +52,18 @@ namespace Farmacio_Services.Implementation
                 .GetDermatologistWorkPlaceInPharmacy(appointment.MedicalStaffId, pharmacy.Id);
             if (workPlace == null)
                 throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
-            
+
             ValidateAppointmentDateTime(appointment, workPlace, appointment.MedicalStaffId);
 
             var priceList = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id);
-            if(priceList == null)
+            if (priceList == null)
                 throw new MissingEntityException("Price list not found for the given pharmacy.");
-            
+
             var price = appointment.Price ?? priceList.ExaminationPrice;
-            if(price <= 0 || price > 999999)
+            if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
-            return Create(new Appointment
+            var createdAppointment = Create(new Appointment
             {
                 PharmacyId = appointment.PharmacyId,
                 MedicalStaffId = appointment.MedicalStaffId,
@@ -71,6 +71,8 @@ namespace Farmacio_Services.Implementation
                 Duration = appointment.Duration,
                 Price = price
             });
+            SaveChanges();
+            return createdAppointment;
         }
 
         private void ValidateAppointmentDateTime(CreateAppointmentDTO appointment, DermatologistWorkPlace workPlace,

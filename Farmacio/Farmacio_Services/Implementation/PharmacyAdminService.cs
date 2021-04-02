@@ -42,13 +42,17 @@ namespace Farmacio_Services.Implementation
         public override Account Create(Account account)
         {
             ValidatePharmacyId(account);
-            return base.Create(account);
+            var createdAccount = base.Create(account);
+            SaveChanges();
+            return createdAccount;
         }
 
         public override Account Update(Account account)
         {
             ValidatePharmacyId(account);
-            return base.Update(account);
+            var updatedAccount = base.Update(account);
+            SaveChanges();
+            return updatedAccount;
         }
 
         private void ValidatePharmacyId(Account account)

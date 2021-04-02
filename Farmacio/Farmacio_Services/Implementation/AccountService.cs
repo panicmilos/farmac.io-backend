@@ -33,9 +33,9 @@ namespace Farmacio_Services.Implementation
 
             account.Salt = CryptographyUtils.GetRandomSalt();
             account.Password = CryptographyUtils.GetSaltedAndHashedPassword(account.Password, account.Salt);
-            var createdAccount = base.Create(account);
+            var createdAccount = Create(account);
             _emailVerificationService.SendTo(createdAccount);
-
+            SaveChanges();
             return createdAccount;
         }
 
@@ -55,16 +55,16 @@ namespace Farmacio_Services.Implementation
             existingAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
             existingAccount.User.Address.Lat = account.User.Address.Lat;
             existingAccount.User.Address.Lng = account.User.Address.Lng;
-
-            return base.Update(existingAccount);
+            
+            var updatedAccount = base.Update(existingAccount);
+            SaveChanges();
+            return updatedAccount;
         }
 
         public Account ReadByEmail(string email)
         {
-            var foundEmail = Repository.Read()
-                                        .FirstOrDefault(account => account.Email == email);
-
-            return foundEmail;
+            return Repository.Read()
+                .FirstOrDefault(account => account.Email == email);
         }
 
         public Account Verify(Guid accountId)
@@ -76,7 +76,10 @@ namespace Farmacio_Services.Implementation
             }
 
             account.IsVerified = true;
-            return Repository.Update(account);
+            
+            var updatedAccount = base.Update(account);
+            SaveChanges();
+            return updatedAccount;
         }
 
         public IEnumerable<Account> SearchByName(string name)
@@ -88,17 +91,12 @@ namespace Farmacio_Services.Implementation
 
         private bool IsUsernameTaken(string username)
         {
-            var foundAccount = Repository.Read()
-                                          .FirstOrDefault(account => account.Username == username);
-
-            return foundAccount != default;
+            return Read().FirstOrDefault(account => account.Username == username) != null;
         }
 
         private bool IsEmailTaken(string email)
         {
-            var foundEmail = ReadByEmail(email);
-
-            return foundEmail != default;
+            return ReadByEmail(email) != null;
         }
     }
 }

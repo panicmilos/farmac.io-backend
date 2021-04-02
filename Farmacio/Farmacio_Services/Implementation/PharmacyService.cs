@@ -23,7 +23,6 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid medicineId)
         {
-
             var listOfPharmacies = new List<PharmaciesOfMedicineDTO>();
             foreach(var pharmacy in base.Read().ToList())
             {
@@ -44,7 +43,7 @@ namespace Farmacio_Services.Implementation
                     Price = medicinePrice.Price
                 });
             }
-            return listOfPharmacies.AsEnumerable();
+            return listOfPharmacies;
         }
 
         public IEnumerable<SmallPharmacyDTO> ReadForHomePage()
@@ -100,6 +99,7 @@ namespace Farmacio_Services.Implementation
             medicineStock.Quantity += changeFor;
 
             base.Update(pharmacy);
+            SaveChanges();
         }
 
         public override Pharmacy Update(Pharmacy pharmacy)
@@ -115,8 +115,10 @@ namespace Farmacio_Services.Implementation
             existingPharmacy.Address.StreetNumber = pharmacy.Address.StreetNumber;
             existingPharmacy.Address.Lat = pharmacy.Address.Lat;
             existingPharmacy.Address.Lng = pharmacy.Address.Lng;
-            
-            return base.Update(existingPharmacy);
+
+            var updatedPharmacy = base.Update(existingPharmacy);
+            SaveChanges();
+            return updatedPharmacy;
         }
     }
 }
