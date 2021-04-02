@@ -12,5 +12,6 @@ namespace Farmacio_Services.Contracts
         T TryToRead(Guid id);
         T Update(T entity);
         T Delete(Guid id);
+        void SaveChanges();
     }
 }

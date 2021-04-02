@@ -9,26 +9,26 @@ namespace Farmacio_Services.Implementation
 {
     public class CrudService<T> : ICrudService<T> where T : BaseEntity
     {
-        protected readonly IRepository<T> _repository;
+        protected readonly IRepository<T> Repository;
 
         public CrudService(IRepository<T> repository)
         {
-            _repository = repository;
+            Repository = repository;
         }
 
         public virtual T Create(T entity)
         {
-            return _repository.Create(entity);
+            return Repository.Create(entity);
         }
 
         public virtual IEnumerable<T> Read()
         {
-            return _repository.Read();
+            return Repository.Read();
         }
 
         public virtual T Read(Guid id)
         {
-            return _repository.Read(id);
+            return Repository.Read(id);
         }
 
         public virtual T TryToRead(Guid id)
@@ -41,24 +41,27 @@ namespace Farmacio_Services.Implementation
 
         public virtual T Update(T entity)
         {
-            var entityForUpdate = _repository.Update(entity);
+            var entityForUpdate = Repository.Update(entity);
             if (entityForUpdate == null)
             {
                 throw new MissingEntityException();
             }
-
             return entityForUpdate;
         }
 
         public virtual T Delete(Guid id)
         {
-            var entityForDeletion = _repository.Delete(id);
+            var entityForDeletion = Repository.Delete(id);
             if (entityForDeletion == null)
             {
                 throw new MissingEntityException();
             }
-
             return entityForDeletion;
+        }
+
+        public void SaveChanges()
+        {
+            Repository.SaveChanges();
         }
     }
 }

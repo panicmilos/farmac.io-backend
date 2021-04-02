@@ -61,7 +61,7 @@ namespace Farmacio_Services.Implementation
 
         public Account ReadByEmail(string email)
         {
-            var foundEmail = _repository.Read()
+            var foundEmail = Repository.Read()
                                         .FirstOrDefault(account => account.Email == email);
 
             return foundEmail;
@@ -76,7 +76,7 @@ namespace Farmacio_Services.Implementation
             }
 
             account.IsVerified = true;
-            return _repository.Update(account);
+            return Repository.Update(account);
         }
 
         public IEnumerable<Account> SearchByName(string name)
@@ -88,7 +88,7 @@ namespace Farmacio_Services.Implementation
 
         private bool IsUsernameTaken(string username)
         {
-            var foundAccount = _repository.Read()
+            var foundAccount = Repository.Read()
                                           .FirstOrDefault(account => account.Username == username);
 
             return foundAccount != default;

@@ -21,23 +21,17 @@ namespace Farmacio_Repositories.Implementation
         public virtual T Create(T entity)
         {
             _entities.Add(entity);
-            _context.SaveChanges();
-
             return entity;
         }
 
         public virtual IEnumerable<T> Read()
         {
-            var allEntities = _entities.Where(entity => entity.Active);
-
-            return allEntities;
+            return _entities.Where(entity => entity.Active);
         }
 
         public virtual T Read(Guid id)
         {
-            var entity = _entities.FirstOrDefault(e => e.Id == id && e.Active);
-
-            return entity;
+            return _entities.FirstOrDefault(e => e.Id == id && e.Active);
         }
 
         public virtual T Update(T entity)
@@ -46,9 +40,7 @@ namespace Farmacio_Repositories.Implementation
             if(entityForUpdate != null)
             {
                 _context.Entry(entityForUpdate).CurrentValues.SetValues(entity);
-                _context.SaveChanges();
             }
-
             return entityForUpdate;
         }
 
@@ -62,6 +54,11 @@ namespace Farmacio_Repositories.Implementation
             }
 
             return entityForDeletion;
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
         }
     }
 }
