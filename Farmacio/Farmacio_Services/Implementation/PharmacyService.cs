@@ -30,7 +30,7 @@ namespace Farmacio_Services.Implementation
                 var medicinePrice = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id)
                     .MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
                     .OrderByDescending(mp => mp.ActiveFrom)
-                   .FirstOrDefault();
+                    .FirstOrDefault();
                 
                 if (medicinePrice == null)
                     continue;
@@ -62,11 +62,7 @@ namespace Farmacio_Services.Implementation
 
         public MedicineInPharmacyDTO ReadMedicine(Guid pharmacyId, Guid medicineId)
         {
-            var pharmacy = Read(pharmacyId);
-            if (pharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var pharmacy = TryToRead(pharmacyId);
 
             var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
@@ -93,11 +89,7 @@ namespace Farmacio_Services.Implementation
 
         public void ChangeStockFor(Guid pharmacyId, Guid medicineId, int changeFor)
         {
-            var pharmacy = Read(pharmacyId);
-            if (pharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var pharmacy = TryToRead(pharmacyId);
 
             var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
@@ -112,11 +104,7 @@ namespace Farmacio_Services.Implementation
 
         public override Pharmacy Update(Pharmacy pharmacy)
         {
-            var existingPharmacy = Read(pharmacy.Id);
-            if (existingPharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var existingPharmacy = TryToRead(pharmacy.Id);
 
             existingPharmacy.Name = pharmacy.Name;
             existingPharmacy.Description = pharmacy.Description;

@@ -31,6 +31,14 @@ namespace Farmacio_Services.Implementation
             return _repository.Read(id);
         }
 
+        public virtual T TryToRead(Guid id)
+        {
+            var existingEntity = Read(id);
+            if(existingEntity == null)
+                throw new MissingEntityException($"{nameof(T)} not found.");
+            return existingEntity;
+        }
+
         public virtual T Update(T entity)
         {
             var entityForUpdate = _repository.Update(entity);

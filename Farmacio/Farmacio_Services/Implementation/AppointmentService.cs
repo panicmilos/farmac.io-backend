@@ -46,9 +46,7 @@ namespace Farmacio_Services.Implementation
 
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment)
         {
-            var pharmacy = _pharmacyService.Read(appointment.PharmacyId);
-            if (pharmacy == null)
-                throw new MissingEntityException("Pharmacy not found.");
+            var pharmacy = _pharmacyService.TryToRead(appointment.PharmacyId);
 
             var workPlace = _dermatologistWorkPlaceService
                 .GetDermatologistWorkPlaceInPharmacy(appointment.MedicalStaffId, pharmacy.Id);

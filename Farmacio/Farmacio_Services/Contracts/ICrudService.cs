@@ -9,6 +9,7 @@ namespace Farmacio_Services.Contracts
         T Create(T entity);
         IEnumerable<T> Read();
         T Read(Guid id);
+        T TryToRead(Guid id);
         T Update(T entity);
         T Delete(Guid id);
     }

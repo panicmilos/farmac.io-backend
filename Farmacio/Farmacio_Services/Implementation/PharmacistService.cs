@@ -30,11 +30,18 @@ namespace Farmacio_Services.Implementation
 
             return account?.Role == Role.Pharmacist ? account : null;
         }
+        
+        public override Account TryToRead(Guid id)
+        {
+            var existingAccount = Read(id);
+            if(existingAccount == null || existingAccount.Role != Role.Pharmacist)
+                throw new MissingEntityException("Pharmacist account not found.");
+            return existingAccount;
+        }
 
         public override Account Create(Account account)
         {
             ValidatePharmacyId(account);
-
             return base.Create(account);
         }
 
@@ -63,8 +70,7 @@ namespace Farmacio_Services.Implementation
 
         private void ValidatePharmacyId(Account account)
         {
-            if (_pharmacyService.Read(((Pharmacist)account.User).PharmacyId) == null)
-                throw new MissingEntityException("Pharmacy with the provided id does not exist.");
+            _pharmacyService.TryToRead(((Pharmacist) account.User).PharmacyId);
         }
 
         private static IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
