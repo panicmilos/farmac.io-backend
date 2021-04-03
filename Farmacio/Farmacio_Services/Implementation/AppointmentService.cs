@@ -17,21 +17,25 @@ namespace Farmacio_Services.Implementation
         private readonly IAccountService _accountService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPharmacyPriceListService _pharmacyPriceListService;
+        private readonly IPatientService _patientService;
         
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
-            , IPharmacyPriceListService pharmacyPriceListService) : base(repository)
+            , IPharmacyPriceListService pharmacyPriceListService
+            , IPatientService patientService) : base(repository)
+
         {
             _pharmacyService = pharmacyService;
             _accountService = accountService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _pharmacyPriceListService = pharmacyPriceListService;
+            _patientService = patientService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
-            return Read().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
+            return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
         }
         
         public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
@@ -94,6 +98,40 @@ namespace Farmacio_Services.Implementation
             if (overlap != null)
                 throw new InvalidAppointmentDateTimeException(
                     "Dermatologist already has an appointment defined on the given date-time.");
+        }
+
+        public Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointmentRequest)
+        {
+            var appointmentWithDermatologist = base.Read(appointmentRequest.AppointmentId);
+            if(appointmentWithDermatologist == null)
+            {
+                throw new MissingEntityException("The given appointment does not exist in the system.");
+            }
+
+            Console.WriteLine(appointmentWithDermatologist.IsReserved);
+            if (appointmentWithDermatologist.IsReserved)
+            {
+                throw new BadLogicException("The given appointment is already reserved.");
+            }
+
+            if (_patientService.ExceededLimitOfNegativePoints(appointmentRequest.PatientId))
+            {
+                throw new BadLogicException("The given patient have 3 or more negative points.");
+            }
+
+            var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentRequest.PatientId);
+            foreach(var appointment in patientsAppointments)
+            {
+                if(TimeIntervalUtils.TimeIntervalTimesOverlap(appointment.DateTime, @appointment.DateTime.AddMinutes(appointment.Duration), appointmentWithDermatologist.DateTime,
+                    appointmentWithDermatologist.DateTime.AddMinutes(appointmentWithDermatologist.Duration)))
+                {
+                    throw new BadLogicException("The given appointment overlpas with the already reserved appointment of the patient.");
+                }
+            }
+
+            appointmentWithDermatologist.IsReserved = true;
+            appointmentWithDermatologist.PatientId = appointmentRequest.PatientId;
+            return base.Update(appointmentWithDermatologist);
         }
     }
 }

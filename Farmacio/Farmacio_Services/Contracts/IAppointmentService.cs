@@ -10,5 +10,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId);
         IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId);
         Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment);
+        Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointment);
     }
 }

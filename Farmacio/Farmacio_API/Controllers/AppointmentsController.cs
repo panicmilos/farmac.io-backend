@@ -67,5 +67,19 @@ namespace Farmacio_API.Controllers
             return Ok(appointment);
         }
 
+        /// <summary>
+        /// Make an appointment with a dermatologist.
+        /// </summary>
+        /// <response code="200">Maked appointment.</response>
+        /// <response code="404">Appointment not found.</response>
+        /// <response code="400">Patient already has appointment in this time, patient has 3 or more negative points, appointment is already reserved.</response>
+        [HttpPost("make-appointment")]
+        public IActionResult MakeAppointmentWithDermatologist(CreateAppointmentWithDermatologist request)
+        {
+            var appointment = _mapper.Map<MakeAppointmentWithDermatologistDTO>(request);
+            _appointmentService.MakeAppointmentWithDermatologist(appointment);
+
+            return Ok(appointment);
+        }
     }
 }

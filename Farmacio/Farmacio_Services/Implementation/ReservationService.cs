@@ -63,9 +63,9 @@ namespace Farmacio_Services.Implementation
             _pharmacyService.TryToRead(reservation.PharmacyId);
 
             var patientAccount = _patientService.TryToRead(reservation.PatientId);
-
+           
             var patient = (Patient)patientAccount.User;
-            if (patient.NegativePoints >= 3)
+            if (_patientService.ExceededLimitOfNegativePoints(patient.Id))
             {
                 throw new BadLogicException("You have 3 negative points, so you cannot reserve a medicine.");
             }

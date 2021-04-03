@@ -11,6 +11,7 @@ namespace Farmacio_API.Mappings.Appointments
         public RequestsToDomain()
         {
             CreateMap<CreateAppointmentRequest, CreateAppointmentDTO>();
+            CreateMap<CreateAppointmentWithDermatologist, MakeAppointmentWithDermatologistDTO>();
         }
     }
 }
