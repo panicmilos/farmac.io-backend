@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Farmacio_API.Validations.Medicines
 {
-    public class CreateMedicineIngridientRequestValidator : AbstractValidator<CreateMedicineIngridientRequest>
+    public class UpdateMedicineIngredientRequestValidator : AbstractValidator<UpdateMedicineIngredientRequest>
     {
-        public CreateMedicineIngridientRequestValidator()
+        public UpdateMedicineIngredientRequestValidator()
         {
             RuleFor(request => request.Name).NotNull().NotEmpty().WithMessage("Ingridient name must be provided.");
 

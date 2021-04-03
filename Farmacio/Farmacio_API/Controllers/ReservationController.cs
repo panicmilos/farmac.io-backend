@@ -36,7 +36,7 @@ namespace Farmacio_API.Controllers
         public IEnumerable<SmallReservationDTO> GetPatientsFutureReservations(Guid patientId)
         {
             return _reservationService.ReadPatientReservations(patientId);
-        } 
+        }
 
         [HttpDelete("cancel/{reservationId}")]
         public IActionResult CancelMedicineReservation(Guid reservationId)

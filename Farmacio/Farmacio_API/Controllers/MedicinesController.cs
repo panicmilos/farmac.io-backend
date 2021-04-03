@@ -54,7 +54,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetMedicine(Guid id)
         {
-            var medicine = _medicineService.Read(id);
+            var medicine = _medicineService.ReadFullMedicine(id);
             if (medicine == null)
             {
                 throw new MissingEntityException();
@@ -80,12 +80,26 @@ namespace Farmacio_API.Controllers
         /// <response code="401">Unable to create medicine because code is already taken.</response>
         /// <response code="404">Unable to create medicine because replacement medicine does not.</response>
         [HttpPost]
-        public IActionResult CreateMedicine(CreateMedicineRequest requst)
+        public IActionResult CreateMedicine(CreateMedicineRequest request)
         {
-            var fullMedicineDto = _mapper.Map<FullMedicineDTO>(requst);
+            var fullMedicineDto = _mapper.Map<FullMedicineDTO>(request);
             _medicineService.Create(fullMedicineDto);
 
             return Ok(fullMedicineDto);
+        }
+
+        /// <summary>
+        /// Updates an existing medicine from the system.
+        /// </summary>
+        /// <response code="200">Returns updated medicine.</response>
+        /// <response code="404">Unable to update medicine because it does not exist.</response>
+        [HttpPut]
+        public IActionResult UpdatePharmacyAdmin(UpdateMedicineRequest request)
+        {
+            var fullMedicineDto = _mapper.Map<FullMedicineDTO>(request);
+            var updatedMedicine = _medicineService.Update(fullMedicineDto);
+
+            return Ok(updatedMedicine);
         }
 
         /// <summary>

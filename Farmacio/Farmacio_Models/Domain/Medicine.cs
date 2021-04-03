@@ -15,7 +15,6 @@ namespace Farmacio_Models.Domain
         public string Contraindications { get; set; }
         public string AdditionalInfo { get; set; }
         public string RecommendedDose { get; set; }
-        public virtual List<MedicineIngredient> MedicineIngredients { get; set; }
         public int AverageGrade { get; set; }
     }
 
@@ -39,6 +38,7 @@ namespace Farmacio_Models.Domain
 
     public class MedicineIngredient : BaseEntity
     {
+        public Guid MedicineId { get; set; }
         public string Name { get; set; }
         public float MassInMilligrams { get; set; }
     }

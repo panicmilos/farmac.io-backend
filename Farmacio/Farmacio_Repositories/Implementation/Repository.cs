@@ -43,7 +43,7 @@ namespace Farmacio_Repositories.Implementation
         public virtual T Update(T entity)
         {
             var entityForUpdate = Read(entity.Id);
-            if(entityForUpdate != null)
+            if (entityForUpdate != null)
             {
                 _context.Entry(entityForUpdate).CurrentValues.SetValues(entity);
                 _context.SaveChanges();

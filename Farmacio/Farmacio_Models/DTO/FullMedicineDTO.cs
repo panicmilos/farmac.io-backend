@@ -6,6 +6,7 @@ namespace Farmacio_Models.DTO
     public class FullMedicineDTO
     {
         public Medicine Medicine { get; set; }
+        public List<MedicineIngredient> Ingredients { get; set; }
         public List<MedicineReplacement> Replacements { get; set; }
     }
 }

@@ -11,17 +11,31 @@ namespace Farmacio_Services.Implementation
 {
     public class MedicineService : CrudService<Medicine>, IMedicineService
     {
-        private readonly IMedicineReplacementService _medicineReplacementService;
+        private readonly IMedicineReplacementService _replacementService;
+        private readonly IMedicineIngredientService _ingredientService;
 
-        public MedicineService(IMedicineReplacementService medicineReplacementService, IRepository<Medicine> repository) :
+        public MedicineService(IMedicineReplacementService replacementService, IMedicineIngredientService ingredientService,
+            IRepository<Medicine> repository) :
             base(repository)
         {
-            _medicineReplacementService = medicineReplacementService;
+            _replacementService = replacementService;
+            _ingredientService = ingredientService;
+        }
+
+        public FullMedicineDTO ReadFullMedicine(Guid id)
+        {
+            return new FullMedicineDTO
+            {
+                Medicine = base.Read(id),
+                Ingredients = _ingredientService.GetIngredientsFor(id).ToList(),
+                Replacements = _replacementService.GetReplacementsFor(id).ToList()
+            };
         }
 
         public FullMedicineDTO Create(FullMedicineDTO fullMedicineDto)
         {
             var medicine = fullMedicineDto.Medicine;
+            var ingredients = fullMedicineDto.Ingredients;
             var replacements = fullMedicineDto.Replacements;
 
             if (!IsIdUnique(medicine.UniqueId))
@@ -38,8 +52,49 @@ namespace Farmacio_Services.Implementation
             }
 
             var createdMedicine = base.Create(medicine);
-            replacements.ForEach(replacement => replacement.MedicineId = medicine.Id);
-            replacements.ForEach(replacement => _medicineReplacementService.Create(replacement));
+            ingredients.ForEach(ingredient => { ingredient.MedicineId = medicine.Id; _ingredientService.Create(ingredient); });
+            replacements.ForEach(replacement => { replacement.MedicineId = medicine.Id; _replacementService.Create(replacement); });
+
+            return fullMedicineDto;
+        }
+
+        public override Medicine Update(Medicine medicine)
+        {
+            var existingMedicine = Read(medicine.Id);
+            if (existingMedicine == null)
+            {
+                throw new MissingEntityException("Medicine does not exist in the system.");
+            }
+
+            existingMedicine.Name = medicine.Name;
+            existingMedicine.Form = medicine.Form;
+            existingMedicine.Type.TypeName = medicine.Type.TypeName;
+            existingMedicine.Manufacturer = medicine.Manufacturer;
+            existingMedicine.IsRecipeOnly = medicine.IsRecipeOnly;
+            existingMedicine.Contraindications = medicine.Contraindications;
+            existingMedicine.AdditionalInfo = medicine.AdditionalInfo;
+            existingMedicine.RecommendedDose = medicine.RecommendedDose;
+
+            return base.Update(existingMedicine);
+        }
+
+        public FullMedicineDTO Update(FullMedicineDTO fullMedicineDto)
+        {
+            var medicine = fullMedicineDto.Medicine;
+            var ingredients = fullMedicineDto.Ingredients;
+            var replacements = fullMedicineDto.Replacements;
+
+            foreach (var replacement in replacements)
+            {
+                if (Read(replacement.ReplacementMedicineId) == null)
+                {
+                    throw new MissingEntityException("Replacement medicine does not exist in the system.");
+                }
+            }
+
+            fullMedicineDto.Medicine = Update(medicine);
+            _replacementService.UpdateReplacementsFor(medicine.Id, replacements);
+            _ingredientService.UpdateIngridientsFor(medicine.Id, ingredients);
 
             return fullMedicineDto;
         }
@@ -54,10 +109,10 @@ namespace Farmacio_Services.Implementation
 
             medicine.Active = false;
             medicine.Type.Active = false;
-            medicine.MedicineIngredients.ForEach(ingritient => ingritient.Active = false);
             base.Update(medicine);
 
-            _medicineReplacementService.DeleteReplacementsFor(medicine.Id);
+            _ingredientService.DeleteIngridientsFor(medicine.Id);
+            _replacementService.DeleteReplacementsFor(medicine.Id);
 
             return medicine;
         }

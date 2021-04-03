@@ -13,6 +13,7 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IPharmacyStockService _pharmacyStockService;
+
         public PharmacyService(IPharmacyPriceListService pharmacyPriceListService, IPharmacyStockService pharmacyStockService
             , IRepository<Pharmacy> repository) :
             base(repository)
@@ -23,15 +24,14 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid medicineId)
         {
-
             var listOfPharmacies = new List<PharmaciesOfMedicineDTO>();
-            foreach(var pharmacy in base.Read().ToList())
+            foreach (var pharmacy in base.Read().ToList())
             {
-                var medicinePrice = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id)
-                    .MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
+                var medicinePrice = _pharmacyPriceListService?.ReadForPharmacy(pharmacy.Id)
+                    ?.MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
                     .OrderByDescending(mp => mp.ActiveFrom)
                    .FirstOrDefault();
-                
+
                 if (medicinePrice == null)
                     continue;
 
@@ -127,7 +127,7 @@ namespace Farmacio_Services.Implementation
             existingPharmacy.Address.StreetNumber = pharmacy.Address.StreetNumber;
             existingPharmacy.Address.Lat = pharmacy.Address.Lat;
             existingPharmacy.Address.Lng = pharmacy.Address.Lng;
-            
+
             return base.Update(existingPharmacy);
         }
     }

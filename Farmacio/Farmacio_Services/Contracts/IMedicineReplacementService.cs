@@ -6,7 +6,9 @@ namespace Farmacio_Services.Contracts
 {
     public interface IMedicineReplacementService : ICrudService<MedicineReplacement>
     {
-        IEnumerable<Medicine> GetReplacementsFor(Guid medicineId);
+        IEnumerable<MedicineReplacement> GetReplacementsFor(Guid medicineId);
+
+        void UpdateReplacementsFor(Guid medicineId, IEnumerable<MedicineReplacement> replacements);
 
         void DeleteReplacementsFor(Guid medicineId);
     }

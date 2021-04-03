@@ -14,19 +14,37 @@ namespace Farmacio_Services.Implementation
         {
         }
 
-        public IEnumerable<Medicine> GetReplacementsFor(Guid medicineId)
+        public IEnumerable<MedicineReplacement> GetReplacementsFor(Guid medicineId)
         {
             return base.Read()
                 .ToList()
-                .Where(replacement => replacement.MedicineId == medicineId)
-                .Select(replacement => replacement.ReplacementMedicine);
+                .Where(replacement => replacement.MedicineId == medicineId);
+        }
+
+        public void UpdateReplacementsFor(Guid medicineId, IEnumerable<MedicineReplacement> replacements)
+        {
+            var existingReplacementsFor = GetReplacementsFor(medicineId);
+
+            foreach (var replacement in replacements)
+            {
+                if (existingReplacementsFor.FirstOrDefault(r => r.ReplacementMedicineId == replacement.ReplacementMedicineId) == null)
+                {
+                    replacement.MedicineId = medicineId;
+                    Create(replacement);
+                }
+            }
+            foreach (var replacement in existingReplacementsFor)
+            {
+                if (replacements.FirstOrDefault(r => r.ReplacementMedicineId == replacement.ReplacementMedicineId) == null)
+                {
+                    Delete(replacement.Id);
+                }
+            }
         }
 
         public void DeleteReplacementsFor(Guid medicineId)
         {
-            var replacementsFor = Read()
-                .Where(replacement => replacement.MedicineId == medicineId)
-                .ToList();
+            var replacementsFor = GetReplacementsFor(medicineId).ToList();
 
             replacementsFor.ForEach(replacement => base.Delete(replacement.Id));
         }
