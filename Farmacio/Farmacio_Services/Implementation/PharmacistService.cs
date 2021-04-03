@@ -5,18 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GlobalExceptionHandler.Exceptions;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_Services.Implementation
 {
     public class PharmacistService : AccountService, IPharmacistService
     {
+        private readonly IAppointmentService _appointmentService;
         private readonly IPharmacyService _pharmacyService;
 
-        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService,
-            IRepository<Account> repository) :
+        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService, 
+            IAppointmentService appointmentService, IRepository<Account> repository) :
             base(emailVerificationService, repository)
         {
             _pharmacyService = pharmacyService;
+            _appointmentService = appointmentService;
+
         }
 
         public override IEnumerable<Account> Read()
@@ -80,6 +84,25 @@ namespace Farmacio_Services.Implementation
         private static IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
         {
             return accounts.Where(p => ((Pharmacist) p.User).PharmacyId == pharmacyId);
+        }
+
+        public IEnumerable<PatientDTO> GetPatients(Guid pharmacistId)
+        {
+            var pharmacistAccount = TryToRead(pharmacistId);
+
+            return _appointmentService
+                .ReadForMedicalStaff(pharmacistAccount.UserId)
+                .Where(ap => ap.IsReserved && ap.PatientId != null)
+                .Select(ap => new PatientDTO
+                {
+                    Id = ap.PatientId.Value,
+                    FirstName = ap.Patient.FirstName,
+                    LastName = ap.Patient.LastName,
+                    DateOfBirth = ap.Patient.DateOfBirth,
+                    Address = ap.Patient.Address,
+                    PhoneNumber = ap.Patient.PhoneNumber,
+                    AppointmentDate = ap.DateTime
+                });
         }
     }
 }

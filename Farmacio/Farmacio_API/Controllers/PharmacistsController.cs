@@ -50,7 +50,17 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.Read(id));
         }
-        
+
+        /// <summary>
+        /// Reads all pharmacist's patients.
+        /// </summary>
+        /// <response code="200">Read patients.</response>
+        [HttpGet("{id}/patients")]
+        public IActionResult GetPatients(Guid id)
+        {
+            return Ok(_pharmacistService.GetPatients(id));
+        }
+
         /// <summary>
         /// Creates a new pharmacist in the system.
         /// </summary>
