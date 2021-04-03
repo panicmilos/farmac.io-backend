@@ -1,5 +1,4 @@
 ﻿using Farmacio_Models.Domain;
-using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
@@ -11,20 +10,18 @@ using System.Linq;
 
 namespace Farmacio_Services.Implementation
 {
-    public class DermatologistService : AccountService, IDermatologistService
+    public class DermatologistService : MedicalStaffService, IDermatologistService
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
-        private readonly IAppointmentService _appointmentService;
 
         public DermatologistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IAppointmentService appointmentService
             , IRepository<Account> repository)
-            : base(emailVerificationService, repository)
+            : base(emailVerificationService, appointmentService, repository)
         {
             _pharmacyService = pharmacyService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
-            _appointmentService = appointmentService;
         }
 
         public override IEnumerable<Account> Read()
@@ -131,25 +128,6 @@ namespace Farmacio_Services.Implementation
                 .FirstOrDefault(wp => TimeIntervalUtils
                     .TimeIntervalTimesOverlap(wp.WorkTime.From, wp.WorkTime.To, workTime.From, workTime.To));
             return overlap == null;
-        }
-
-        public IEnumerable<PatientDTO> GetPatients(Guid dermatologistAccountId)
-        {
-            var dermatologistAccount = TryToRead(dermatologistAccountId);
-
-            return _appointmentService
-                .ReadForMedicalStaff(dermatologistAccount.UserId)
-                .Where(ap => ap.IsReserved && ap.PatientId != null)
-                .Select(ap => new PatientDTO
-                {
-                    Id = ap.PatientId.Value,
-                    FirstName = ap.Patient.FirstName,
-                    LastName = ap.Patient.LastName,
-                    DateOfBirth = ap.Patient.DateOfBirth,
-                    Address = ap.Patient.Address,
-                    PhoneNumber = ap.Patient.PhoneNumber,
-                    AppointmentDate = ap.DateTime
-                });
         }
     }
 }
