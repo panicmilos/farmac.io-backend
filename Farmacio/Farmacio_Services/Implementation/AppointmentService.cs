@@ -116,7 +116,6 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("The given appointment does not exist in the system.");
             }
 
-            Console.WriteLine(appointmentWithDermatologist.IsReserved);
             if (appointmentWithDermatologist.IsReserved)
             {
                 throw new BadLogicException("The given appointment is already reserved.");
@@ -125,6 +124,11 @@ namespace Farmacio_Services.Implementation
             if (_patientService.ExceededLimitOfNegativePoints(appointmentRequest.PatientId))
             {
                 throw new BadLogicException("The given patient have 3 or more negative points.");
+            }
+
+            if(appointmentWithDermatologist.DateTime < DateTime.Now)
+            {
+                throw new BadLogicException("The given appointment is in the past.");
             }
 
             var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentRequest.PatientId);
@@ -143,6 +147,23 @@ namespace Farmacio_Services.Implementation
             var email = _templatesProvider.FromTemplate<Email>("Appointment", new { Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
             return base.Update(appointmentWithDermatologist);
+        }
+
+        public IEnumerable<Appointment> SortAppointments(Guid pharmacyId, string criteria, bool isAsc)
+        {
+            var sortingCriteriums = new Dictionary<string, Func<Appointment, object>>()
+            {
+                { "grade", a => a.MedicalStaff.AverageGrade },
+                { "price", a => a.Price }
+            };
+
+            var appointments = ReadForDermatologistsInPharmacy(pharmacyId);
+
+            if (sortingCriteriums.TryGetValue(criteria ?? "", out var sortingCriterium)) {
+                appointments = isAsc ? appointments.OrderBy(sortingCriterium) : appointments.OrderByDescending(sortingCriterium);
+            }
+
+            return appointments;
         }
     }
 }

@@ -81,5 +81,16 @@ namespace Farmacio_API.Controllers
 
             return Ok(appointment);
         }
+
+
+        /// <summary>
+        /// Sort an appointment with a dermatologist in pharmacy.
+        /// </summary>
+        /// <response code="200">Sorted appointment.</response>
+        [HttpGet("sort")]
+        public IActionResult SortAppointments(Guid pharmacyId, string criteria, bool isAsc)
+        {
+            return Ok(_appointmentService.SortAppointments(pharmacyId, criteria, isAsc));
+        }
     }
 }
