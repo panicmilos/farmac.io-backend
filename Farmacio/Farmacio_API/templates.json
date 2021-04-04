@@ -44,6 +44,16 @@
         "Recipients": [ "panic.milos99@gmail.com" ],
         "Body": "<p>Dear {{name}},</p><p>You reservation with id {{id}} is successfully created. Please pickup your reservation until: {{deadline}}.</p>"
       }
+    },
+    {
+      "type": "Email",
+      "name": "Appointment",
+      "template": {
+        "Subject": "Successfull making appointment with dermatologist on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "panic.milos99@gmail.com" ],
+        "Body": "<p>Dear {{name}},</p><p>You appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
+      }
     }
   ]
 }

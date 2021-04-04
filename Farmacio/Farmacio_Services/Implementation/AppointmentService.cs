@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using EmailService.Constracts;
+using EmailService.Models;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
@@ -18,12 +20,16 @@ namespace Farmacio_Services.Implementation
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IPatientService _patientService;
-        
+        private readonly IEmailDispatcher _emailDispatcher;
+        private readonly ITemplatesProvider _templatesProvider;
+
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IPharmacyPriceListService pharmacyPriceListService
-            , IPatientService patientService) : base(repository)
+            , IPatientService patientService
+            , IEmailDispatcher emailDispatcher
+            , ITemplatesProvider templateProvider) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -31,6 +37,8 @@ namespace Farmacio_Services.Implementation
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _pharmacyPriceListService = pharmacyPriceListService;
             _patientService = patientService;
+            _emailDispatcher = emailDispatcher;
+            _templatesProvider = templateProvider;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
@@ -131,6 +139,8 @@ namespace Farmacio_Services.Implementation
 
             appointmentWithDermatologist.IsReserved = true;
             appointmentWithDermatologist.PatientId = appointmentRequest.PatientId;
+            var email = _templatesProvider.FromTemplate<Email>("Appointment", new { Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
+            _emailDispatcher.Dispatch(email);
             return base.Update(appointmentWithDermatologist);
         }
     }
