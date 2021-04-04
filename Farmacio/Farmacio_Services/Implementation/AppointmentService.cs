@@ -130,7 +130,8 @@ namespace Farmacio_Services.Implementation
             var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentRequest.PatientId);
             foreach(var appointment in patientsAppointments)
             {
-                if(TimeIntervalUtils.TimeIntervalTimesOverlap(appointment.DateTime, @appointment.DateTime.AddMinutes(appointment.Duration), appointmentWithDermatologist.DateTime,
+                if(appointment.DateTime.Date == appointmentWithDermatologist.DateTime.Date && TimeIntervalUtils.TimeIntervalTimesOverlap(appointment.DateTime, 
+                    appointment.DateTime.AddMinutes(appointment.Duration), appointmentWithDermatologist.DateTime,
                     appointmentWithDermatologist.DateTime.AddMinutes(appointmentWithDermatologist.Duration)))
                 {
                     throw new BadLogicException("The given appointment overlpas with the already reserved appointment of the patient.");
