@@ -42,7 +42,7 @@ namespace Farmacio_Services.Implementation
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);
-            if (existingAccount == null || existingAccount.Role != Role.Dermatologist)
+            if (existingAccount == null)
                 throw new MissingEntityException("Dermatologist account not found.");
             return existingAccount;
         }
@@ -56,7 +56,7 @@ namespace Farmacio_Services.Implementation
         {
             var dermatologistAccount = Read(dermatologistAccountId);
             return _dermatologistWorkPlaceService
-                .GetDermatologistWorkPlaceInPharmacy(dermatologistAccount.UserId, pharmacyId) != null
+                .GetWorkPlaceInPharmacyFor(dermatologistAccount.UserId, pharmacyId) != null
                 ? dermatologistAccount
                 : null;
         }
@@ -72,7 +72,7 @@ namespace Farmacio_Services.Implementation
             var pharmacy = _pharmacyService.TryToRead(pharmacyId);
 
             var workPlace =
-                _dermatologistWorkPlaceService.GetDermatologistWorkPlaceInPharmacy(dermatologistAccount.UserId,
+                _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(dermatologistAccount.UserId,
                     pharmacyId);
 
             if (workPlace != null)
@@ -99,7 +99,7 @@ namespace Farmacio_Services.Implementation
             var dermatologistAccount = TryToRead(dermatologistAccountId);
 
             var workPlace =
-                _dermatologistWorkPlaceService.GetDermatologistWorkPlaceInPharmacy(dermatologistAccount.UserId, pharmacyId);
+                _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(dermatologistAccount.UserId, pharmacyId);
             if (workPlace == null)
                 throw new NotEmployedInPharmacyException("Dermatologist is not employed in the given pharmacy.");
 
@@ -110,7 +110,7 @@ namespace Farmacio_Services.Implementation
         private IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
         {
             return accounts.Where(a =>
-                _dermatologistWorkPlaceService.GetDermatologistWorkPlaceInPharmacy(a.UserId, pharmacyId) != null);
+                _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(a.UserId, pharmacyId) != null);
         }
 
         private static void ValidateWorkTime(WorkTime workTime)
@@ -124,7 +124,7 @@ namespace Farmacio_Services.Implementation
         private bool IsWorkTimeForDermatologistValid(WorkTime workTime, Guid dermatologistId)
         {
             var overlap = _dermatologistWorkPlaceService
-                .GetDermatologistWorkPlaces(dermatologistId)
+                .GetWorkPlacesFor(dermatologistId)
                 .FirstOrDefault(wp => TimeIntervalUtils
                     .TimeIntervalTimesOverlap(wp.WorkTime.From, wp.WorkTime.To, workTime.From, workTime.To));
             return overlap == null;

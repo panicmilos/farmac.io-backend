@@ -6,6 +6,8 @@ services:
     environment:
       - JwtSecret=${JWT_SECRET}
       - EmailSecret=${EMAIL_SECRET}
+      - RunMigrations=${RunMigrations}
+      - SeedDatabase=${SeedDatabase}
     ports:
       - 80
     networks:

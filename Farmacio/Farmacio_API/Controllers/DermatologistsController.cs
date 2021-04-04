@@ -54,10 +54,10 @@ namespace Farmacio_API.Controllers
         [HttpGet("with-work-places")]
         public IActionResult GetDermatologistsWithWorkPlaces()
         {
-            return Ok(_dermatologistService.Read().Select(da => new DermatologistWithWorkPlacesResponse
+            return Ok(_dermatologistService.Read().Select(dermatologistAccount => new DermatologistWithWorkPlacesResponse
             {
-                DermatologistAccount = da,
-                WorkPlaces = _dermatologistWorkPlaceService.GetDermatologistWorkPlaces(da.User.Id)
+                DermatologistAccount = dermatologistAccount,
+                WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
             }));
         }
 
@@ -68,10 +68,10 @@ namespace Farmacio_API.Controllers
         [HttpGet("with-work-places/search")]
         public IActionResult SearchDermatologistsWithWorkPlaces(string name)
         {
-            return Ok(_dermatologistService.SearchByName(name).Select(da => new DermatologistWithWorkPlacesResponse
+            return Ok(_dermatologistService.SearchByName(name).Select(dermatologistAccount => new DermatologistWithWorkPlacesResponse
             {
-                DermatologistAccount = da,
-                WorkPlaces = _dermatologistWorkPlaceService.GetDermatologistWorkPlaces(da.User.Id)
+                DermatologistAccount = dermatologistAccount,
+                WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
             }));
         }
 
