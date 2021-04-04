@@ -34,7 +34,7 @@ namespace Farmacio_Services.Implementation
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);
-            if(existingAccount == null || existingAccount.Role != Role.PharmacyAdmin)
+            if(existingAccount == null)
                 throw new MissingEntityException("Pharmacy Admin account not found.");
             return existingAccount;
         }

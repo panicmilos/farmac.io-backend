@@ -49,7 +49,7 @@ namespace Farmacio_Services.Implementation
             var pharmacy = _pharmacyService.TryToRead(appointment.PharmacyId);
 
             var workPlace = _dermatologistWorkPlaceService
-                .GetDermatologistWorkPlaceInPharmacy(appointment.MedicalStaffId, pharmacy.Id);
+                .GetWorkPlaceInPharmacyFor(appointment.MedicalStaffId, pharmacy.Id);
             if (workPlace == null)
                 throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
             
