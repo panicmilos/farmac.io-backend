@@ -27,11 +27,7 @@ namespace Farmacio_Services.Implementation
             var listOfPharmacies = new List<PharmaciesOfMedicineDTO>();
             foreach (var pharmacy in base.Read().ToList())
             {
-                var medicinePrice = _pharmacyPriceListService?.ReadForPharmacy(pharmacy.Id)
-                    ?.MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
-                    .OrderByDescending(mp => mp.ActiveFrom)
-                   .FirstOrDefault();
-
+                var medicinePrice = GetMedicinePriceInPharmacy(medicineId, pharmacy.Id);
                 if (medicinePrice == null)
                     continue;
 
@@ -62,23 +58,13 @@ namespace Farmacio_Services.Implementation
 
         public MedicineInPharmacyDTO ReadMedicine(Guid pharmacyId, Guid medicineId)
         {
-            var pharmacy = Read(pharmacyId);
-            if (pharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var pharmacy = TryToRead(pharmacyId);
 
             var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
-            {
                 throw new MissingEntityException("Given pharmacy does not have wanted medicine.");
-            }
 
-            var medicinePrice = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id)
-                .MedicinePriceList
-                .Where(mp => mp.MedicineId == medicineId)
-                .OrderByDescending(mp => mp.ActiveFrom)
-                .FirstOrDefault();
+            var medicinePrice = GetMedicinePriceInPharmacy(medicineId, pharmacyId);
             if (medicinePrice == null)
                 throw new MissingEntityException("Medicine price not found.");
 
@@ -93,17 +79,11 @@ namespace Farmacio_Services.Implementation
 
         public void ChangeStockFor(Guid pharmacyId, Guid medicineId, int changeFor)
         {
-            var pharmacy = Read(pharmacyId);
-            if (pharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var pharmacy = TryToRead(pharmacyId);
 
             var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
-            {
                 throw new MissingEntityException("Given pharmacy does not have wanted medicine.");
-            }
 
             medicineStock.Quantity += changeFor;
 
@@ -112,11 +92,7 @@ namespace Farmacio_Services.Implementation
 
         public override Pharmacy Update(Pharmacy pharmacy)
         {
-            var existingPharmacy = Read(pharmacy.Id);
-            if (existingPharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var existingPharmacy = TryToRead(pharmacy.Id);
 
             existingPharmacy.Name = pharmacy.Name;
             existingPharmacy.Description = pharmacy.Description;
@@ -129,6 +105,14 @@ namespace Farmacio_Services.Implementation
             existingPharmacy.Address.Lng = pharmacy.Address.Lng;
 
             return base.Update(existingPharmacy);
+        }
+        
+        private MedicinePrice GetMedicinePriceInPharmacy(Guid medicineId, Guid pharmacyId)
+        {
+            return _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
+                .MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
+                .OrderByDescending(mp => mp.ActiveFrom)
+                .FirstOrDefault();
         }
     }
 }

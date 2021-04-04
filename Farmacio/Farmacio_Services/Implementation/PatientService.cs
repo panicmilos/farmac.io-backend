@@ -4,6 +4,7 @@ using Farmacio_Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
@@ -23,6 +24,14 @@ namespace Farmacio_Services.Implementation
         {
             var account = base.Read(id);
             return account?.Role == Role.Patient ? account : null;
+        }
+        
+        public override Account TryToRead(Guid id)
+        {
+            var existingAccount = Read(id);
+            if(existingAccount == null)
+                throw new MissingEntityException("Patient account not found.");
+            return existingAccount;
         }
     }
 }

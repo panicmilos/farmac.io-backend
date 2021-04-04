@@ -1,9 +1,9 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
-using Farmacio_Repositories.Contracts;
 
 namespace Farmacio_Services.Implementation
 {
@@ -21,14 +21,32 @@ namespace Farmacio_Services.Implementation
             return _repository.Create(entity);
         }
 
+        public virtual IEnumerable<T> Create(IEnumerable<T> entities)
+        {
+            return _repository.Create(entities);
+        }
+
         public virtual IEnumerable<T> Read()
         {
             return _repository.Read();
         }
 
+        public virtual IEnumerable<T> Read(Predicate<T> predicate)
+        {
+            return _repository.Read(predicate);
+        }
+
         public virtual T Read(Guid id)
         {
             return _repository.Read(id);
+        }
+
+        public virtual T TryToRead(Guid id)
+        {
+            var existingEntity = Read(id);
+            if (existingEntity == null)
+                throw new MissingEntityException($"{typeof(T).Name} not found.");
+            return existingEntity;
         }
 
         public virtual T Update(T entity)
@@ -51,6 +69,21 @@ namespace Farmacio_Services.Implementation
             }
 
             return entityForDeletion;
+        }
+
+        public virtual IEnumerable<T> Delete(IEnumerable<Guid> ids)
+        {
+            return _repository.Delete(ids);
+        }
+
+        public virtual IEnumerable<T> OrderBy<TKey>(Func<T, TKey> keySelector)
+        {
+            return _repository.OrderBy(keySelector);
+        }
+
+        public virtual IEnumerable<T> OrderByDescending<TKey>(Func<T, TKey> keySelector)
+        {
+            return _repository.OrderByDescending(keySelector);
         }
     }
 }

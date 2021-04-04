@@ -41,11 +41,7 @@ namespace Farmacio_Services.Implementation
 
         public override Account Update(Account account)
         {
-            var existingAccount = Read(account.Id);
-            if (existingAccount == null)
-            {
-                throw new MissingEntityException();
-            }
+            var existingAccount = TryToRead(account.Id);
 
             existingAccount.User.FirstName = account.User.FirstName;
             existingAccount.User.LastName = account.User.LastName;
@@ -73,11 +69,7 @@ namespace Farmacio_Services.Implementation
 
         public Account Verify(Guid accountId)
         {
-            var account = _repository.Read(accountId);
-            if (account == null)
-            {
-                throw new MissingEntityException($"Account does not exist in the system.");
-            }
+            var account = TryToRead(accountId);
             if (account.IsVerified)
             {
                 throw new BadLogicException("Account is already verified.");
@@ -91,8 +83,7 @@ namespace Farmacio_Services.Implementation
         {
             return Read().Where(a =>
                 name == null ||
-                a.User.FirstName.ToLower().Contains(name.ToLower()) ||
-                a.User.LastName.ToLower().Contains(name.ToLower()));
+                $"{a.User.FirstName.ToLower()} {a.User.LastName.ToLower()}".Contains(name.ToLower()));
         }
 
         private bool IsUsernameTaken(string username)

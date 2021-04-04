@@ -26,5 +26,13 @@ namespace Farmacio_Services.Implementation
 
             return account?.Role == Role.SystemAdmin ? account : null;
         }
+        
+        public override Account TryToRead(Guid id)
+        {
+            var existingAccount = Read(id);
+            if(existingAccount == null)
+                throw new MissingEntityException("System Admin account not found.");
+            return existingAccount;
+        }
     }
 }

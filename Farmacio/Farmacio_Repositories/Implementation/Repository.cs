@@ -26,18 +26,27 @@ namespace Farmacio_Repositories.Implementation
             return entity;
         }
 
+        public virtual IEnumerable<T> Create(IEnumerable<T> entities)
+        {
+            _entities.AddRange(entities);
+            _context.SaveChanges();
+
+            return entities;
+        }
+
         public virtual IEnumerable<T> Read()
         {
-            var allEntities = _entities.Where(entity => entity.Active);
+            return _entities.Where(entity => entity.Active); ;
+        }
 
-            return allEntities;
+        public IEnumerable<T> Read(Predicate<T> predicate)
+        {
+            return _entities.Where(entity => entity.Active && predicate(entity));
         }
 
         public virtual T Read(Guid id)
         {
-            var entity = _entities.FirstOrDefault(e => e.Id == id && e.Active);
-
-            return entity;
+            return _entities.FirstOrDefault(e => e.Id == id && e.Active); ;
         }
 
         public virtual T Update(T entity)
@@ -62,6 +71,29 @@ namespace Farmacio_Repositories.Implementation
             }
 
             return entityForDeletion;
+        }
+
+        public virtual IEnumerable<T> Delete(IEnumerable<Guid> ids)
+        {
+            var entities = _entities.Where(entity => entity.Active && ids.Contains(entity.Id)).ToList();
+            foreach (var entity in entities)
+            {
+                entity.Active = false;
+            }
+            _entities.UpdateRange(entities);
+            _context.SaveChanges();
+
+            return entities;
+        }
+
+        public virtual IEnumerable<T> OrderBy<TKey>(Func<T, TKey> keySelector)
+        {
+            return _entities.OrderBy(keySelector);
+        }
+
+        public virtual IEnumerable<T> OrderByDescending<TKey>(Func<T, TKey> keySelector)
+        {
+            return _entities.OrderByDescending(keySelector);
         }
     }
 }

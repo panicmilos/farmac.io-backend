@@ -13,12 +13,12 @@ namespace Farmacio_Services.Implementation
         {
         }
 
-        public IEnumerable<DermatologistWorkPlace> GetDermatologistWorkPlaces(Guid dermatologistId)
+        public IEnumerable<DermatologistWorkPlace> GetWorkPlacesFor(Guid dermatologistId)
         {
             return Read().Where(wp => wp.DermatologistId == dermatologistId).ToList();
         }
 
-        public DermatologistWorkPlace GetDermatologistWorkPlaceInPharmacy(Guid dermatologistId, Guid pharmacyId)
+        public DermatologistWorkPlace GetWorkPlaceInPharmacyFor(Guid dermatologistId, Guid pharmacyId)
         {
             return Read().FirstOrDefault(wp => wp.DermatologistId == dermatologistId && wp.PharmacyId == pharmacyId);
         }

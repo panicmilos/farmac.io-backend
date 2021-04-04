@@ -130,11 +130,12 @@ namespace Farmacio_API.Controllers
         [HttpGet("{pharmacyId}/dermatologists/with-work-places")]
         public IActionResult GetDermatologistsWithWorkPlaces(Guid pharmacyId)
         {
-            return Ok(_dermatologistService.ReadForPharmacy(pharmacyId).Select(da => new DermatologistWithWorkPlacesResponse
-            {
-                DermatologistAccount = da,
-                WorkPlaces = _dermatologistWorkPlaceService.GetDermatologistWorkPlaces(da.User.Id)
-            }));
+            return Ok(_dermatologistService.ReadForPharmacy(pharmacyId).Select(dermatologistAccount =>
+                new DermatologistWithWorkPlacesResponse
+                {
+                    DermatologistAccount = dermatologistAccount,
+                    WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
+                }));
         }
         
         /// <summary>
@@ -144,11 +145,11 @@ namespace Farmacio_API.Controllers
         [HttpGet("{pharmacyId}/dermatologists/with-work-places/search")]
         public IActionResult SearchDermatologistsWithWorkPlaces(Guid pharmacyId, string name)
         {
-            return Ok(_dermatologistService.SearchByNameForPharmacy(pharmacyId, name).Select(da =>
+            return Ok(_dermatologistService.SearchByNameForPharmacy(pharmacyId, name).Select(dermatologistAccount =>
                 new DermatologistWithWorkPlacesResponse
                 {
-                    DermatologistAccount = da,
-                    WorkPlaces = _dermatologistWorkPlaceService.GetDermatologistWorkPlaces(da.User.Id)
+                    DermatologistAccount = dermatologistAccount,
+                    WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
                 }));
         }
         
