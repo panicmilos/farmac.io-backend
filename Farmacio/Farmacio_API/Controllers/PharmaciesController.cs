@@ -7,28 +7,33 @@ using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Farmacio_API.Contracts.Responses.Dermatologists;
 
 namespace Farmacio_API.Controllers
 {
     [Route("pharmacies")]
     [ApiController]
     [Produces("application/json")]
-    public class PharmaciesControlles : ControllerBase
+    public class PharmaciesController : ControllerBase
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IPharmacistService _pharmacistService;
         private readonly IDermatologistService _dermatologistService;
         private readonly IAppointmentService _appointmentService;
+        private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IMapper _mapper;
 
-        public PharmaciesControlles(IPharmacyService pharmacyService, IPharmacistService pharmacistService
-            , IDermatologistService dermatologistService, IAppointmentService appointmentService, IMapper mapper)
+        public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
+            , IDermatologistService dermatologistService, IAppointmentService appointmentService
+            , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
             _dermatologistService = dermatologistService;
             _mapper = mapper;
             _appointmentService = appointmentService;
+            _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
         }
 
         /// <summary>
@@ -119,6 +124,36 @@ namespace Farmacio_API.Controllers
         }
         
         /// <summary>
+        /// Reads all existing dermatologists employed in the pharmacy with their work places.
+        /// </summary>
+        /// <response code="200">Read dermatologists with their work places from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/dermatologists/with-work-places")]
+        public IActionResult GetDermatologistsWithWorkPlaces(Guid pharmacyId)
+        {
+            return Ok(_dermatologistService.ReadForPharmacy(pharmacyId).Select(dermatologistAccount =>
+                new DermatologistWithWorkPlacesResponse
+                {
+                    DermatologistAccount = dermatologistAccount,
+                    WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
+                }));
+        }
+        
+        /// <summary>
+        /// Search all existing dermatologists in the pharmacy with their work places.
+        /// </summary>
+        /// <response code="200">Searched dermatologists with their work places.</response>
+        [HttpGet("{pharmacyId}/dermatologists/with-work-places/search")]
+        public IActionResult SearchDermatologistsWithWorkPlaces(Guid pharmacyId, string name)
+        {
+            return Ok(_dermatologistService.SearchByNameForPharmacy(pharmacyId, name).Select(dermatologistAccount =>
+                new DermatologistWithWorkPlacesResponse
+                {
+                    DermatologistAccount = dermatologistAccount,
+                    WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
+                }));
+        }
+        
+        /// <summary>
         /// Reads an existing dermatologist employed in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologist from the pharmacy.</response>
@@ -127,7 +162,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
         }
-        
+
         /// <summary>
         /// Add an existing dermatologist to the pharmacy.
         /// </summary>

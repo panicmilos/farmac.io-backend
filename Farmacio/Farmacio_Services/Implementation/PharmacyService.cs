@@ -1,6 +1,6 @@
 ﻿using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
@@ -11,21 +11,23 @@ namespace Farmacio_Services.Implementation
 {
     public class PharmacyService : CrudService<Pharmacy>, IPharmacyService
     {
-        public PharmacyService(IRepository<Pharmacy> repository) :
+        private readonly IPharmacyPriceListService _pharmacyPriceListService;
+        private readonly IPharmacyStockService _pharmacyStockService;
+        public PharmacyService(IPharmacyPriceListService pharmacyPriceListService, IPharmacyStockService pharmacyStockService
+            , IRepository<Pharmacy> repository) :
             base(repository)
         {
+            _pharmacyPriceListService = pharmacyPriceListService;
+            _pharmacyStockService = pharmacyStockService;
         }
 
-        public IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid Id)
+        public IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid medicineId)
         {
 
             var listOfPharmacies = new List<PharmaciesOfMedicineDTO>();
             foreach(var pharmacy in base.Read().ToList())
             {
-                var medicinePrice = pharmacy.PriceList
-                    .MedicinePriceList.Where(medicinePrice => medicinePrice.MedicineId == Id)
-                    .OrderByDescending(medicinePrice => medicinePrice.ActiveFrom)
-                   .FirstOrDefault();
+                var medicinePrice = GetMedicinePriceInPharmacy(medicineId, pharmacy.Id);
                 
                 if (medicinePrice == null)
                     continue;
@@ -57,23 +59,15 @@ namespace Farmacio_Services.Implementation
 
         public MedicineInPharmacyDTO ReadMedicine(Guid pharmacyId, Guid medicineId)
         {
-            var pharmacy = Read(pharmacyId);
-            if (pharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var pharmacy = TryToRead(pharmacyId);
 
-            var medicineStock = pharmacy.Stock.FirstOrDefault(medicine => medicine.MedicineId == medicineId);
+            var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
-            {
                 throw new MissingEntityException("Given pharmacy does not have wanted medicine.");
-            }
 
-            var medicinePrice = pharmacy.PriceList
-                .MedicinePriceList
-                .Where(medicinePrice => medicinePrice.MedicineId == medicineId)
-                .OrderByDescending(medicinePrice => medicinePrice.ActiveFrom)
-                .FirstOrDefault();
+            var medicinePrice = GetMedicinePriceInPharmacy(medicineId, pharmacyId);
+            if (medicinePrice == null)
+                throw new MissingEntityException("Medicine price not found.");
 
             return new MedicineInPharmacyDTO
             {
@@ -86,42 +80,40 @@ namespace Farmacio_Services.Implementation
 
         public void ChangeStockFor(Guid pharmacyId, Guid medicineId, int changeFor)
         {
-            var pharmacy = Read(pharmacyId);
-            if (pharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var pharmacy = TryToRead(pharmacyId);
 
-            var medicineStock = pharmacy.Stock.FirstOrDefault(medicine => medicine.MedicineId == medicineId);
+            var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
-            {
                 throw new MissingEntityException("Given pharmacy does not have wanted medicine.");
-            }
 
             medicineStock.Quantity += changeFor;
 
             base.Update(pharmacy);
         }
 
-        public override Pharmacy Update(Pharmacy entity)
+        public override Pharmacy Update(Pharmacy pharmacy)
         {
-            var pharmacy = Read(entity.Id);
-            if (pharmacy == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            var existingPharmacy = TryToRead(pharmacy.Id);
 
-            pharmacy.Name = entity.Name;
-            pharmacy.Description = entity.Description;
+            existingPharmacy.Name = pharmacy.Name;
+            existingPharmacy.Description = pharmacy.Description;
 
-            pharmacy.Address.State = entity.Address.State;
-            pharmacy.Address.City = entity.Address.City;
-            pharmacy.Address.StreetName = entity.Address.StreetName;
-            pharmacy.Address.StreetNumber = entity.Address.StreetNumber;
-            pharmacy.Address.Lat = entity.Address.Lat;
-            pharmacy.Address.Lng = entity.Address.Lng;
+            existingPharmacy.Address.State = pharmacy.Address.State;
+            existingPharmacy.Address.City = pharmacy.Address.City;
+            existingPharmacy.Address.StreetName = pharmacy.Address.StreetName;
+            existingPharmacy.Address.StreetNumber = pharmacy.Address.StreetNumber;
+            existingPharmacy.Address.Lat = pharmacy.Address.Lat;
+            existingPharmacy.Address.Lng = pharmacy.Address.Lng;
             
-            return base.Update(entity);
+            return base.Update(existingPharmacy);
+        }
+        
+        private MedicinePrice GetMedicinePriceInPharmacy(Guid medicineId, Guid pharmacyId)
+        {
+            return _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
+                .MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
+                .OrderByDescending(mp => mp.ActiveFrom)
+                .FirstOrDefault();
         }
     }
 }

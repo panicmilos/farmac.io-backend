@@ -1,6 +1,6 @@
 ﻿using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;

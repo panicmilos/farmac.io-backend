@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Farmacio_Models.Domain
 {
@@ -7,6 +8,7 @@ namespace Farmacio_Models.Domain
         public string UniqueId { get; set; }
         public string Name { get; set; }
         public MedicineForm Form { get; set; }
+        public Guid TypeId { get; set; }
         public virtual MedicineType Type { get; set; }
         public string Manufacturer { get; set; }
         public bool IsRecipeOnly { get; set; }
@@ -14,9 +16,7 @@ namespace Farmacio_Models.Domain
         public string AdditionalInfo { get; set; }
         public string RecommendedDose { get; set; }
         public virtual List<MedicineIngredient> MedicineIngredients { get; set; }
-        public virtual List<Medicine> Replacements { get; set; }
         public int AverageGrade { get; set; }
-        public virtual List<Grade> Grades { get; set; }
     }
 
     public enum MedicineForm
@@ -39,7 +39,14 @@ namespace Farmacio_Models.Domain
 
     public class MedicineIngredient : BaseEntity
     {
-        public virtual Ingredient Ingredient { get; set; }
-        public float MassInMilligramms { get; set; }
+        public string Name { get; set; }
+        public float MassInMilligrams { get; set; }
+    }
+
+    public class MedicineReplacement : BaseEntity
+    {
+        public Guid MedicineId { get; set; }
+        public Guid ReplacementMedicineId { get; set; }
+        public virtual Medicine ReplacementMedicine { get; set; }
     }
 }

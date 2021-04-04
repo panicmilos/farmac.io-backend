@@ -3,14 +3,16 @@ using System;
 using Farmacio_Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Farmacio_API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210331223002_Appointment_ReportIdNullable")]
+    partial class Appointment_ReportIdNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -161,7 +163,7 @@ namespace Farmacio_API.Migrations
                     b.Property<Guid>("MedicalStaffId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("PatientId")
+                    b.Property<Guid>("PatientId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid>("PharmacyId")
@@ -1000,7 +1002,9 @@ namespace Farmacio_API.Migrations
 
                     b.HasOne("Farmacio_Models.Domain.Patient", "Patient")
                         .WithMany()
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Farmacio_Models.Domain.Pharmacy", "Pharmacy")
                         .WithMany()

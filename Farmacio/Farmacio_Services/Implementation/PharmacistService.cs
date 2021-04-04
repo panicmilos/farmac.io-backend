@@ -1,5 +1,5 @@
 ﻿using Farmacio_Models.Domain;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -30,37 +30,25 @@ namespace Farmacio_Services.Implementation
 
             return account?.Role == Role.Pharmacist ? account : null;
         }
+        
+        public override Account TryToRead(Guid id)
+        {
+            var existingAccount = Read(id);
+            if(existingAccount == null)
+                throw new MissingEntityException("Pharmacist account not found.");
+            return existingAccount;
+        }
 
         public override Account Create(Account account)
         {
             ValidatePharmacyId(account);
-
             return base.Create(account);
         }
 
         public override Account Update(Account account)
         {
             ValidatePharmacyId(account);
-            var pharmacist = Read(account.Id);
-            if (pharmacist == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            pharmacist.User.FirstName = account.User.FirstName;
-            pharmacist.User.LastName = account.User.LastName;
-            pharmacist.User.PhoneNumber = account.User.PhoneNumber;
-            pharmacist.User.PID = account.User.PID;
-            pharmacist.User.DateOfBirth = account.User.DateOfBirth;
-
-            pharmacist.User.Address.State = account.User.Address.State;
-            pharmacist.User.Address.City = account.User.Address.City;
-            pharmacist.User.Address.StreetName = account.User.Address.StreetName;
-            pharmacist.User.Address.StreetNumber = account.User.Address.StreetNumber;
-            pharmacist.User.Address.Lat = account.User.Address.Lat;
-            pharmacist.User.Address.Lng = account.User.Address.Lng;
-
-            return base.Update(pharmacist);
+            return base.Update(account);
         }
 
         public IEnumerable<Account> ReadForPharmacy(Guid pharmacyId)
@@ -82,8 +70,7 @@ namespace Farmacio_Services.Implementation
 
         private void ValidatePharmacyId(Account account)
         {
-            if (_pharmacyService.Read(((Pharmacist)account.User).PharmacyId) == null)
-                throw new MissingEntityException("Pharmacy with the provided id does not exist.");
+            _pharmacyService.TryToRead(((Pharmacist) account.User).PharmacyId);
         }
 
         private static IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)

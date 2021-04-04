@@ -24,7 +24,9 @@
       "environmentVariables": {
         "JwtSecret": "buJnCsMnGTCxFXU8D8PL8a4brk19M904",
         "EmailSecret": "1gR42BdF1shruZewiSGKeEZre5CznWLS",
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "RunMigrations": "true",
+        "SeedDatabase": "false"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }

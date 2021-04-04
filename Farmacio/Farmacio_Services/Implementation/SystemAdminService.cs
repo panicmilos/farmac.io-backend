@@ -1,5 +1,5 @@
 ﻿using Farmacio_Models.Domain;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
@@ -26,29 +26,13 @@ namespace Farmacio_Services.Implementation
 
             return account?.Role == Role.SystemAdmin ? account : null;
         }
-
-        public override Account Update(Account account)
+        
+        public override Account TryToRead(Guid id)
         {
-            var systemAdmin = Read(account.Id);
-            if (systemAdmin == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            systemAdmin.User.FirstName = account.User.FirstName;
-            systemAdmin.User.LastName = account.User.LastName;
-            systemAdmin.User.PhoneNumber = account.User.PhoneNumber;
-            systemAdmin.User.PID = account.User.PID;
-            systemAdmin.User.DateOfBirth = account.User.DateOfBirth;
-
-            systemAdmin.User.Address.State = account.User.Address.State;
-            systemAdmin.User.Address.City = account.User.Address.City;
-            systemAdmin.User.Address.StreetName = account.User.Address.StreetName;
-            systemAdmin.User.Address.StreetNumber = account.User.Address.StreetNumber;
-            systemAdmin.User.Address.Lat = account.User.Address.Lat;
-            systemAdmin.User.Address.Lng = account.User.Address.Lng;
-
-            return base.Update(systemAdmin);
+            var existingAccount = Read(id);
+            if(existingAccount == null)
+                throw new MissingEntityException("System Admin account not found.");
+            return existingAccount;
         }
     }
 }

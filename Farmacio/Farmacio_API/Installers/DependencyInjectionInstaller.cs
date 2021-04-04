@@ -1,5 +1,4 @@
 ﻿using Farmacio_Repositories.Contracts;
-using Farmacio_Repositories.Contracts.Repositories;
 using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation;
@@ -25,8 +24,6 @@ namespace Farmacio_API.Installers
         private void AddRepositories()
         {
             _services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-
-            _services.AddScoped<IDummyRepository, DummyRepository>();
         }
 
         private void AddServices()
@@ -47,9 +44,9 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IEmailVerificationService), typeof(EmailVerificationService));
             _services.AddScoped(typeof(ITokenProvider), typeof(TokenProvider));
             _services.AddScoped(typeof(IAuthenticationService), typeof(AuthenticationService));
-
-            _services.AddScoped<IDummyService, DummyService>();
-            _services.AddScoped(typeof(IWeatherForecastService), typeof(WeatherForecastService));
+            _services.AddScoped(typeof(IDermatologistWorkPlaceService), typeof(DermatologistWorkPlaceService));
+            _services.AddScoped(typeof(IPharmacyPriceListService), typeof(PharmacyPriceListService));
+            _services.AddScoped(typeof(IPharmacyStockService), typeof(PharmacyStockService));
         }
     }
 }

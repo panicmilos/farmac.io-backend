@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Farmacio_API.Migrations
 {
-    public partial class initialdatabase : Migration
+    public partial class PostRefactor_InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -24,6 +24,21 @@ namespace Farmacio_API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Address", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Grades",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
+                    Value = table.Column<int>(nullable: false),
+                    PatientId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Grades", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -72,21 +87,6 @@ namespace Farmacio_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PharmacyPriceList",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
-                    ExaminationPrice = table.Column<float>(nullable: false),
-                    ConsultationPrice = table.Column<float>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PharmacyPriceList", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WorkTime",
                 columns: table => new
                 {
@@ -102,39 +102,26 @@ namespace Farmacio_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Medicines",
+                name: "Pharmacies",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    UniqueId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    Form = table.Column<int>(nullable: false),
-                    TypeId = table.Column<Guid>(nullable: true),
-                    Manufacturer = table.Column<string>(nullable: true),
-                    IsRecipeOnly = table.Column<bool>(nullable: false),
-                    Contraindications = table.Column<string>(nullable: true),
-                    AdditionalInfo = table.Column<string>(nullable: true),
-                    RecommendedDose = table.Column<string>(nullable: true),
-                    AverageGrade = table.Column<int>(nullable: false),
-                    MedicineId = table.Column<Guid>(nullable: true)
+                    AddressId = table.Column<Guid>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    AverageGrade = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Medicines", x => x.Id);
+                    table.PrimaryKey("PK_Pharmacies", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Medicines_Medicines_MedicineId",
-                        column: x => x.MedicineId,
-                        principalTable: "Medicines",
+                        name: "FK_Pharmacies_Address_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Address",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Medicines_MedicineType_TypeId",
-                        column: x => x.TypeId,
-                        principalTable: "MedicineType",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -144,7 +131,7 @@ namespace Farmacio_API.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    MedicineId = table.Column<Guid>(nullable: true),
+                    MedicineId = table.Column<Guid>(nullable: false),
                     Points = table.Column<int>(nullable: false),
                     LoyaltyPointsId = table.Column<Guid>(nullable: true)
                 },
@@ -157,95 +144,63 @@ namespace Farmacio_API.Migrations
                         principalTable: "LoyaltyPoints",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MedicinePoints_Medicines_MedicineId",
-                        column: x => x.MedicineId,
-                        principalTable: "Medicines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MedicinePrice",
+                name: "Medicines",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    Price = table.Column<float>(nullable: false),
-                    ActiveFrom = table.Column<DateTime>(nullable: false),
-                    MedicineId = table.Column<Guid>(nullable: true),
-                    PharmacyPriceListId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MedicinePrice", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MedicinePrice_Medicines_MedicineId",
-                        column: x => x.MedicineId,
-                        principalTable: "Medicines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MedicinePrice_PharmacyPriceList_PharmacyPriceListId",
-                        column: x => x.PharmacyPriceListId,
-                        principalTable: "PharmacyPriceList",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pharmacies",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
+                    UniqueId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    AddressId = table.Column<Guid>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    PriceListId = table.Column<Guid>(nullable: true),
-                    AverageGrade = table.Column<int>(nullable: false),
-                    PatientId = table.Column<Guid>(nullable: true)
+                    Form = table.Column<int>(nullable: false),
+                    TypeId = table.Column<Guid>(nullable: false),
+                    Manufacturer = table.Column<string>(nullable: true),
+                    IsRecipeOnly = table.Column<bool>(nullable: false),
+                    Contraindications = table.Column<string>(nullable: true),
+                    AdditionalInfo = table.Column<string>(nullable: true),
+                    RecommendedDose = table.Column<string>(nullable: true),
+                    AverageGrade = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pharmacies", x => x.Id);
+                    table.PrimaryKey("PK_Medicines", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Pharmacies_Address_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Address",
+                        name: "FK_Medicines_MedicineType_TypeId",
+                        column: x => x.TypeId,
+                        principalTable: "MedicineType",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Pharmacies_PharmacyPriceList_PriceListId",
-                        column: x => x.PriceListId,
-                        principalTable: "PharmacyPriceList",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Promotion",
+                name: "DermatologistWorkPlaces",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    Discount = table.Column<int>(nullable: false),
-                    From = table.Column<DateTime>(nullable: false),
-                    To = table.Column<DateTime>(nullable: false),
-                    PharmacyId = table.Column<Guid>(nullable: true)
+                    DermatologistId = table.Column<Guid>(nullable: false),
+                    WorkTimeId = table.Column<Guid>(nullable: false),
+                    PharmacyId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Promotion", x => x.Id);
+                    table.PrimaryKey("PK_DermatologistWorkPlaces", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Promotion_Pharmacies_PharmacyId",
+                        name: "FK_DermatologistWorkPlaces_Pharmacies_PharmacyId",
                         column: x => x.PharmacyId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DermatologistWorkPlaces_WorkTime_WorkTimeId",
+                        column: x => x.WorkTimeId,
+                        principalTable: "WorkTime",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,11 +215,10 @@ namespace Farmacio_API.Migrations
                     DateOfBirth = table.Column<DateTime>(nullable: false),
                     PID = table.Column<string>(nullable: true),
                     PhoneNumber = table.Column<string>(nullable: true),
-                    AddressId = table.Column<Guid>(nullable: true),
+                    AddressId = table.Column<Guid>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
-                    AverageGrade = table.Column<int>(nullable: true),
+                    AverageGrade = table.Column<float>(nullable: true),
                     PharmacyId = table.Column<Guid>(nullable: true),
-                    Pharmacist_PharmacyId = table.Column<Guid>(nullable: true),
                     WorkTimeId = table.Column<Guid>(nullable: true),
                     Points = table.Column<int>(nullable: true),
                     NegativePoints = table.Column<int>(nullable: true),
@@ -275,73 +229,153 @@ namespace Farmacio_API.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Pharmacies_PharmacyId",
-                        column: x => x.PharmacyId,
-                        principalTable: "Pharmacies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_Users_LoyaltyProgram_LoyaltyProgramId",
                         column: x => x.LoyaltyProgramId,
                         principalTable: "LoyaltyProgram",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Users_Pharmacies_Pharmacist_PharmacyId",
-                        column: x => x.Pharmacist_PharmacyId,
+                        name: "FK_Users_Pharmacies_PharmacyId",
+                        column: x => x.PharmacyId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_WorkTime_WorkTimeId",
                         column: x => x.WorkTimeId,
                         principalTable: "WorkTime",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Pharmacies_PharmacyAdmin_PharmacyId",
                         column: x => x.PharmacyAdmin_PharmacyId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Address_AddressId",
                         column: x => x.AddressId,
                         principalTable: "Address",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AbsenceRequest",
+                name: "MedicineIngredient",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    RequesterId = table.Column<Guid>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    MassInMilligrams = table.Column<float>(nullable: false),
+                    MedicineId = table.Column<Guid>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedicineIngredient", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MedicineIngredient_Medicines_MedicineId",
+                        column: x => x.MedicineId,
+                        principalTable: "Medicines",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MedicineReplacements",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
+                    MedicineId = table.Column<Guid>(nullable: false),
+                    ReplacementMedicineId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedicineReplacements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MedicineReplacements_Medicines_ReplacementMedicineId",
+                        column: x => x.ReplacementMedicineId,
+                        principalTable: "Medicines",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PatientAllergies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
+                    PatientId = table.Column<Guid>(nullable: false),
+                    MedicineId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PatientAllergies", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PatientAllergies_Medicines_MedicineId",
+                        column: x => x.MedicineId,
+                        principalTable: "Medicines",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PharmacyMedicines",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
+                    PharmacyId = table.Column<Guid>(nullable: false),
+                    MedicineId = table.Column<Guid>(nullable: false),
+                    Quantity = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PharmacyMedicines", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PharmacyMedicines_Medicines_MedicineId",
+                        column: x => x.MedicineId,
+                        principalTable: "Medicines",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AbsenceRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
+                    RequesterId = table.Column<Guid>(nullable: false),
                     Type = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     FromDate = table.Column<DateTime>(nullable: false),
                     ToDate = table.Column<DateTime>(nullable: false),
                     Answer = table.Column<string>(nullable: true),
-                    PharmacyId = table.Column<Guid>(nullable: true)
+                    PharmacyId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AbsenceRequest", x => x.Id);
+                    table.PrimaryKey("PK_AbsenceRequests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AbsenceRequest_Pharmacies_PharmacyId",
+                        name: "FK_AbsenceRequests_Pharmacies_PharmacyId",
                         column: x => x.PharmacyId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AbsenceRequest_Users_RequesterId",
+                        name: "FK_AbsenceRequests_Users_RequesterId",
                         column: x => x.RequesterId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -358,7 +392,7 @@ namespace Farmacio_API.Migrations
                     Role = table.Column<int>(nullable: false),
                     IsVerified = table.Column<bool>(nullable: false),
                     ShouldChangePassword = table.Column<bool>(nullable: false),
-                    UserId = table.Column<Guid>(nullable: true)
+                    UserId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -368,7 +402,7 @@ namespace Farmacio_API.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -378,7 +412,7 @@ namespace Farmacio_API.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    WriterId = table.Column<Guid>(nullable: true),
+                    WriterId = table.Column<Guid>(nullable: false),
                     Text = table.Column<string>(nullable: true),
                     IsAboutPharmacy = table.Column<bool>(nullable: false)
                 },
@@ -390,41 +424,7 @@ namespace Farmacio_API.Migrations
                         column: x => x.WriterId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DermatologistWorkPlace",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
-                    WorkTimeId = table.Column<Guid>(nullable: true),
-                    PharmacyId = table.Column<Guid>(nullable: true),
-                    DermatologistId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DermatologistWorkPlace", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DermatologistWorkPlace_Users_DermatologistId",
-                        column: x => x.DermatologistId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DermatologistWorkPlace_Pharmacies_PharmacyId",
-                        column: x => x.PharmacyId,
-                        principalTable: "Pharmacies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DermatologistWorkPlace_WorkTime_WorkTimeId",
-                        column: x => x.WorkTimeId,
-                        principalTable: "WorkTime",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -436,7 +436,7 @@ namespace Farmacio_API.Migrations
                     Active = table.Column<bool>(nullable: false),
                     UniqueId = table.Column<string>(nullable: true),
                     IssuingDate = table.Column<DateTime>(nullable: false),
-                    PatientId = table.Column<Guid>(nullable: true)
+                    PatientId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -446,93 +446,34 @@ namespace Farmacio_API.Migrations
                         column: x => x.PatientId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Grade",
+                name: "PatientPharmacyFollows",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    Value = table.Column<int>(nullable: false),
-                    PatientId = table.Column<string>(nullable: true),
-                    MedicalStaffId = table.Column<Guid>(nullable: true),
-                    MedicineId = table.Column<Guid>(nullable: true),
-                    PharmacyId = table.Column<Guid>(nullable: true)
+                    PatientId = table.Column<Guid>(nullable: false),
+                    PharmacyId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Grade", x => x.Id);
+                    table.PrimaryKey("PK_PatientPharmacyFollows", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Grade_Users_MedicalStaffId",
-                        column: x => x.MedicalStaffId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Grade_Medicines_MedicineId",
-                        column: x => x.MedicineId,
-                        principalTable: "Medicines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Grade_Pharmacies_PharmacyId",
-                        column: x => x.PharmacyId,
-                        principalTable: "Pharmacies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Ingredient",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    PatientId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ingredient", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Ingredient_Users_PatientId",
+                        name: "FK_PatientPharmacyFollows_Users_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PharmacyOrder",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
-                    PharmacyId = table.Column<Guid>(nullable: true),
-                    PharmacyAdminId = table.Column<Guid>(nullable: true),
-                    OffersDeadline = table.Column<DateTime>(nullable: false),
-                    IsProcessed = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PharmacyOrder", x => x.Id);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PharmacyOrder_Users_PharmacyAdminId",
-                        column: x => x.PharmacyAdminId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PharmacyOrder_Pharmacies_PharmacyId",
+                        name: "FK_PatientPharmacyFollows_Pharmacies_PharmacyId",
                         column: x => x.PharmacyId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -545,8 +486,8 @@ namespace Farmacio_API.Migrations
                     UniqueId = table.Column<string>(nullable: true),
                     State = table.Column<int>(nullable: false),
                     PickupDeadline = table.Column<DateTime>(nullable: false),
-                    PharmacyId = table.Column<Guid>(nullable: true),
-                    PatientId = table.Column<Guid>(nullable: true)
+                    PharmacyId = table.Column<Guid>(nullable: false),
+                    PatientId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -556,13 +497,13 @@ namespace Farmacio_API.Migrations
                         column: x => x.PatientId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Pharmacies_PharmacyId",
                         column: x => x.PharmacyId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -573,8 +514,8 @@ namespace Farmacio_API.Migrations
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
                     Text = table.Column<string>(nullable: true),
-                    WriterId = table.Column<Guid>(nullable: true),
-                    ComplaintId = table.Column<Guid>(nullable: true)
+                    WriterId = table.Column<Guid>(nullable: false),
+                    ComplaintId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -584,13 +525,13 @@ namespace Farmacio_API.Migrations
                         column: x => x.ComplaintId,
                         principalTable: "Complaints",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ComplaintAnswer_Users_WriterId",
                         column: x => x.WriterId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -600,7 +541,7 @@ namespace Farmacio_API.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Active = table.Column<bool>(nullable: false),
-                    MedicineId = table.Column<Guid>(nullable: true),
+                    MedicineId = table.Column<Guid>(nullable: false),
                     Quantity = table.Column<int>(nullable: false),
                     ERecipeId = table.Column<Guid>(nullable: true)
                 },
@@ -618,7 +559,7 @@ namespace Farmacio_API.Migrations
                         column: x => x.MedicineId,
                         principalTable: "Medicines",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -630,103 +571,17 @@ namespace Farmacio_API.Migrations
                     Active = table.Column<bool>(nullable: false),
                     Notes = table.Column<string>(nullable: true),
                     TherapyDurationInDays = table.Column<int>(nullable: false),
-                    RecipeId = table.Column<Guid>(nullable: true)
+                    ERecipeId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Report", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Report_ERecipes_RecipeId",
-                        column: x => x.RecipeId,
+                        name: "FK_Report_ERecipes_ERecipeId",
+                        column: x => x.ERecipeId,
                         principalTable: "ERecipes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MedicineIngredient",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
-                    IngredientId = table.Column<Guid>(nullable: true),
-                    MassInMilligramms = table.Column<float>(nullable: false),
-                    MedicineId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MedicineIngredient", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MedicineIngredient_Ingredient_IngredientId",
-                        column: x => x.IngredientId,
-                        principalTable: "Ingredient",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MedicineIngredient_Medicines_MedicineId",
-                        column: x => x.MedicineId,
-                        principalTable: "Medicines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderedMedicine",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
-                    Quantity = table.Column<int>(nullable: false),
-                    MedicineId = table.Column<Guid>(nullable: true),
-                    PharmacyOrderId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderedMedicine", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderedMedicine_Medicines_MedicineId",
-                        column: x => x.MedicineId,
-                        principalTable: "Medicines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrderedMedicine_PharmacyOrder_PharmacyOrderId",
-                        column: x => x.PharmacyOrderId,
-                        principalTable: "PharmacyOrder",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SupplierOffer",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Active = table.Column<bool>(nullable: false),
-                    SupplierId = table.Column<Guid>(nullable: true),
-                    DeliveryDeadline = table.Column<DateTime>(nullable: false),
-                    TotalPrice = table.Column<float>(nullable: false),
-                    Status = table.Column<int>(nullable: false),
-                    PharmacyOrderId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SupplierOffer", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SupplierOffer_PharmacyOrder_PharmacyOrderId",
-                        column: x => x.PharmacyOrderId,
-                        principalTable: "PharmacyOrder",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_SupplierOffer_Users_SupplierId",
-                        column: x => x.SupplierId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -738,7 +593,7 @@ namespace Farmacio_API.Migrations
                     Active = table.Column<bool>(nullable: false),
                     Price = table.Column<float>(nullable: false),
                     Quantity = table.Column<int>(nullable: false),
-                    MedicineId = table.Column<Guid>(nullable: true),
+                    MedicineId = table.Column<Guid>(nullable: false),
                     ReservationId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>
@@ -749,7 +604,7 @@ namespace Farmacio_API.Migrations
                         column: x => x.MedicineId,
                         principalTable: "Medicines",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ReservedMedicine_Reservations_ReservationId",
                         column: x => x.ReservationId,
@@ -769,10 +624,10 @@ namespace Farmacio_API.Migrations
                     Duration = table.Column<int>(nullable: false),
                     Price = table.Column<float>(nullable: false),
                     IsReserved = table.Column<bool>(nullable: false),
-                    PatientId = table.Column<Guid>(nullable: true),
-                    MedicalStaffId = table.Column<Guid>(nullable: true),
-                    ReportId = table.Column<Guid>(nullable: true),
-                    PharmacyId = table.Column<Guid>(nullable: true)
+                    PatientId = table.Column<Guid>(nullable: false),
+                    MedicalStaffId = table.Column<Guid>(nullable: false),
+                    ReportId = table.Column<Guid>(nullable: false),
+                    PharmacyId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -782,35 +637,35 @@ namespace Farmacio_API.Migrations
                         column: x => x.MedicalStaffId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Appointments_Users_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Appointments_Pharmacies_PharmacyId",
                         column: x => x.PharmacyId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Appointments_Report_ReportId",
                         column: x => x.ReportId,
                         principalTable: "Report",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AbsenceRequest_PharmacyId",
-                table: "AbsenceRequest",
+                name: "IX_AbsenceRequests_PharmacyId",
+                table: "AbsenceRequests",
                 column: "PharmacyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AbsenceRequest_RequesterId",
-                table: "AbsenceRequest",
+                name: "IX_AbsenceRequests_RequesterId",
+                table: "AbsenceRequests",
                 column: "RequesterId");
 
             migrationBuilder.CreateIndex(
@@ -854,18 +709,13 @@ namespace Farmacio_API.Migrations
                 column: "WriterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DermatologistWorkPlace_DermatologistId",
-                table: "DermatologistWorkPlace",
-                column: "DermatologistId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DermatologistWorkPlace_PharmacyId",
-                table: "DermatologistWorkPlace",
+                name: "IX_DermatologistWorkPlaces_PharmacyId",
+                table: "DermatologistWorkPlaces",
                 column: "PharmacyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DermatologistWorkPlace_WorkTimeId",
-                table: "DermatologistWorkPlace",
+                name: "IX_DermatologistWorkPlaces_WorkTimeId",
+                table: "DermatologistWorkPlaces",
                 column: "WorkTimeId");
 
             migrationBuilder.CreateIndex(
@@ -884,31 +734,6 @@ namespace Farmacio_API.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Grade_MedicalStaffId",
-                table: "Grade",
-                column: "MedicalStaffId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Grade_MedicineId",
-                table: "Grade",
-                column: "MedicineId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Grade_PharmacyId",
-                table: "Grade",
-                column: "PharmacyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ingredient_PatientId",
-                table: "Ingredient",
-                column: "PatientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicineIngredient_IngredientId",
-                table: "MedicineIngredient",
-                column: "IngredientId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MedicineIngredient_MedicineId",
                 table: "MedicineIngredient",
                 column: "MedicineId");
@@ -919,24 +744,9 @@ namespace Farmacio_API.Migrations
                 column: "LoyaltyPointsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MedicinePoints_MedicineId",
-                table: "MedicinePoints",
-                column: "MedicineId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicinePrice_MedicineId",
-                table: "MedicinePrice",
-                column: "MedicineId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicinePrice_PharmacyPriceListId",
-                table: "MedicinePrice",
-                column: "PharmacyPriceListId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Medicines_MedicineId",
-                table: "Medicines",
-                column: "MedicineId");
+                name: "IX_MedicineReplacements_ReplacementMedicineId",
+                table: "MedicineReplacements",
+                column: "ReplacementMedicineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Medicines_TypeId",
@@ -944,14 +754,19 @@ namespace Farmacio_API.Migrations
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderedMedicine_MedicineId",
-                table: "OrderedMedicine",
+                name: "IX_PatientAllergies_MedicineId",
+                table: "PatientAllergies",
                 column: "MedicineId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderedMedicine_PharmacyOrderId",
-                table: "OrderedMedicine",
-                column: "PharmacyOrderId");
+                name: "IX_PatientPharmacyFollows_PatientId",
+                table: "PatientPharmacyFollows",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PatientPharmacyFollows_PharmacyId",
+                table: "PatientPharmacyFollows",
+                column: "PharmacyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pharmacies_AddressId",
@@ -959,34 +774,14 @@ namespace Farmacio_API.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pharmacies_PatientId",
-                table: "Pharmacies",
-                column: "PatientId");
+                name: "IX_PharmacyMedicines_MedicineId",
+                table: "PharmacyMedicines",
+                column: "MedicineId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pharmacies_PriceListId",
-                table: "Pharmacies",
-                column: "PriceListId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PharmacyOrder_PharmacyAdminId",
-                table: "PharmacyOrder",
-                column: "PharmacyAdminId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PharmacyOrder_PharmacyId",
-                table: "PharmacyOrder",
-                column: "PharmacyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Promotion_PharmacyId",
-                table: "Promotion",
-                column: "PharmacyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Report_RecipeId",
+                name: "IX_Report_ERecipeId",
                 table: "Report",
-                column: "RecipeId");
+                column: "ERecipeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_PatientId",
@@ -1009,29 +804,14 @@ namespace Farmacio_API.Migrations
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SupplierOffer_PharmacyOrderId",
-                table: "SupplierOffer",
-                column: "PharmacyOrderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SupplierOffer_SupplierId",
-                table: "SupplierOffer",
-                column: "SupplierId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_PharmacyId",
-                table: "Users",
-                column: "PharmacyId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_LoyaltyProgramId",
                 table: "Users",
                 column: "LoyaltyProgramId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Pharmacist_PharmacyId",
+                name: "IX_Users_PharmacyId",
                 table: "Users",
-                column: "Pharmacist_PharmacyId");
+                column: "PharmacyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_WorkTimeId",
@@ -1047,32 +827,12 @@ namespace Farmacio_API.Migrations
                 name: "IX_Users_AddressId",
                 table: "Users",
                 column: "AddressId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Pharmacies_Users_PatientId",
-                table: "Pharmacies",
-                column: "PatientId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Pharmacies_PharmacyId",
-                table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Pharmacies_Pharmacist_PharmacyId",
-                table: "Users");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Pharmacies_PharmacyAdmin_PharmacyId",
-                table: "Users");
-
             migrationBuilder.DropTable(
-                name: "AbsenceRequest");
+                name: "AbsenceRequests");
 
             migrationBuilder.DropTable(
                 name: "Accounts");
@@ -1084,13 +844,13 @@ namespace Farmacio_API.Migrations
                 name: "ComplaintAnswer");
 
             migrationBuilder.DropTable(
-                name: "DermatologistWorkPlace");
+                name: "DermatologistWorkPlaces");
 
             migrationBuilder.DropTable(
                 name: "ERecipeMedicine");
 
             migrationBuilder.DropTable(
-                name: "Grade");
+                name: "Grades");
 
             migrationBuilder.DropTable(
                 name: "MedicineIngredient");
@@ -1099,28 +859,25 @@ namespace Farmacio_API.Migrations
                 name: "MedicinePoints");
 
             migrationBuilder.DropTable(
-                name: "MedicinePrice");
+                name: "MedicineReplacements");
 
             migrationBuilder.DropTable(
-                name: "OrderedMedicine");
+                name: "PatientAllergies");
 
             migrationBuilder.DropTable(
-                name: "Promotion");
+                name: "PatientPharmacyFollows");
+
+            migrationBuilder.DropTable(
+                name: "PharmacyMedicines");
 
             migrationBuilder.DropTable(
                 name: "ReservedMedicine");
-
-            migrationBuilder.DropTable(
-                name: "SupplierOffer");
 
             migrationBuilder.DropTable(
                 name: "Report");
 
             migrationBuilder.DropTable(
                 name: "Complaints");
-
-            migrationBuilder.DropTable(
-                name: "Ingredient");
 
             migrationBuilder.DropTable(
                 name: "LoyaltyPoints");
@@ -1132,25 +889,19 @@ namespace Farmacio_API.Migrations
                 name: "Reservations");
 
             migrationBuilder.DropTable(
-                name: "PharmacyOrder");
-
-            migrationBuilder.DropTable(
                 name: "ERecipes");
 
             migrationBuilder.DropTable(
                 name: "MedicineType");
 
             migrationBuilder.DropTable(
-                name: "Pharmacies");
-
-            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "PharmacyPriceList");
+                name: "LoyaltyProgram");
 
             migrationBuilder.DropTable(
-                name: "LoyaltyProgram");
+                name: "Pharmacies");
 
             migrationBuilder.DropTable(
                 name: "WorkTime");

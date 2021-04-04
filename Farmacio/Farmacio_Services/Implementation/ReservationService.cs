@@ -2,7 +2,7 @@
 using Farmacio_Models.DTO;
 using EmailService.Constracts;
 using EmailService.Models;
-using Farmacio_Repositories.Contracts.Repositories;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
@@ -31,11 +31,7 @@ namespace Farmacio_Services.Implementation
 
         public Reservation CancelMedicineReservation(Guid reservationId)
         {
-            var reservation = base.Read(reservationId);
-            if (reservation == null)
-            {
-                throw new MissingEntityException("Given reservation does not exist in the system.");
-            }
+            var reservation = TryToRead(reservationId);
 
             if (reservation.State == ReservationState.Cancelled)
             {
@@ -54,7 +50,7 @@ namespace Farmacio_Services.Implementation
 
             reservation.State = ReservationState.Cancelled;
 
-            foreach (ReservedMedicine reservedMedicine in reservation.Medicines)
+            foreach (var reservedMedicine in reservation.Medicines)
             {
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity);
             }
@@ -64,16 +60,9 @@ namespace Farmacio_Services.Implementation
 
         public override Reservation Create(Reservation reservation)
         {
-            if (_pharmacyService.Read(reservation.PharmacyId) == null)
-            {
-                throw new MissingEntityException("Given pharmacy does not exist in the system.");
-            }
+            _pharmacyService.TryToRead(reservation.PharmacyId);
 
-            var patientAccount = _patientService.Read(reservation.PatientId);
-            if (_patientService.Read(reservation.PatientId) == null)
-            {
-                throw new MissingEntityException("Given patient does not exist in the system.");
-            }
+            var patientAccount = _patientService.TryToRead(reservation.PatientId);
 
             var patient = (Patient)patientAccount.User;
             if (patient.NegativePoints >= 3)
@@ -102,7 +91,7 @@ namespace Farmacio_Services.Implementation
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity * -1);
             }
 
-            var createdReservation = base.Create(reservation);
+            var createdReservation = Create(reservation);
             var email = _templatesProvider.FromTemplate<Email>("Reservation", new { Name = patientAccount.User.FirstName, Id = reservation.UniqueId, Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
 
@@ -111,35 +100,24 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<SmallReservedMedicineDTO> ReadMedicinesForReservation(Guid reservationId)
         {
-            var reservation = base.Read(reservationId);
-            if(reservation == null)
-            {
-                throw new MissingEntityException("Given reservation does not exist in the system.");
-            }
+            var reservation = TryToRead(reservationId);
 
-            List<SmallReservedMedicineDTO> reservedMedicines = new List<SmallReservedMedicineDTO>();
-            foreach(var reservedMedicine in reservation.Medicines)
+            return reservation.Medicines.Select(reservedMedicine => new SmallReservedMedicineDTO
             {
-                reservedMedicines.Add(new SmallReservedMedicineDTO
-                {
-                    MedicineId = reservedMedicine.MedicineId,
-                    Price = reservedMedicine.Price,
-                    Quantity = reservedMedicine.Quantity
-                });
-            }
-
-            return reservedMedicines;
+                MedicineId = reservedMedicine.MedicineId, Price = reservedMedicine.Price,
+                Quantity = reservedMedicine.Quantity
+            }).ToList();
         }
 
         public IEnumerable<SmallReservationDTO> ReadPatientReservations(Guid patientId)
         {
-            var reservations = base.Read().ToList();
+            var reservations = Read().ToList();
             var patientReservations = new List<SmallReservationDTO>();
             foreach(var reservation in reservations)
             {
                 if(reservation.State == ReservationState.Reserved && reservation.PatientId == patientId && reservation.CreatedAt < DateTime.Now)
                 {
-                    float price = reservation.Medicines.ToList().Sum(medicine => medicine.Quantity * medicine.Price);
+                    var price = reservation.Medicines.ToList().Sum(medicine => medicine.Quantity * medicine.Price);
                     patientReservations.Add(new SmallReservationDTO
                     {
                         ReservationId = reservation.Id,

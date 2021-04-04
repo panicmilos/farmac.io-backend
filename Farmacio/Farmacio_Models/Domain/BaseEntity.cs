@@ -1,5 +1,5 @@
-﻿using Farmacio_Models.Contracts.Entities;
-using System;
+﻿using System;
+using Farmacio_Models.Contracts;
 
 namespace Farmacio_Models.Domain
 {

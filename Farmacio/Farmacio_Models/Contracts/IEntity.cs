@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Farmacio_Models.Contracts.Entities
+namespace Farmacio_Models.Contracts
 {
     public interface IEntity
     {

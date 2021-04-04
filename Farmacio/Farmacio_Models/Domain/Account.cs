@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Farmacio_Models.Domain
 {
@@ -16,6 +17,7 @@ namespace Farmacio_Models.Domain
         public Role Role { get; set; }
         public bool IsVerified { get; set; }
         public bool ShouldChangePassword { get; set; }
+        public Guid UserId { get; set; }
         public virtual User User { get; set; }
     }
 
