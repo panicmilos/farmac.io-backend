@@ -42,7 +42,7 @@ namespace Farmacio_Services.Implementation
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);
-            if(existingAccount == null || existingAccount.Role != Role.Dermatologist)
+            if (existingAccount == null || existingAccount.Role != Role.Dermatologist)
                 throw new MissingEntityException("Dermatologist account not found.");
             return existingAccount;
         }
