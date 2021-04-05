@@ -31,7 +31,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
-            return Read().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
+            return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
         }
         
         public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
