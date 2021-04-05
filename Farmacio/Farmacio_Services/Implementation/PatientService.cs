@@ -10,8 +10,10 @@ namespace Farmacio_Services.Implementation
 {
     public class PatientService : AccountService, IPatientService
     {
-        public PatientService(IEmailVerificationService emailVerificationService, IRepository<Account> repository) :
-            base(emailVerificationService, repository)
+
+        public PatientService(IEmailVerificationService emailVerificationService,
+            IRepository<Account> repository)
+            : base(emailVerificationService, repository)
         {
         }
 
@@ -36,7 +38,7 @@ namespace Farmacio_Services.Implementation
             var account = base.Read(id);
             return account?.Role == Role.Patient ? account : null;
         }
-        
+
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);

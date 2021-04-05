@@ -20,7 +20,7 @@ namespace Farmacio_Services.Implementation
             _appointmentService = appointmentService;
         }
 
-        public IEnumerable<PatientDTO> GetPatients(Guid medicalAccountId)
+        public IEnumerable<PatientDTO> ReadPatientsForMedicalStaff(Guid medicalAccountId)
         {
             var medicalAccount = TryToRead(medicalAccountId);
 
@@ -29,7 +29,7 @@ namespace Farmacio_Services.Implementation
                 .Where(ap => ap.IsReserved && ap.PatientId != null)
                 .Select(ap => new PatientDTO
                 {
-                    Id = ap.PatientId.Value,
+                    PatientId = ap.PatientId.Value,
                     FirstName = ap.Patient.FirstName,
                     LastName = ap.Patient.LastName,
                     DateOfBirth = ap.Patient.DateOfBirth,
@@ -37,6 +37,27 @@ namespace Farmacio_Services.Implementation
                     PhoneNumber = ap.Patient.PhoneNumber,
                     AppointmentDate = ap.DateTime
                 });
+        }
+
+        public IEnumerable<PatientDTO> ReadSortedPatientsForMedicalStaff(Guid medicalAccountId, string crit, bool isAsc)
+        {
+            var sortingCriteria = new Dictionary<string, Func<PatientDTO, object>>()
+            {
+                { "firstName", p => p.FirstName },
+                { "lastName", p => p.LastName },
+                { "appointmentDate", p => p.AppointmentDate }
+            };
+            var patients = ReadPatientsForMedicalStaff(medicalAccountId);
+            if (sortingCriteria.TryGetValue(crit ?? "", out var sortCrit))
+                patients = isAsc ? patients.OrderBy(sortCrit) : patients.OrderByDescending(sortCrit);
+            return patients;
+        }
+
+        public IEnumerable<PatientDTO> SearchPatientsForMedicalStaff(Guid medicalAccountId, string name)
+        {
+            return ReadPatientsForMedicalStaff(medicalAccountId).Where(p =>
+                name == null ||
+                $"{p.FirstName.ToLower()} {p.LastName.ToLower()}".Contains(name.ToLower()));
         }
     }
 }
