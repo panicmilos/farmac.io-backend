@@ -77,7 +77,7 @@ namespace Farmacio_API.Controllers
         /// Creates a new medicine in the system.
         /// </summary>
         /// <response code="200">Returns created medicine.</response>
-        /// <response code="401">Unable to create medicine because code is already taken.</response>
+        /// <response code="400">Unable to create medicine because code is already taken.</response>
         /// <response code="404">Unable to create medicine because replacement medicine does not.</response>
         [HttpPost]
         public IActionResult CreateMedicine(CreateMedicineRequest request)

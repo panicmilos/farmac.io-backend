@@ -43,12 +43,9 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("Code must be unique.");
             }
 
-            foreach (var replacement in replacements)
+            if (replacements.Any(replacement => Read(replacement.ReplacementMedicineId) == null))
             {
-                if (Read(replacement.ReplacementMedicineId) == null)
-                {
-                    throw new MissingEntityException("Replacement medicine does not exist in the system.");
-                }
+                throw new MissingEntityException("Replacement medicine does not exist in the system.");
             }
 
             var createdMedicine = base.Create(medicine);
@@ -84,12 +81,9 @@ namespace Farmacio_Services.Implementation
             var ingredients = fullMedicineDto.Ingredients;
             var replacements = fullMedicineDto.Replacements;
 
-            foreach (var replacement in replacements)
+            if (replacements.Any(replacement => Read(replacement.ReplacementMedicineId) == null))
             {
-                if (Read(replacement.ReplacementMedicineId) == null)
-                {
-                    throw new MissingEntityException("Replacement medicine does not exist in the system.");
-                }
+                throw new MissingEntityException("Replacement medicine does not exist in the system.");
             }
 
             fullMedicineDto.Medicine = Update(medicine);
