@@ -28,8 +28,7 @@ public static class SeedDb
 
     private static void AddIFNotDuplicate<T>(DbContext context, T entity) where T : BaseEntity
     {
-
-        if(context.Find<T>(entity.Id) == null)
+        if (context.Find<T>(entity.Id) == null)
         {
             context.Add(entity);
         }
@@ -71,8 +70,6 @@ public static class SeedDb
         AddIFNotDuplicate(context, address2);
         AddIFNotDuplicate(context, address3);
 
-
-
         var medicineType1 = new MedicineType
         {
             TypeName = "Analgetik"
@@ -92,7 +89,7 @@ public static class SeedDb
             MassInMilligrams = 500
         };
 
-        var ingredients1 = new List<MedicineIngredient> {medicineIngridient1, medicineIngridient2};
+        var ingredients1 = new List<MedicineIngredient> { medicineIngridient1, medicineIngridient2 };
 
         var medicineIngridient3 = new MedicineIngredient
         {
@@ -191,7 +188,7 @@ public static class SeedDb
             ActiveFrom = DateTime.Now
         };
 
-        var medicinePrices1 = new List<MedicinePrice> {medicinePrice1, medicinePrice2};
+        var medicinePrices1 = new List<MedicinePrice> { medicinePrice1, medicinePrice2 };
 
         AddIFNotDuplicate(context, medicinePrice1);
         AddIFNotDuplicate(context, medicinePrice2);
@@ -210,7 +207,7 @@ public static class SeedDb
             ActiveFrom = DateTime.Now
         };
 
-        var medicinePrices2 = new List<MedicinePrice> {medicinePrice3, medicinePrice4};
+        var medicinePrices2 = new List<MedicinePrice> { medicinePrice3, medicinePrice4 };
 
         AddIFNotDuplicate(context, medicinePrice3);
         AddIFNotDuplicate(context, medicinePrice4);
@@ -229,11 +226,11 @@ public static class SeedDb
             ActiveFrom = DateTime.Now
         };
 
-        var medicinePrices3 = new List<MedicinePrice> {medicinePrice5, medicinePrice6};
+        var medicinePrices3 = new List<MedicinePrice> { medicinePrice5, medicinePrice6 };
 
         AddIFNotDuplicate(context, medicinePrice5);
         AddIFNotDuplicate(context, medicinePrice6);
-        
+
         var pharmacy1 = new Pharmacy
         {
             Name = "BENU Apoteka",
@@ -241,7 +238,7 @@ public static class SeedDb
             Description = "Apotekarska ustanova BENU je najveci lanac apoteka u Srbiji i deo je velike medjunarodne kompanije PHOENIX iz Nemacke.",
             AverageGrade = 0,
         };
-        
+
         var pharmacy2 = new Pharmacy
         {
             Name = "Viva Farm",
@@ -249,7 +246,7 @@ public static class SeedDb
             Description = "Tu smo da zajedno sa vama uti�emo na o�uvanje dobog zdravlja i spre�avanje razvoja bolesti za koje postoji rizik ili predispozicija.",
             AverageGrade = 0,
         };
-        
+
         var pharmacy3 = new Pharmacy
         {
             Name = "Dr.Max",
@@ -269,42 +266,42 @@ public static class SeedDb
             MedicineId = medicine1.Id,
             Quantity = 4
         };
-        
+
         var pharmacyMedicine12 = new PharmacyMedicine
         {
             PharmacyId = pharmacy1.Id,
             MedicineId = medicine2.Id,
             Quantity = 5
         };
-        
+
         var pharmacyMedicine21 = new PharmacyMedicine
         {
             PharmacyId = pharmacy2.Id,
             MedicineId = medicine1.Id,
             Quantity = 2
         };
-        
+
         var pharmacyMedicine22 = new PharmacyMedicine
         {
             PharmacyId = pharmacy2.Id,
             MedicineId = medicine3.Id,
             Quantity = 1
         };
-        
+
         var pharmacyMedicine31 = new PharmacyMedicine
         {
             PharmacyId = pharmacy3.Id,
             MedicineId = medicine2.Id,
             Quantity = 2
         };
-        
+
         var pharmacyMedicine32 = new PharmacyMedicine
         {
             PharmacyId = pharmacy3.Id,
             MedicineId = medicine3.Id,
             Quantity = 7
         };
-        
+
         AddIFNotDuplicate(context, pharmacyMedicine11);
         AddIFNotDuplicate(context, pharmacyMedicine12);
         AddIFNotDuplicate(context, pharmacyMedicine21);
@@ -345,19 +342,19 @@ public static class SeedDb
             Discount = 30,
             MinPoints = 5
         };
-        
+
         var loyaltyProgram2 = new LoyaltyProgram
         {
             Discount = 20,
             MinPoints = 3
         };
-        
+
         var loyaltyProgram3 = new LoyaltyProgram
         {
             Discount = 50,
             MinPoints = 15
         };
-        
+
         AddIFNotDuplicate(context, loyaltyProgram1);
         AddIFNotDuplicate(context, loyaltyProgram2);
         AddIFNotDuplicate(context, loyaltyProgram3);
@@ -380,14 +377,14 @@ public static class SeedDb
             MedicineId = medicine1.Id,
             PatientId = patient1.Id
         };
-        
+
         AddIFNotDuplicate(context, allergy1);
 
         var account1 = new Account
         {
             Username = "pera",
-            Password = "pera123",
-            Salt = "",
+            Password = "NZ72wIqfGVuYpvNIuOqSE6PrBzzhhGY73SbO7hg+/rM=",
+            Salt = "rR69PlY8GTfpkoy9ztGyUA1koyk2JmZvMnKxEWvuf5k=",
             Email = "pera.peric@gmail.com",
             Role = Role.Patient,
             IsVerified = true,
@@ -411,8 +408,8 @@ public static class SeedDb
         var account2 = new Account
         {
             Username = "mika",
-            Password = "mika123",
-            Salt = "",
+            Password = "rFP3YfAQfskxjarItdztYb63agyWcD4Id7GrTiX7wGw=",
+            Salt = "9PQE00Eg2wgqRj8n3QwBY0P5biEVwvl7wZuK6lbr3OI=",
             Email = "mika.mika@gmail.com",
             Role = Role.Patient,
             IsVerified = true,
@@ -436,8 +433,8 @@ public static class SeedDb
         var account3 = new Account
         {
             Username = "janko",
-            Password = "janko123",
-            Salt = "",
+            Password = "qOQzfKI3MOS3tuei1enUaGDvCky9kL71xbqvbS8s0xk=",
+            Salt = "fJHZyhp6wai3LWwkXrrrCgLSqMFKxnYgphKiQ55XUCE=",
             Email = "janko.jankovic@gmail.com",
             Role = Role.Patient,
             IsVerified = true,
@@ -458,8 +455,8 @@ public static class SeedDb
         var account4 = new Account
         {
             Username = "sysadmin",
-            Password = "admin123",
-            Salt = "",
+            Password = "YpvznSTblbad6/C3aRmCu5ADTXj/bChmM/SnjfKncfE=",
+            Salt = "wGmHx+1wQZmnWPv6WssqtldX8KFcHRNxUy9/kTnDQXU=",
             Email = "sistem.admin@gmail.com",
             Role = Role.SystemAdmin,
             IsVerified = true,
@@ -481,8 +478,8 @@ public static class SeedDb
         var account5 = new Account
         {
             Username = "pharmadmin",
-            Password = "phadmin123",
-            Salt = "",
+            Password = "vjEd42+JWk7zfK2U4SlCHoFZjtm+01w+7AgbzkCnDQM=",
+            Salt = "4t0GdyenPDTpi6giXSlGXEmGSfKn6xlDjnRw1UAm1KQ=",
             Email = "pharmacy1admin@gmail.com",
             Role = Role.PharmacyAdmin,
             IsVerified = true,
@@ -510,8 +507,8 @@ public static class SeedDb
         var account6 = new Account
         {
             Username = "ppetar",
-            Password = "petrovic123",
-            Salt = "",
+            Password = "tnQCFUMIuJ+6gwwuKraVpz3YRwPuVnAcOd9IejU2Rnc=",
+            Salt = "zqblcOiRflN5u+qaXu2o77m14j5tpruNbLzMi/DRAZA=",
             Email = "petar82petrovic@gmail.com",
             Role = Role.Pharmacist,
             IsVerified = true,
@@ -539,8 +536,8 @@ public static class SeedDb
         var account7 = new Account
         {
             Username = "pjelena",
-            Password = "jelena123",
-            Salt = "",
+            Password = "7ku8vhgfafrVgVlbHCUhwgaqmqjbFj17uKn3K99Snvo=",
+            Salt = "LqJzcXbgElZ4yxor4y3FYNBy++Pmgv5TTnUBOe7a++g=",
             Email = "jelpetrovic@gmail.com",
             Role = Role.Pharmacist,
             IsVerified = true,
@@ -562,8 +559,8 @@ public static class SeedDb
         var account8 = new Account
         {
             Username = "mmilica",
-            Password = "milica123",
-            Salt = "",
+            Password = "CvuOUuMG2p+NtlpKoXd5udKBjzWqi2HdRxsi6LAqhTM=",
+            Salt = "CvuOUuMG2p+NtlpKoXd5udKBjzWqi2HdRxsi6LAqhTM=",
             Email = "milicamikic@gmail.com",
             Role = Role.Dermatologist,
             IsVerified = true,
@@ -585,8 +582,8 @@ public static class SeedDb
         var account9 = new Account
         {
             Username = "mmilos",
-            Password = "milos123",
-            Salt = "",
+            Password = "Xnxvvx5uwm/+GdB6MoHV8U6w4x4ZU775AqVpphL1eDo=",
+            Salt = "xWhX60uTJunkr3IqnlD/GzVP81LChadjGbGZrmD2n4Q=",
             Email = "milosmikic85@gmail.com",
             Role = Role.Dermatologist,
             IsVerified = true,
@@ -649,7 +646,7 @@ public static class SeedDb
         AddIFNotDuplicate(context, appointment1);
         AddIFNotDuplicate(context, appointment2);
         AddIFNotDuplicate(context, appointment3);
-        
+
         var workPlace1 = new DermatologistWorkPlace
         {
             WorkTime = new WorkTime
@@ -660,7 +657,7 @@ public static class SeedDb
             DermatologistId = dermatologist1.Id,
             Pharmacy = pharmacy2
         };
-        
+
         AddIFNotDuplicate(context, workPlace1);
 
         context.SaveChanges();
