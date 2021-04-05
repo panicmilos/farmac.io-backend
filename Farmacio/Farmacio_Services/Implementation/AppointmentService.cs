@@ -116,14 +116,19 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("The given appointment does not exist in the system.");
             }
 
+            if(_patientService.Read(appointmentRequest.PatientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exixst in the system.");
+            }
+
             if (appointmentWithDermatologist.IsReserved)
             {
                 throw new BadLogicException("The given appointment is already reserved.");
             }
 
-            if (_patientService.ExceededLimitOfNegativePoints(appointmentRequest.PatientId))
+            if (_patientService.HasExceededLimitOfNegativePoints(appointmentRequest.PatientId))
             {
-                throw new BadLogicException("The given patient have 3 or more negative points.");
+                throw new BadLogicException("The given patient has 3 or more negative points.");
             }
 
             if(appointmentWithDermatologist.DateTime < DateTime.Now)
@@ -138,7 +143,7 @@ namespace Farmacio_Services.Implementation
                     appointment.DateTime.AddMinutes(appointment.Duration), appointmentWithDermatologist.DateTime,
                     appointmentWithDermatologist.DateTime.AddMinutes(appointmentWithDermatologist.Duration)))
                 {
-                    throw new BadLogicException("The given appointment overlpas with the already reserved appointment of the patient.");
+                    throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
                 }
             }
 

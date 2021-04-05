@@ -15,7 +15,7 @@ namespace Farmacio_Services.Implementation
         {
         }
 
-        public bool ExceededLimitOfNegativePoints(Guid patientId)
+        public bool HasExceededLimitOfNegativePoints(Guid patientId)
         {
             var account = base.Read().Where(account => account.UserId == patientId).FirstOrDefault();
             if(account == null)

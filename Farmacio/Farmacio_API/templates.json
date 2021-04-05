@@ -49,10 +49,10 @@
       "type": "Email",
       "name": "Appointment",
       "template": {
-        "Subject": "Successfull making appointment with dermatologist on Farmac.io",
+        "Subject": "Successfull reserving appointment with dermatologist on Farmac.io",
         "From": "panic.milos99@gmail.com",
         "Recipients": [ "panic.milos99@gmail.com" ],
-        "Body": "<p>Dear {{name}},</p><p>You appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
+        "Body": "<p>Dear {{name}},</p><p>Your appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
       }
     }
   ]

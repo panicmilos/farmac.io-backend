@@ -71,7 +71,7 @@ namespace Farmacio_API.Controllers
         /// Make an appointment with a dermatologist.
         /// </summary>
         /// <response code="200">Maked appointment.</response>
-        /// <response code="404">Appointment not found.</response>
+        /// <response code="404">Appointment not found ot patient not found.</response>
         /// <response code="400">Patient already has appointment in this time, patient has 3 or more negative points, appointment is already reserved.</response>
         [HttpPost("make-appointment")]
         public IActionResult MakeAppointmentWithDermatologist(CreateAppointmentWithDermatologist request)
@@ -84,9 +84,9 @@ namespace Farmacio_API.Controllers
 
 
         /// <summary>
-        /// Sort an appointment with a dermatologist in pharmacy.
+        /// Sort an appointments with a dermatologist in pharmacy.
         /// </summary>
-        /// <response code="200">Sorted appointment.</response>
+        /// <response code="200">Sorted appointments.</response>
         [HttpGet("sort")]
         public IActionResult SortAppointments(Guid pharmacyId, string criteria, bool isAsc)
         {
