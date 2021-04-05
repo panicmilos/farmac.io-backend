@@ -116,7 +116,7 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("The given appointment does not exist in the system.");
             }
 
-            if(_patientService.Read(appointmentRequest.PatientId) == null)
+            if(_patientService.Read().Where(account => account.UserId == appointmentRequest.PatientId) == null)
             {
                 throw new MissingEntityException("The given patient does not exixst in the system.");
             }
