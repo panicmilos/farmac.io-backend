@@ -178,7 +178,7 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exixst in the system.");
             }
-            return Read().ToList().Where(appointmnet => appointmnet.PatientId == patientId && appointmnet.IsReserved && appointmnet.DateTime > DateTime.Now);
+            return Read().ToList().Where(appointments => appointments.PatientId == patientId && appointments.IsReserved && appointments.DateTime > DateTime.Now);
         }
     }
 }

@@ -97,8 +97,8 @@ namespace Farmacio_API.Controllers
         /// Returns patients future appointments.
         /// </summary>
         /// <response code="200">Returns appointments.</response>
-        /// <response code="400">Unable to return appointments because given patient does not exist in the system.</response>
-        [HttpGet("future-appointmnets/{patientId}")]
+        /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
+        [HttpGet("future-appointments/{patientId}")]
         public IEnumerable<Appointment> ReadPatientsFutureAppointments(Guid patientId)
         {
             return _appointmentService.ReadForPatients(patientId);
