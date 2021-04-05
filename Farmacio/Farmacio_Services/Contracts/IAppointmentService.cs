@@ -12,5 +12,6 @@ namespace Farmacio_Services.Contracts
         Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment);
         Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointment);
         IEnumerable<Appointment> SortAppointments(Guid pharmacyId, string criteria, bool isAsc);
+        IEnumerable<Appointment> ReadForPatients(Guid patientId);
     }
 }
