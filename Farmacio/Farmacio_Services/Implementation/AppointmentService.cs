@@ -170,5 +170,15 @@ namespace Farmacio_Services.Implementation
 
             return appointments;
         }
+
+        public IEnumerable<Appointment> ReadForPatients(Guid patientId)
+        {
+
+            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exixst in the system.");
+            }
+            return Read().ToList().Where(appointmnet => appointmnet.PatientId == patientId && appointmnet.IsReserved && appointmnet.DateTime > DateTime.Now);
+        }
     }
 }
