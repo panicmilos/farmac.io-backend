@@ -151,7 +151,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> SortAppointments(Guid pharmacyId, string criteria, bool isAsc)
         {
-            var sortingCriteriums = new Dictionary<string, Func<Appointment, object>>()
+            var sortingCriteria = new Dictionary<string, Func<Appointment, object>>()
             {
                 { "grade", a => a.MedicalStaff.AverageGrade },
                 { "price", a => a.Price }
@@ -159,8 +159,8 @@ namespace Farmacio_Services.Implementation
 
             var appointments = ReadForDermatologistsInPharmacy(pharmacyId);
 
-            if (sortingCriteriums.TryGetValue(criteria ?? "", out var sortingCriterium)) {
-                appointments = isAsc ? appointments.OrderBy(sortingCriterium) : appointments.OrderByDescending(sortingCriterium);
+            if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion)) {
+                appointments = isAsc ? appointments.OrderBy(sortingCriterion) : appointments.OrderByDescending(sortingCriterion);
             }
 
             return appointments;
