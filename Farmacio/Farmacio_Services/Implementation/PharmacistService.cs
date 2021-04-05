@@ -8,13 +8,13 @@ using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
-    public class PharmacistService : AccountService, IPharmacistService
+    public class PharmacistService : MedicalStaffService, IPharmacistService
     {
         private readonly IPharmacyService _pharmacyService;
 
-        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService,
-            IRepository<Account> repository) :
-            base(emailVerificationService, repository)
+        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService, 
+            IAppointmentService appointmentService, IRepository<Account> repository) :
+            base(emailVerificationService, appointmentService, repository)
         {
             _pharmacyService = pharmacyService;
         }

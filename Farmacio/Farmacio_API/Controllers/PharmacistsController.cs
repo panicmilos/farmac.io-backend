@@ -50,7 +50,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.Read(id));
         }
-        
+
         /// <summary>
         /// Creates a new pharmacist in the system.
         /// </summary>

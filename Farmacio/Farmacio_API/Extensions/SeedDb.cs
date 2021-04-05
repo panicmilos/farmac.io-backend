@@ -135,7 +135,6 @@ public static class SeedDb
             "zrnaca koji se javljaj kod �este i dugotrajne upotrebe)",
             AdditionalInfo = "Izgled tableta: okrugle tablete, bele boje, koje sa jedne strane imaju utisnutu podeonu crtu. ",
             RecommendedDose = "2 do 4 tablete dnevno",
-            MedicineIngredients = ingredients1,
             AverageGrade = 0,
         };
 
@@ -151,7 +150,6 @@ public static class SeedDb
             "nadimanje, konstipacija, crna stolica, krvarenje u stomaku i crevima, povra�anje krvi), osip, zamor",
             AdditionalInfo = "Izgled: bela, ovalna, bikonveksna film tableta",
             RecommendedDose = "Uobi�ajena doza je 600-1800 mg na dan podeljena u nekoliko doza",
-            MedicineIngredients = ingredients2,
             AverageGrade = 0,
         };
 
@@ -166,7 +164,6 @@ public static class SeedDb
             Contraindications = "Gadjenje, povracanje, nesanica, lupanje srca ili ubrzan rad srca, porecemaji funkcije jetre i bubrega, zavisnost.",
             AdditionalInfo = "Izgled: bela, ovalna, ravna.",
             RecommendedDose = "3-4 tablete dnevno",
-            MedicineIngredients = ingredients3,
             AverageGrade = 0,
         };
 
