@@ -29,7 +29,7 @@ namespace Farmacio_Services.Implementation
                 .Where(ap => ap.IsReserved && ap.PatientId != null)
                 .Select(ap => new PatientDTO
                 {
-                    Id = ap.PatientId.Value,
+                    PatientId = ap.PatientId.Value,
                     FirstName = ap.Patient.FirstName,
                     LastName = ap.Patient.LastName,
                     DateOfBirth = ap.Patient.DateOfBirth,
