@@ -19,15 +19,5 @@ namespace Farmacio_API.Controllers
             _medicalStaffService = medicalStaffService;
             _mapper = mapper;
         }
-
-        /// <summary>
-        /// Reads all medical staff's patients.
-        /// </summary>
-        /// <response code="200">Read patients.</response>
-        [HttpGet("{id}/patients")]
-        public IActionResult GetPatients(Guid id)
-        {
-            return Ok(_medicalStaffService.GetPatients(id));
-        }
     }
 }

@@ -10,8 +10,10 @@ namespace Farmacio_Services.Implementation
 {
     public class PatientService : AccountService, IPatientService
     {
-        public PatientService(IEmailVerificationService emailVerificationService, IRepository<Account> repository) :
-            base(emailVerificationService, repository)
+
+        public PatientService(IEmailVerificationService emailVerificationService,
+            IRepository<Account> repository)
+            : base(emailVerificationService, repository)
         {
         }
 
