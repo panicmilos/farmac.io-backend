@@ -28,8 +28,7 @@ public static class SeedDb
 
     private static void AddIFNotDuplicate<T>(DbContext context, T entity) where T : BaseEntity
     {
-
-        if(context.Find<T>(entity.Id) == null)
+        if (context.Find<T>(entity.Id) == null)
         {
             context.Add(entity);
         }
@@ -71,8 +70,6 @@ public static class SeedDb
         AddIFNotDuplicate(context, address2);
         AddIFNotDuplicate(context, address3);
 
-
-
         var medicineType1 = new MedicineType
         {
             TypeName = "Analgetik"
@@ -92,7 +89,7 @@ public static class SeedDb
             MassInMilligrams = 500
         };
 
-        var ingredients1 = new List<MedicineIngredient> {medicineIngridient1, medicineIngridient2};
+        var ingredients1 = new List<MedicineIngredient> { medicineIngridient1, medicineIngridient2 };
 
         var medicineIngridient3 = new MedicineIngredient
         {
@@ -138,7 +135,6 @@ public static class SeedDb
             "zrnaca koji se javljaj kod �este i dugotrajne upotrebe)",
             AdditionalInfo = "Izgled tableta: okrugle tablete, bele boje, koje sa jedne strane imaju utisnutu podeonu crtu. ",
             RecommendedDose = "2 do 4 tablete dnevno",
-            MedicineIngredients = ingredients1,
             AverageGrade = 0,
         };
 
@@ -154,7 +150,6 @@ public static class SeedDb
             "nadimanje, konstipacija, crna stolica, krvarenje u stomaku i crevima, povra�anje krvi), osip, zamor",
             AdditionalInfo = "Izgled: bela, ovalna, bikonveksna film tableta",
             RecommendedDose = "Uobi�ajena doza je 600-1800 mg na dan podeljena u nekoliko doza",
-            MedicineIngredients = ingredients2,
             AverageGrade = 0,
         };
 
@@ -169,7 +164,6 @@ public static class SeedDb
             Contraindications = "Gadjenje, povracanje, nesanica, lupanje srca ili ubrzan rad srca, porecemaji funkcije jetre i bubrega, zavisnost.",
             AdditionalInfo = "Izgled: bela, ovalna, ravna.",
             RecommendedDose = "3-4 tablete dnevno",
-            MedicineIngredients = ingredients3,
             AverageGrade = 0,
         };
 
@@ -191,7 +185,7 @@ public static class SeedDb
             ActiveFrom = DateTime.Now
         };
 
-        var medicinePrices1 = new List<MedicinePrice> {medicinePrice1, medicinePrice2};
+        var medicinePrices1 = new List<MedicinePrice> { medicinePrice1, medicinePrice2 };
 
         AddIFNotDuplicate(context, medicinePrice1);
         AddIFNotDuplicate(context, medicinePrice2);
@@ -210,7 +204,7 @@ public static class SeedDb
             ActiveFrom = DateTime.Now
         };
 
-        var medicinePrices2 = new List<MedicinePrice> {medicinePrice3, medicinePrice4};
+        var medicinePrices2 = new List<MedicinePrice> { medicinePrice3, medicinePrice4 };
 
         AddIFNotDuplicate(context, medicinePrice3);
         AddIFNotDuplicate(context, medicinePrice4);
@@ -229,11 +223,11 @@ public static class SeedDb
             ActiveFrom = DateTime.Now
         };
 
-        var medicinePrices3 = new List<MedicinePrice> {medicinePrice5, medicinePrice6};
+        var medicinePrices3 = new List<MedicinePrice> { medicinePrice5, medicinePrice6 };
 
         AddIFNotDuplicate(context, medicinePrice5);
         AddIFNotDuplicate(context, medicinePrice6);
-        
+
         var pharmacy1 = new Pharmacy
         {
             Name = "BENU Apoteka",
@@ -241,7 +235,7 @@ public static class SeedDb
             Description = "Apotekarska ustanova BENU je najveci lanac apoteka u Srbiji i deo je velike medjunarodne kompanije PHOENIX iz Nemacke.",
             AverageGrade = 0,
         };
-        
+
         var pharmacy2 = new Pharmacy
         {
             Name = "Viva Farm",
@@ -249,7 +243,7 @@ public static class SeedDb
             Description = "Tu smo da zajedno sa vama uti�emo na o�uvanje dobog zdravlja i spre�avanje razvoja bolesti za koje postoji rizik ili predispozicija.",
             AverageGrade = 0,
         };
-        
+
         var pharmacy3 = new Pharmacy
         {
             Name = "Dr.Max",
@@ -269,42 +263,42 @@ public static class SeedDb
             MedicineId = medicine1.Id,
             Quantity = 4
         };
-        
+
         var pharmacyMedicine12 = new PharmacyMedicine
         {
             PharmacyId = pharmacy1.Id,
             MedicineId = medicine2.Id,
             Quantity = 5
         };
-        
+
         var pharmacyMedicine21 = new PharmacyMedicine
         {
             PharmacyId = pharmacy2.Id,
             MedicineId = medicine1.Id,
             Quantity = 2
         };
-        
+
         var pharmacyMedicine22 = new PharmacyMedicine
         {
             PharmacyId = pharmacy2.Id,
             MedicineId = medicine3.Id,
             Quantity = 1
         };
-        
+
         var pharmacyMedicine31 = new PharmacyMedicine
         {
             PharmacyId = pharmacy3.Id,
             MedicineId = medicine2.Id,
             Quantity = 2
         };
-        
+
         var pharmacyMedicine32 = new PharmacyMedicine
         {
             PharmacyId = pharmacy3.Id,
             MedicineId = medicine3.Id,
             Quantity = 7
         };
-        
+
         AddIFNotDuplicate(context, pharmacyMedicine11);
         AddIFNotDuplicate(context, pharmacyMedicine12);
         AddIFNotDuplicate(context, pharmacyMedicine21);
@@ -345,19 +339,19 @@ public static class SeedDb
             Discount = 30,
             MinPoints = 5
         };
-        
+
         var loyaltyProgram2 = new LoyaltyProgram
         {
             Discount = 20,
             MinPoints = 3
         };
-        
+
         var loyaltyProgram3 = new LoyaltyProgram
         {
             Discount = 50,
             MinPoints = 15
         };
-        
+
         AddIFNotDuplicate(context, loyaltyProgram1);
         AddIFNotDuplicate(context, loyaltyProgram2);
         AddIFNotDuplicate(context, loyaltyProgram3);
@@ -380,7 +374,7 @@ public static class SeedDb
             MedicineId = medicine1.Id,
             PatientId = patient1.Id
         };
-        
+
         AddIFNotDuplicate(context, allergy1);
 
         var account1 = new Account
@@ -649,7 +643,7 @@ public static class SeedDb
         AddIFNotDuplicate(context, appointment1);
         AddIFNotDuplicate(context, appointment2);
         AddIFNotDuplicate(context, appointment3);
-        
+
         var workPlace1 = new DermatologistWorkPlace
         {
             WorkTime = new WorkTime
@@ -660,7 +654,7 @@ public static class SeedDb
             DermatologistId = dermatologist1.Id,
             Pharmacy = pharmacy2
         };
-        
+
         AddIFNotDuplicate(context, workPlace1);
 
         context.SaveChanges();
