@@ -14,5 +14,9 @@ namespace Farmacio_Services.Contracts
         FullMedicineDTO Update(FullMedicineDTO fullMedicineDto);
 
         IEnumerable<SmallMedicineDTO> ReadForDisplay();
+
+        IEnumerable<string> ReadMedicineNames(Guid pharmacyId);
+
+        IEnumerable<MedicineInPharmacyDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name);
     }
 }

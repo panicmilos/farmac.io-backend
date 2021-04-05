@@ -13,13 +13,18 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IMedicineReplacementService _replacementService;
         private readonly IMedicineIngredientService _ingredientService;
+        private readonly IPharmacyPriceListService _pharmacyPriceListService;
+        private readonly IPharmacyService _pharmacyService;
 
         public MedicineService(IMedicineReplacementService replacementService, IMedicineIngredientService ingredientService,
+            IPharmacyPriceListService pharmacyPriceListService, IPharmacyService pharmacyService,
             IRepository<Medicine> repository) :
             base(repository)
         {
             _replacementService = replacementService;
             _ingredientService = ingredientService;
+            _pharmacyPriceListService = pharmacyPriceListService;
+            _pharmacyService = pharmacyService;
         }
 
         public FullMedicineDTO ReadFullMedicine(Guid id)
@@ -128,6 +133,21 @@ namespace Farmacio_Services.Implementation
         private bool IsIdUnique(string id)
         {
             return Read().FirstOrDefault(medicine => medicine.UniqueId == id) == default;
+        }
+
+        public IEnumerable<string> ReadMedicineNames(Guid pharmacyId)
+        {
+            return _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
+                .MedicinePriceList.Select(mp => mp.Medicine.Name);
+        }
+
+        public IEnumerable<MedicineInPharmacyDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name)
+        {
+            var medicines = _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
+                .MedicinePriceList.Select(mp => mp.Medicine).Where(m => m.Name == name)
+                .Select(m => _pharmacyService.ReadMedicine(pharmacyId, m.Id));
+            // TODO: Find replacements if there is 0 in stock.
+            return medicines;
         }
     }
 }

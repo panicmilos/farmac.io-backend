@@ -114,5 +114,25 @@ namespace Farmacio_API.Controllers
 
             return Ok(deletedMedicine);
         }
+
+        /// <summary>
+        /// Reads medicine names.
+        /// </summary>
+        /// <response code="200">Returns medicine names.</response>
+        [HttpGet("in-pharmacy/{pharmacyId}/names")]
+        public IActionResult ReadMedicineNames(Guid pharmacyId)
+        {
+            return Ok(_medicineService.ReadMedicineNames(pharmacyId));
+        }
+
+        /// <summary>
+        /// Reads medicines or replacements by name.
+        /// </summary>
+        /// <response code="200">Returns medicines.</response>
+        [HttpGet("in-pharmacy/{pharmacyId}/search")]
+        public IActionResult ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name)
+        {
+            return Ok(_medicineService.ReadMedicinesOrReplacementsByName(pharmacyId, name));
+        }
     }
 }
