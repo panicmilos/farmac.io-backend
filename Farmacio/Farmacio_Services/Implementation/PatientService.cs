@@ -15,6 +15,17 @@ namespace Farmacio_Services.Implementation
         {
         }
 
+        public bool HasExceededLimitOfNegativePoints(Guid patientId)
+        {
+            var account = base.Read().Where(account => account.UserId == patientId).FirstOrDefault();
+            if(account == null)
+            {
+                throw new BadLogicException("The given patient does not exixst in the system.");
+            }
+            var patient = (Patient)account.User;
+            return patient.NegativePoints >= 3;
+        }
+
         public override IEnumerable<Account> Read()
         {
             return base.Read().Where(account => account.Role == Role.Patient).ToList();
