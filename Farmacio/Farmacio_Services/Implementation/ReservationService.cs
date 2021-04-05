@@ -61,22 +61,18 @@ namespace Farmacio_Services.Implementation
         public override Reservation Create(Reservation reservation)
         {
             _pharmacyService.TryToRead(reservation.PharmacyId);
-
             var patientAccount = _patientService.TryToRead(reservation.PatientId);
-           
             var patient = (Patient)patientAccount.User;
             if (_patientService.HasExceededLimitOfNegativePoints(patient.Id))
             {
                 throw new BadLogicException("You have 3 negative points, so you cannot reserve a medicine.");
             }
 
-            reservation.PatientId = patientAccount.User.Id;
-
+            reservation.PatientId = patient.Id;
             if (DateTime.Now.AddHours(36) > reservation.PickupDeadline)
             {
                 throw new BadLogicException("You have to reserve medicines at least 36 hours before pickup deadline.");
             }
-
             reservation.UniqueId = GetUniqueId();
             reservation.State = ReservationState.Reserved;
 
@@ -91,8 +87,8 @@ namespace Farmacio_Services.Implementation
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity * -1);
             }
 
-            var createdReservation = Create(reservation);
-            var email = _templatesProvider.FromTemplate<Email>("Reservation", new { Name = patientAccount.User.FirstName, Id = reservation.UniqueId, Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm") });
+            var createdReservation = base.Create(reservation);
+            var email = _templatesProvider.FromTemplate<Email>("Reservation", new { Name = patient.FirstName, Id = reservation.UniqueId, Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
 
             return createdReservation;
@@ -104,7 +100,8 @@ namespace Farmacio_Services.Implementation
 
             return reservation.Medicines.Select(reservedMedicine => new SmallReservedMedicineDTO
             {
-                MedicineId = reservedMedicine.MedicineId, Price = reservedMedicine.Price,
+                MedicineId = reservedMedicine.MedicineId,
+                Price = reservedMedicine.Price,
                 Quantity = reservedMedicine.Quantity
             }).ToList();
         }
@@ -113,9 +110,9 @@ namespace Farmacio_Services.Implementation
         {
             var reservations = Read().ToList();
             var patientReservations = new List<SmallReservationDTO>();
-            foreach(var reservation in reservations)
+            foreach (var reservation in reservations)
             {
-                if(reservation.State == ReservationState.Reserved && reservation.PatientId == patientId && reservation.CreatedAt < DateTime.Now)
+                if (reservation.State == ReservationState.Reserved && reservation.PatientId == patientId && reservation.CreatedAt < DateTime.Now)
                 {
                     var price = reservation.Medicines.ToList().Sum(medicine => medicine.Quantity * medicine.Price);
                     patientReservations.Add(new SmallReservationDTO

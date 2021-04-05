@@ -18,9 +18,9 @@ namespace Farmacio_Services.Implementation
         public bool HasExceededLimitOfNegativePoints(Guid patientId)
         {
             var account = base.Read().Where(account => account.UserId == patientId).FirstOrDefault();
-            if(account == null)
+            if (account == null)
             {
-                throw new BadLogicException("The given patient does not exixst in the system.");
+                throw new BadLogicException("The given patient does not exist in the system.");
             }
             var patient = (Patient)account.User;
             return patient.NegativePoints >= 3;
@@ -36,11 +36,11 @@ namespace Farmacio_Services.Implementation
             var account = base.Read(id);
             return account?.Role == Role.Patient ? account : null;
         }
-        
+
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);
-            if(existingAccount == null)
+            if (existingAccount == null)
                 throw new MissingEntityException("Patient account not found.");
             return existingAccount;
         }

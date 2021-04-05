@@ -7,7 +7,8 @@ namespace Farmacio_Models.Domain
     {
         public int Points { get; set; }
         public int NegativePoints { get; set; }
-        public Guid LoyaltyProgramId { get; set; }
+
+        //public Guid LoyaltyProgramId { get; set; }
         public virtual LoyaltyProgram LoyaltyProgram { get; set; }
     }
 
@@ -16,7 +17,7 @@ namespace Farmacio_Models.Domain
         public Guid PatientId { get; set; }
         public virtual Patient Patient { get; set; }
         public Guid PharmacyId { get; set; }
-        public virtual Pharmacy Pharmacy {get; set; }
+        public virtual Pharmacy Pharmacy { get; set; }
     }
 
     public class PatientAllergy : BaseEntity

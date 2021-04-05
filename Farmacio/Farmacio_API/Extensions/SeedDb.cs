@@ -366,7 +366,7 @@ public static class SeedDb
             Address = address1,
             Points = 0,
             NegativePoints = 0,
-            LoyaltyProgramId = loyaltyProgram1.Id
+            LoyaltyProgram = loyaltyProgram1
         };
 
         var allergy1 = new PatientAllergy
@@ -399,7 +399,7 @@ public static class SeedDb
             Address = address2,
             Points = 0,
             NegativePoints = 1,
-            LoyaltyProgramId = loyaltyProgram2.Id
+            LoyaltyProgram = loyaltyProgram2
         };
 
         var account2 = new Account
@@ -424,7 +424,7 @@ public static class SeedDb
             Address = address3,
             Points = 0,
             NegativePoints = 0,
-            LoyaltyProgramId = loyaltyProgram3.Id
+            LoyaltyProgram = loyaltyProgram3
         };
 
         var account3 = new Account

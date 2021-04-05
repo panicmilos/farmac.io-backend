@@ -36,7 +36,7 @@ namespace Farmacio_Repositories.Implementation
 
         public virtual IEnumerable<T> Read()
         {
-            return _entities.Where(entity => entity.Active); ;
+            return _entities.Where(entity => entity.Active);
         }
 
         public IEnumerable<T> Read(Predicate<T> predicate)
@@ -46,7 +46,7 @@ namespace Farmacio_Repositories.Implementation
 
         public virtual T Read(Guid id)
         {
-            return _entities.FirstOrDefault(e => e.Id == id && e.Active); ;
+            return _entities.FirstOrDefault(e => e.Id == id && e.Active);
         }
 
         public virtual T Update(T entity)
