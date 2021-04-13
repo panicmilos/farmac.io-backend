@@ -18,6 +18,7 @@ namespace Farmacio_API.Mappings.Accounts
             AddDermatologistMapping();
             AddPharmacyAdminMapping();
             AddSystemAdminMapping();
+            AddSupplierMapping();
         }
 
         private void AddPatientMapping()
@@ -98,6 +99,23 @@ namespace Farmacio_API.Mappings.Accounts
             CreateMap<UpdateSystemAdminRequest, Account>()
                 .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
                 .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.SystemAdmin));
+        }
+
+        private void AddSupplierMapping()
+        {
+            CreateMap<CreateSupplierUserRequest, Supplier>();
+            CreateMap<UpdateSupplierUserRequest, Supplier>();
+
+            CreateMap<CreateSupplierRequest, Account>()
+                .ForMember(dst => dst.Username, opts => opts.MapFrom(src => src.Account.Username))
+                .ForMember(dst => dst.Password, opts => opts.MapFrom(src => src.Account.Password))
+                .ForMember(dst => dst.Email, opts => opts.MapFrom(src => src.Account.Email))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Supplier))
+                .ForMember(dst => dst.ShouldChangePassword, opts => opts.MapFrom(src => true));
+
+            CreateMap<UpdateSupplierRequest, Account>()
+                .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Supplier));
         }
     }
 }
