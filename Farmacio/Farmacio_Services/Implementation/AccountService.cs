@@ -1,11 +1,12 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Farmacio_Repositories.Contracts;
 
 namespace Farmacio_Services.Implementation
 {
@@ -57,6 +58,21 @@ namespace Farmacio_Services.Implementation
             existingAccount.User.Address.Lng = account.User.Address.Lng;
 
             return base.Update(existingAccount);
+        }
+
+        public Account ChangePasswordFor(Guid id, string currentPassword, string newPassword)
+        {
+            var account = TryToRead(id);
+            if (account.Password != CryptographyUtils.GetSaltedAndHashedPassword(currentPassword, account.Salt))
+            {
+                throw new WrongCurrentPasswordException("Given current password does not match password of the account.");
+            }
+
+            account.ShouldChangePassword = false;
+            account.Salt = CryptographyUtils.GetRandomSalt();
+            account.Password = CryptographyUtils.GetSaltedAndHashedPassword(newPassword, account.Salt);
+
+            return _repository.Update(account);
         }
 
         public Account ReadByEmail(string email)
