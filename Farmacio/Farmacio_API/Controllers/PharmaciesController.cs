@@ -233,5 +233,15 @@ namespace Farmacio_API.Controllers
 
             return Ok(deletedPharmacy);
         }
+
+        /// <summary>
+        /// Returns pharmacies that contains given params.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacies.</response>
+        [HttpGet("search")]
+        public IEnumerable<SmallPharmacyDTO> SearchPharmacies([FromQuery] PharmacySearchParams searchParams)
+        {
+            return _pharmacyService.ReadBy(searchParams);
+        }
     }
 }
