@@ -109,10 +109,11 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns canceled appointment.</response>
         /// <response code="404">Given appointment does not exist in the system.</response>
+        /// <response code="400">Unable to cancel appointment in the past or that starts in less than 24 hours or that is not reserved.</response>
         [HttpDelete("cancel-appointment/{appointmentId}")]
-        public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
+        public IActionResult CancelAppointmentWithDermatologist(Guid appointmentId)
         {
-            return _appointmentService.CancelAppointmentWithDermatologist(appointmentId);
+            return Ok(_appointmentService.CancelAppointmentWithDermatologist(appointmentId));
         }
     }
 }

@@ -190,7 +190,7 @@ namespace Farmacio_Services.Implementation
             }
             if(DateTime.Now.AddHours(24) > appointment.DateTime)
             {
-                throw new BadLogicException("It is not possible to cancel a appointment if there are less than 24 left before the start.");
+                throw new BadLogicException("It is not possible to cancel an appointment if there are less than 24 hours left before the start.");
             }
             if(appointment.DateTime < DateTime.Now)
             {
