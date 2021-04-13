@@ -48,7 +48,23 @@ namespace Farmacio_Services.Implementation
         public override Account Update(Account account)
         {
             ValidatePharmacyId(account);
-            return base.Update(account);
+            var existingAccount = TryToRead(account.Id);
+
+            existingAccount.User.FirstName = account.User.FirstName;
+            existingAccount.User.LastName = account.User.LastName;
+            existingAccount.User.PhoneNumber = account.User.PhoneNumber;
+            existingAccount.User.PID = account.User.PID;
+            existingAccount.User.DateOfBirth = account.User.DateOfBirth;
+
+            existingAccount.User.Address.State = account.User.Address.State;
+            existingAccount.User.Address.City = account.User.Address.City;
+            existingAccount.User.Address.StreetName = account.User.Address.StreetName;
+            existingAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
+            existingAccount.User.Address.Lat = account.User.Address.Lat;
+            existingAccount.User.Address.Lng = account.User.Address.Lng;
+            ((PharmacyAdmin) existingAccount.User).PharmacyId = ((PharmacyAdmin) account.User).PharmacyId;
+            
+            return _repository.Update(existingAccount);
         }
 
         private void ValidatePharmacyId(Account account)
