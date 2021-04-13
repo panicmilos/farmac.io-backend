@@ -47,6 +47,16 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns medicines that contains given name from the system for home page.
+        /// </summary>
+        /// <response code="200">Returns list medicines.</response>
+        [HttpGet("search")]
+        public IEnumerable<SmallMedicineDTO> SearchMedicines(string name)
+        {
+            return _medicineService.SearchByName(name);
+        }
+
+        /// <summary>
         /// Returns medicine specified by id.
         /// </summary>
         /// <response code="200">Returns medicine.</response>

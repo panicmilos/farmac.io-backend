@@ -130,6 +130,16 @@ namespace Farmacio_Services.Implementation
                 });
         }
 
+        public IEnumerable<SmallMedicineDTO> SearchByName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return ReadForDisplay();
+            }
+
+            return ReadForDisplay().Where(m => m.Name.ToLower().Contains(name.ToLower()));
+        }
+
         private bool IsIdUnique(string id)
         {
             return Read().FirstOrDefault(medicine => medicine.UniqueId == id) == default;
