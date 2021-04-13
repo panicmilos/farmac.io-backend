@@ -38,7 +38,8 @@ namespace Farmacio_Services.Implementation
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.Name, account.Id.ToString()),
-                    new Claim(ClaimTypes.Role, account.Role.ToString())
+                    new Claim(ClaimTypes.Role, account.Role.ToString()),
+                    new Claim("ShouldChangePassword", account.ShouldChangePassword.ToString().ToLower())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(expiresFor),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
