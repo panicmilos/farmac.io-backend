@@ -180,5 +180,27 @@ namespace Farmacio_Services.Implementation
             }
             return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
         }
+
+        public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
+        {
+            var appointment = base.TryToRead(appointmentId);
+            if(appointment.IsReserved == false)
+            {
+                throw new BadLogicException("Given appointment is not reserved.");
+            }
+            if(DateTime.Now.AddHours(24) > appointment.DateTime)
+            {
+                throw new BadLogicException("It is not possible to cancel an appointment if there are less than 24 hours left before the start.");
+            }
+            if(appointment.DateTime < DateTime.Now)
+            {
+                throw new BadLogicException("It is not possible to cancel an appointment which date and time in the past.");
+            }
+            appointment.IsReserved = false;
+            appointment.PatientId = null;
+            appointment.Patient = null;
+            base.Update(appointment);
+            return appointment;
+        }
     }
 }
