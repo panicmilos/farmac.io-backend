@@ -1,4 +1,5 @@
 ﻿using Farmacio_API.Contracts.Requests.Accounts;
+using Farmacio_API.Validations.Extensions;
 using FluentValidation;
 
 namespace Farmacio_API.Validations.Accounts
@@ -7,7 +8,7 @@ namespace Farmacio_API.Validations.Accounts
     {
         public ChangePasswordRequestValidator()
         {
-            RuleFor(request => request.NewPassword).NotNull().NotEmpty().Matches(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$").WithMessage("Password must have at least 8 characters, special character and a number.");
+            RuleFor(request => request.NewPassword).Password().WithMessage("Password must have at least 8 characters, special character and a number.");
         }
     }
 }
