@@ -130,14 +130,18 @@ namespace Farmacio_Services.Implementation
                 });
         }
 
-        public IEnumerable<SmallMedicineDTO> SearchByName(string name)
+        public IEnumerable<SmallMedicineDTO> ReadBy(MedicineSearchParams searchParams)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                return ReadForDisplay();
-            }
+            var (name, type, gradeFrom, gradeTo) = searchParams;
 
-            return ReadForDisplay().Where(m => m.Name.ToLower().Contains(name.ToLower()));
+            return ReadForDisplay().Where(m => string.IsNullOrEmpty(name) || m.Name.ToLower().Contains(name.ToLower()))
+                                   .Where(m => string.IsNullOrEmpty(type) || m.Type.TypeName.ToLower() == type.ToLower())
+                                   .Where(m => m.AverageGrade >= gradeFrom && m.AverageGrade <= gradeTo);
+        }
+
+        public IEnumerable<string> ReadTypes()
+        {
+            return Read().ToList().Select(m => m.Type.TypeName.ToLower()).ToHashSet();
         }
 
         private bool IsIdUnique(string id)
