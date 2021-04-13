@@ -37,6 +37,16 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns all medicine types from the system.
+        /// </summary>
+        /// <response code="200">Returns list of medicine types.</response>
+        [HttpGet("types")]
+        public IEnumerable<string> GetMedicineTypes()
+        {
+            return _medicineService.ReadTypes();
+        }
+
+        /// <summary>
         /// Returns all medicines from the system for home page with less information.
         /// </summary>
         /// <response code="200">Returns list of small medicines objects.</response>
@@ -47,13 +57,13 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns medicines that contains given name from the system for home page.
+        /// Returns medicines that contains given params from the system for home page.
         /// </summary>
-        /// <response code="200">Returns list medicines.</response>
+        /// <response code="200">Returns list of medicines.</response>
         [HttpGet("search")]
-        public IEnumerable<SmallMedicineDTO> SearchMedicines(string name)
+        public IEnumerable<SmallMedicineDTO> SearchMedicines([FromQuery] MedicineSearchParams searchParams)
         {
-            return _medicineService.SearchByName(name);
+            return _medicineService.ReadBy(searchParams);
         }
 
         /// <summary>
