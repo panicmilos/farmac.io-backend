@@ -18,5 +18,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<string> ReadMedicineNames(Guid pharmacyId);
 
         IEnumerable<MedicineInPharmacyDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name);
+
+        IEnumerable<SmallMedicineDTO> SearchByName(string name);
     }
 }
