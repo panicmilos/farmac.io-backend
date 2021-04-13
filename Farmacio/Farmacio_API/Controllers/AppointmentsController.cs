@@ -103,5 +103,16 @@ namespace Farmacio_API.Controllers
         {
             return _appointmentService.ReadForPatients(patientId);
         }
+
+        /// <summary>
+        /// Cancel appointment with dermatologist.
+        /// </summary>
+        /// <response code="200">Returns canceled appointment.</response>
+        /// <response code="404">Given appointment does not exist in the system.</response>
+        [HttpDelete("cancel-appointment/{appointmentId}")]
+        public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
+        {
+            return _appointmentService.CancelAppointmentWithDermatologist(appointmentId);
+        }
     }
 }
