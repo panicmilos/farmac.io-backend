@@ -118,9 +118,10 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<SmallPharmacyDTO> ReadBy(PharmacySearchParams searchParams)
         {
-            var (name, city) = searchParams;
+            var (name, streetAndCity) = searchParams;
             return ReadForHomePage().Where(pharmacy => string.IsNullOrEmpty(name) || pharmacy.Name.ToLower().Contains(name.ToLower()))
-                .Where(pharmacy => string.IsNullOrEmpty(city) || pharmacy.Address.City.ToLower().Contains(city.ToLower()));
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.City.ToLower()))
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()));
         }
     }
 }

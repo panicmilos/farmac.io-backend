@@ -7,12 +7,12 @@ namespace Farmacio_Models.DTO
     public class PharmacySearchParams
     {
         public string Name { get; set; }
-        public string City { get; set; }
+        public string StreetAndCity { get; set; }
 
-        public void Deconstruct(out string name, out string city)
+        public void Deconstruct(out string name, out string streetAndCity)
         {
             name = Name;
-            city = City;
+            streetAndCity = StreetAndCity;
         }
     }
 }
