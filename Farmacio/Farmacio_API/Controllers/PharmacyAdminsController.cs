@@ -53,8 +53,8 @@ namespace Farmacio_API.Controllers
         /// <summary>
         /// Creates a new pharmacy admin in the system.
         /// </summary>
-        /// <response code="200">Returns created pharmacy.</response>
-        /// <response code="401">Unable to create pharmacy admin because username or email is already taken.</response>
+        /// <response code="200">Returns created pharmacy admin.</response>
+        /// <response code="400">Unable to create pharmacy admin because username or email is already taken.</response>
         /// <response code="404">Unable to create pharmacy admin because pharmacy does not exist.</response>
         [HttpPost]
         public IActionResult CreatePharmacyAdmin(CreatePharmacyAdminRequest request)

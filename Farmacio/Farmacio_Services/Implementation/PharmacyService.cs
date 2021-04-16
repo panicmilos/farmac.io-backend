@@ -52,7 +52,8 @@ namespace Farmacio_Services.Implementation
                     Id = pharmacy.Id,
                     Name = pharmacy.Name,
                     Description = pharmacy.Description,
-                    Address = pharmacy.Address
+                    Address = pharmacy.Address,
+                    AverageGrade = pharmacy.AverageGrade
                 });
         }
 
@@ -113,6 +114,14 @@ namespace Farmacio_Services.Implementation
                 .MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
                 .OrderByDescending(mp => mp.ActiveFrom)
                 .FirstOrDefault();
+        }
+
+        public IEnumerable<SmallPharmacyDTO> ReadBy(PharmacySearchParams searchParams)
+        {
+            var (name, streetAndCity) = searchParams;
+            return ReadForHomePage().Where(pharmacy => string.IsNullOrEmpty(name) || pharmacy.Name.ToLower().Contains(name.ToLower()))
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.City.ToLower()))
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()));
         }
     }
 }
