@@ -62,7 +62,6 @@ namespace Farmacio_Services.Implementation
             existingAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
             existingAccount.User.Address.Lat = account.User.Address.Lat;
             existingAccount.User.Address.Lng = account.User.Address.Lng;
-            ((PharmacyAdmin) existingAccount.User).PharmacyId = ((PharmacyAdmin) account.User).PharmacyId;
             
             return _repository.Update(existingAccount);
         }
