@@ -63,13 +63,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetPatient(Guid id)
         {
-            var patient = _patientService.Read(id);
-            if (patient == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            return Ok(patient);
+            return Ok(_patientService.TryToRead(id));
         }
 
         /// <summary>
