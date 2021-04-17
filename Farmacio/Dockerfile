@@ -18,7 +18,7 @@ COPY . .
 
 RUN dotnet publish -c Release -o out Farmacio_API/
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 
 WORKDIR /app
 
