@@ -46,7 +46,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.SearchByName(name));
         }
-        
+
         /// <summary>
         /// Reads all existing dermatologists in the system with their work places.
         /// </summary>
@@ -82,7 +82,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetDermatologist(Guid id)
         {
-            return Ok(_dermatologistService.Read(id));
+            return Ok(_dermatologistService.TryToRead(id));
         }
 
         /// <summary>
