@@ -62,11 +62,22 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Added allergies.</response>
         /// <response code="404">Given medicine does not exist in the system.</response>
         /// <response code="400">Given allergy already exists in the system.</response>
-        [HttpPost("allergies")]
+        [HttpPost("add-allergies")]
         public IActionResult CreateAllergies(PatientAllergyDTO request)
         {
             var pharmacy = _mapper.Map<PatientAllergyDTO>(request);
             return Ok(_patientAllergyService.Create(request));
+        }
+
+        /// <summary>
+        /// Retruns patients allergies.
+        /// </summary>
+        /// <response code="200">Patients allergies.</response>
+        /// <response code="404">Given patient does not exist in the system.</response>
+        [HttpGet("patients-allergies/{patientId}")]
+        public IActionResult GedPatientsAllergies(Guid patientId)
+        {
+            return Ok(_patientAllergyService.GetPatientsAllergies(patientId));
         }
     }
 }

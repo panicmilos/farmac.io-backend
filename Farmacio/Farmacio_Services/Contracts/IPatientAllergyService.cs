@@ -9,5 +9,6 @@ namespace Farmacio_Services.Contracts
     public interface IPatientAllergyService : ICrudService<PatientAllergy>
     {
         IEnumerable<PatientAllergy> Create(PatientAllergyDTO request);
+        IEnumerable<SmallMedicineDTO> GetPatientsAllergies(Guid patientId);
     }
 }

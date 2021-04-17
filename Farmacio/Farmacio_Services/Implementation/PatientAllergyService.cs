@@ -46,5 +46,19 @@ namespace Farmacio_Services.Implementation
             }
             return listOfAllergies;
         }
+
+        public IEnumerable<SmallMedicineDTO> GetPatientsAllergies(Guid patientId)
+        {
+            _patientService.TryToRead(patientId);
+            return base.Read().ToList().Where(allergy => allergy.PatientId == patientId)
+                .Select(allergy => new SmallMedicineDTO
+                {
+                    Name = allergy.Medicine.Name,
+                    AverageGrade = allergy.Medicine.AverageGrade,
+                    Manufacturer = allergy.Medicine.Manufacturer,
+                    Type = allergy.Medicine.Type,
+                    Id = allergy.Medicine.Id
+                });
+        }
     }
 }
