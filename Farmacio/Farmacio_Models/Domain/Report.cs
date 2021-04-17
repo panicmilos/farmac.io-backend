@@ -6,7 +6,7 @@ namespace Farmacio_Models.Domain
     {
         public string Notes { get; set; }
         public int TherapyDurationInDays { get; set; }
-        public Guid ERecipeId { get; set; }
+        public Guid? ERecipeId { get; set; }
         public virtual ERecipe ERecipe { get; set; }
     }
 }

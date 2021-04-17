@@ -22,6 +22,8 @@ namespace Farmacio_Services.Implementation
         private readonly IPatientService _patientService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
+        private readonly IReportService _reportService;
+
 
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
@@ -29,7 +31,8 @@ namespace Farmacio_Services.Implementation
             , IPharmacyPriceListService pharmacyPriceListService
             , IPatientService patientService
             , IEmailDispatcher emailDispatcher
-            , ITemplatesProvider templateProvider) : base(repository)
+            , ITemplatesProvider templateProvider
+            , IReportService reportService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -39,6 +42,7 @@ namespace Farmacio_Services.Implementation
             _patientService = patientService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
+            _reportService = reportService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
@@ -184,7 +188,7 @@ namespace Farmacio_Services.Implementation
         public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
         {
             var appointment = base.TryToRead(appointmentId);
-            if(appointment.IsReserved == false)
+            if(!appointment.IsReserved)
             {
                 throw new BadLogicException("Given appointment is not reserved.");
             }
@@ -201,6 +205,22 @@ namespace Farmacio_Services.Implementation
             appointment.Patient = null;
             base.Update(appointment);
             return appointment;
+        }
+
+        public Report CreateReport(CreateReportDTO reportDTO)
+        {
+            var appointment = base.TryToRead(reportDTO.AppointmentId);
+            if (!appointment.IsReserved)
+                throw new BadLogicException("Given appointment is not reserved.");
+            var report = new Report
+            {
+                Notes = reportDTO.Notes,
+                TherapyDurationInDays = reportDTO.TherapyDurationInDays,
+            };
+            report = _reportService.Create(report);
+            appointment.Report = report;
+            base.Update(appointment);
+            return report;
         }
     }
 }
