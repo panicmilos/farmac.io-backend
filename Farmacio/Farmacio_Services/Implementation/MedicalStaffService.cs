@@ -27,6 +27,8 @@ namespace Farmacio_Services.Implementation
             return _appointmentService
                 .ReadForMedicalStaff(medicalAccount.UserId)
                 .Where(ap => ap.IsReserved && ap.PatientId != null)
+                .GroupBy(ap => ap.PatientId)
+                .Select(gr => gr.Where(ap => ap.DateTime == gr.Max(ap => ap.DateTime)).First())
                 .Select(ap => new PatientDTO
                 {
                     PatientId = ap.PatientId.Value,
