@@ -52,6 +52,7 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IPharmacyStockService), typeof(PharmacyStockService));
             _services.AddScoped(typeof(IMedicalStaffService), typeof(MedicalStaffService));
             _services.AddScoped(typeof(IPatientAllergyService), typeof(PatientAllergyService));
+            _services.AddScoped(typeof(IMedicinePdfService), typeof(MedicinePdfService));
         }
     }
 }

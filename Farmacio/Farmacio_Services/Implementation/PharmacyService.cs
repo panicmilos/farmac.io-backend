@@ -52,7 +52,8 @@ namespace Farmacio_Services.Implementation
                     Id = pharmacy.Id,
                     Name = pharmacy.Name,
                     Description = pharmacy.Description,
-                    Address = pharmacy.Address
+                    Address = pharmacy.Address,
+                    AverageGrade = pharmacy.AverageGrade
                 });
         }
 
@@ -113,6 +114,28 @@ namespace Farmacio_Services.Implementation
                 .MedicinePriceList.Where(mp => mp.MedicineId == medicineId)
                 .OrderByDescending(mp => mp.ActiveFrom)
                 .FirstOrDefault();
+        }
+
+        public IEnumerable<SmallPharmacyDTO> ReadBy(PharmacySearchParams searchParams)
+        {
+            var (name, streetAndCity, sortCriteria, isAscending) = searchParams;
+            var pharmacies = ReadForHomePage().Where(pharmacy => string.IsNullOrEmpty(name) || pharmacy.Name.ToLower().Contains(name.ToLower()))
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.City.ToLower()))
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()));
+
+            var sortingCriteria = new Dictionary<string, Func<SmallPharmacyDTO, object>>()
+            {
+                { "name", p => p.Name },
+                { "city", p => p.Address.City },
+                { "grade", p => p.AverageGrade }
+            };
+
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
+            {
+                pharmacies = isAscending ? pharmacies.OrderBy(sortingCriterion) : pharmacies.OrderByDescending(sortingCriterion);
+            }
+
+            return pharmacies;
         }
     }
 }

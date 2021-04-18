@@ -1,0 +1,72 @@
+﻿<html>
+<head>
+</head>
+
+<body>
+    <h1 style="text-align: center;">{{medicine.medicine.name}} ({{medicine.medicine.unique_id}})</h1>
+    <h2 style="text-align: center;"><u>Medicine specification.</u></h2>
+
+    <br />
+
+    <ol>
+        <li><h3><b>MEDICINE NAME</b></h3></li>
+        <b>{{medicine.medicine.name}} By &#169; {{medicine.medicine.manufacturer}}</b>
+
+        <li><h3><b>Ingridients</b></h3></li>
+        <p>{{medicine.medicine.name}} is made of:</p>
+
+        <table border="1">
+            <thead>
+            <th>Ingridient name</th>
+            <th>Ingridient mass</th>
+            </thead>
+            <tbody>
+                {{for ingridient in medicine.ingredients}}
+                <tr>
+                    <td>
+                        {{ingridient.name}}
+                    </td>
+                    <td>
+                        {{ingridient.mass_in_milligrams}}mg
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+
+        <li><h3><b>PHARMACEUTICAL FORM</b></h3></li>
+        <p>Form: {{medicine.medicine.form}}</p>
+
+        <li>
+            <h3><b>CLINICAL PARTICULARS</b></h3>
+            <ol>
+                <li><b>Reccomended dose</b></li>
+                <p>{{ medicine.medicine.recommended_dose }}</p>
+
+                <li><b>Contraindications</b></li>
+                <p>{{ medicine.medicine.contraindications }}</p>
+
+                <li><b>Additional info</b></li>
+                <p>{{ medicine.medicine.additional_info }}</p>
+
+                <li><b>Replacements</b></li>
+                <ol>
+                    {{for replacement in medicine.replacements}}
+                    <li>{{replacement.replacement_medicine.name}}</li>
+                    {{end}}
+                </ol>
+            </ol>
+        </li>
+
+        <li><h3><b>PHARMACOLOGICAL INFORMATION</b></h3></li>
+        <p>Type: {{medicine.medicine.type.type_name}}</p>
+
+        <li><h3><b>AVAILABILITY INFO</b></h3></li>
+        {{if medicine.medicine.is_recipe_only}}
+        <p>{{medicine.medicine.name}} can be purchased only with recipe.</p>
+        {{else}}
+        <p>{{medicine.medicine.name}} can be purchased without recipe.</p>
+        {{end}}
+    </ol>
+</body>
+</html>
