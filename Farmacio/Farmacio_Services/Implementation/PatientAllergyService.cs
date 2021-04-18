@@ -22,7 +22,7 @@ namespace Farmacio_Services.Implementation
             _patientService = patientService;
         }
 
-        public IEnumerable<PatientAllergy> Create(PatientAllergyDTO request)
+        public IEnumerable<PatientAllergy> CreateAllergies(PatientAllergyDTO request)
         {
             _patientService.TryToRead(request.patientId);
             foreach(var medicineId in request.medicinesId)
