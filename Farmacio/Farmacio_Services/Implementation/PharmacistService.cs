@@ -4,6 +4,7 @@ using Farmacio_Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Implementation.Validation;
 using GlobalExceptionHandler.Exceptions;
 
@@ -86,6 +87,14 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name)
         {
             return FilterByPharmacyId(SearchByName(name), pharmacyId);
+        }
+        
+        public override IEnumerable<Account> ReadBy(MedicalStaffFilterParamsDTO filterParams)
+        {
+            var pharmacyId = filterParams.PharmacyId;
+            return pharmacyId != null
+                ? FilterByPharmacyId(base.ReadBy(filterParams), new Guid(pharmacyId))
+                : base.ReadBy(filterParams);
         }
 
         private void ValidatePharmacyId(Account account)

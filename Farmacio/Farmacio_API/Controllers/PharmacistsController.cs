@@ -2,6 +2,7 @@
 using AutoMapper;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,16 @@ namespace Farmacio_API.Controllers
         public IActionResult SearchPharmacists(string name)
         {
             return Ok(_pharmacistService.SearchByName(name));
+        }
+        
+        /// <summary>
+        /// Returns pharmacists that match the given params from the system.
+        /// </summary>
+        /// <response code="200">List of pharmacists.</response>
+        [HttpGet("filter")]
+        public IActionResult FilterPharmacists([FromQuery] MedicalStaffFilterParamsDTO filterParams)
+        {
+            return Ok(_pharmacistService.ReadBy(filterParams));
         }
         
         /// <summary>
