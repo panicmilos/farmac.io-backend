@@ -234,5 +234,16 @@ namespace Farmacio_Services.Implementation
         {
             return ReadForMedicalStaff(medicalStaffId).Where(ap => ap.IsReserved && ap.ReportId == null).ToList();
         }
+
+        public Report NotePatientDidNotShowUp(CreateReportDTO reportDTO)
+        {
+            var report = CreateReport(reportDTO);
+            var appointment = base.TryToRead(reportDTO.AppointmentId);
+            var patient = appointment.Patient;
+            patient.NegativePoints += 1;
+            var patientAccount = _accountService.ReadByUserId(patient.Id);
+            _patientService.Update(patientAccount);
+            return report;
+        }
     }
 }

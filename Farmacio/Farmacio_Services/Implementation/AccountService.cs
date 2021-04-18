@@ -100,5 +100,10 @@ namespace Farmacio_Services.Implementation
 
             return foundEmail != default;
         }
+
+        public Account ReadByUserId(Guid userId)
+        {
+            return _repository.Read().FirstOrDefault(account => account.UserId == userId);
+        }
     }
 }

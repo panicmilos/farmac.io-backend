@@ -139,5 +139,19 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_appointmentService.ReadReservedButUnreportedForMedicalStaff(medicalStaffId));
         }
+
+        /// <summary>
+        /// Creates a report for appointment, with note that patient did not show up.
+        /// </summary>
+        /// <response code="200">Created report.</response>
+        /// <response code="404">Appointment not found.</response>
+        /// <response code="400">Unable to create report for not reserved appointment.</response>
+        [HttpPost("{appointmentId}/not-show-up")]
+        public IActionResult NotePatientDidNotShowUp(Guid appointmentId, CreateReportRequest request)
+        {
+            var reportDTO = _mapper.Map<CreateReportDTO>(request);
+            reportDTO.AppointmentId = appointmentId;
+            return Ok(_appointmentService.NotePatientDidNotShowUp(reportDTO));
+        }
     }
 }

@@ -16,5 +16,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadForPatients(Guid patientId);
         Appointment CancelAppointmentWithDermatologist(Guid appointmentId);
         Report CreateReport(CreateReportDTO reportDTO);
+        Report NotePatientDidNotShowUp(CreateReportDTO reportDTO);
     }
 }
