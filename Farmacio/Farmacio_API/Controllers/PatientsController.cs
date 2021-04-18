@@ -107,7 +107,7 @@ namespace Farmacio_API.Controllers
         public IActionResult CreateAllergies(PatientAllergyDTO request)
         {
             var pharmacy = _mapper.Map<PatientAllergyDTO>(request);
-            return Ok(_patientAllergyService.Create(request));
+            return Ok(_patientAllergyService.CreateAllergies(request));
         }
 
         /// <summary>
