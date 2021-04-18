@@ -25,7 +25,7 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<PatientAllergy> CreateAllergies(PatientAllergyDTO request)
         {
             _patientService.TryToRead(request.patientId);
-            foreach(var medicineId in request.medicinesId)
+            foreach(var medicineId in request.medicineIds)
             {
                 _medicineService.TryToRead(medicineId);
                 var allergy = base.Read().Where(a => a.MedicineId == medicineId && a.PatientId == request.patientId).FirstOrDefault();
@@ -36,7 +36,7 @@ namespace Farmacio_Services.Implementation
             }
 
             List<PatientAllergy> listOfAllergies = new List<PatientAllergy>();
-            foreach(var medicineId in request.medicinesId)
+            foreach(var medicineId in request.medicineIds)
             {
                 listOfAllergies.Add(base.Create(new PatientAllergy
                 {
