@@ -125,7 +125,7 @@ namespace Farmacio_Services.Implementation
                 .Where(pharmacy => pharmacy.AverageGrade >= gradeFrom && pharmacy.AverageGrade <= gradeTo);
 
 
-            if(distanceFrom != 0 && distanceTo != 0)
+            if(distanceFrom != 0 && distanceTo != 0 && userLat != 200 && userLon != 200)
             {
                 pharmacies = pharmacies.Where(pharmacy => getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) >= distanceFrom &&
                 getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) <= distanceTo);
