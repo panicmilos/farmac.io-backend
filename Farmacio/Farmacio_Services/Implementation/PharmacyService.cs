@@ -124,14 +124,9 @@ namespace Farmacio_Services.Implementation
                 .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()))
                 .Where(pharmacy => pharmacy.AverageGrade >= gradeFrom && pharmacy.AverageGrade <= gradeTo);
 
-            Console.WriteLine(distanceFrom);
-            Console.WriteLine(distanceTo);
+
             if(distanceFrom != 0 && distanceTo != 0)
             {
-                foreach(var pharmacy in pharmacies)
-                {
-                    Console.WriteLine(getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon));
-                }
                 pharmacies = pharmacies.Where(pharmacy => getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) >= distanceFrom &&
                 getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) <= distanceTo);
             }
