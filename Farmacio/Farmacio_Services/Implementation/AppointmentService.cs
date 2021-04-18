@@ -216,9 +216,13 @@ namespace Farmacio_Services.Implementation
             {
                 Notes = reportDTO.Notes,
                 TherapyDurationInDays = reportDTO.TherapyDurationInDays,
+                ERecipe = new ERecipe
+                {
+                    PatientId = appointment.PatientId.Value
+                    //TODO
+                }
             };
-            report = _reportService.Create(report);
-            appointment.Report = report;
+            appointment.Report = _reportService.Create(report);
             base.Update(appointment);
             return report;
         }
