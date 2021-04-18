@@ -118,10 +118,23 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<SmallPharmacyDTO> ReadBy(PharmacySearchParams searchParams)
         {
-            var (name, streetAndCity, sortCriteria, isAscending) = searchParams;
+            var (name, streetAndCity, sortCriteria, isAscending, gradeFrom, gradeTo, distanceFrom, distanceTo, userLat, userLon) = searchParams;
             var pharmacies = ReadForHomePage().Where(pharmacy => string.IsNullOrEmpty(name) || pharmacy.Name.ToLower().Contains(name.ToLower()))
                 .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.City.ToLower()))
-                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()));
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()))
+                .Where(pharmacy => pharmacy.AverageGrade >= gradeFrom && pharmacy.AverageGrade <= gradeTo);
+
+            Console.WriteLine(distanceFrom);
+            Console.WriteLine(distanceTo);
+            if(distanceFrom != 0 && distanceTo != 0)
+            {
+                foreach(var pharmacy in pharmacies)
+                {
+                    Console.WriteLine(getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon));
+                }
+                pharmacies = pharmacies.Where(pharmacy => getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) >= distanceFrom &&
+                getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) <= distanceTo);
+            }
 
             var sortingCriteria = new Dictionary<string, Func<SmallPharmacyDTO, object>>()
             {
@@ -136,6 +149,25 @@ namespace Farmacio_Services.Implementation
             }
 
             return pharmacies;
+        }
+
+        private double getDistanceFromLatLonInKm(float lat1, float lon1, float lat2, float lon2)
+        {
+            var R = 6371;
+            var dLat = deg2rad(lat2 - lat1);
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                    Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(deg2rad(lat1)) * Math.Cos(deg2rad(lat2)) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            var d = R * c; 
+            return d;
+        }
+
+        private double deg2rad(float deg)
+        {
+            return deg * (Math.PI / 180);
         }
     }
 }
