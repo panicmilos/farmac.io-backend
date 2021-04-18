@@ -49,7 +49,7 @@ namespace Farmacio_Services.Implementation
         {
             return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
         }
-        
+
         public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
         {
             return Read()
@@ -212,6 +212,8 @@ namespace Farmacio_Services.Implementation
             var appointment = base.TryToRead(reportDTO.AppointmentId);
             if (!appointment.IsReserved)
                 throw new BadLogicException("Given appointment is not reserved.");
+            if (appointment.ReportId != null)
+                throw new BadLogicException("Given appointment is already reported.");
             var report = new Report
             {
                 Notes = reportDTO.Notes,
@@ -222,9 +224,15 @@ namespace Farmacio_Services.Implementation
                     //TODO
                 }
             };
-            appointment.Report = _reportService.Create(report);
+            report = _reportService.Create(report);
+            appointment.Report = report;
             base.Update(appointment);
             return report;
+        }
+
+        public IEnumerable<Appointment> ReadReservedButUnreportedForMedicalStaff(Guid medicalStaffId)
+        {
+            return ReadForMedicalStaff(medicalStaffId).Where(ap => ap.IsReserved && ap.ReportId == null).ToList();
         }
     }
 }

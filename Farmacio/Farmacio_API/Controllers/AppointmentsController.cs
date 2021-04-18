@@ -129,5 +129,15 @@ namespace Farmacio_API.Controllers
             reportDTO.AppointmentId = appointmentId;
             return Ok(_appointmentService.CreateReport(reportDTO));
         }
+
+        /// <summary>
+        /// Returns medical staff's appointments that are reserved but not reported.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        [HttpGet("my-appointments/{medicalStaffId}")]
+        public IActionResult GetAppointmentsForMedicalStaff(Guid medicalStaffId)
+        {
+            return Ok(_appointmentService.ReadReservedButUnreportedForMedicalStaff(medicalStaffId));
+        }
     }
 }
