@@ -14,13 +14,13 @@ namespace Farmacio_API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IPharmacistService _pharmacistService;
-        
+
         public PharmacistsController(IPharmacistService pharmacistService, IMapper mapper)
         {
             _pharmacistService = pharmacistService;
             _mapper = mapper;
         }
-        
+
         /// <summary>
         /// Reads all existing pharmacists in the system.
         /// </summary>
@@ -30,7 +30,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.Read());
         }
-        
+
         /// <summary>
         /// Search all existing pharmacists in the system.
         /// </summary>
@@ -40,7 +40,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.SearchByName(name));
         }
-        
+
         /// <summary>
         /// Reads an existing pharmacist in the system.
         /// </summary>
@@ -48,7 +48,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetPharmacist(Guid id)
         {
-            return Ok(_pharmacistService.Read(id));
+            return Ok(_pharmacistService.TryToRead(id));
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Farmacio_API.Controllers
             var pharmacist = _mapper.Map<Account>(request);
             return Ok(_pharmacistService.Create(pharmacist));
         }
-        
+
         /// <summary>
         /// Updates an existing pharmacist in the system.
         /// </summary>
@@ -76,7 +76,7 @@ namespace Farmacio_API.Controllers
             var pharmacist = _mapper.Map<Account>(request);
             return Ok(_pharmacistService.Update(pharmacist));
         }
-        
+
         /// <summary>
         /// Deletes an existing pharmacist in the system.
         /// </summary>

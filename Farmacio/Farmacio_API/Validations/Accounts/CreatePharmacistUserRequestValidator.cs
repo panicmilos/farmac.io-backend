@@ -8,6 +8,7 @@ namespace Farmacio_API.Validations.Accounts
         public CreatePharmacistUserRequestValidator() : base()
         {
             RuleFor(request => request.PharmacyId).NotNull().WithMessage("PharmacyId must be provided.");
+            RuleFor(request => request.WorkTime).NotNull().WithMessage("Work time must be provided.");
         }
     }
 }

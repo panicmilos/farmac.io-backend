@@ -18,10 +18,17 @@ COPY . .
 
 RUN dotnet publish -c Release -o out Farmacio_API/
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 
 WORKDIR /app
 
 COPY --from=build /app/out ./
+
+RUN ["apt-get", "update"]
+RUN ["apt-get", "-y", "install", "libgdiplus"]
+RUN ["apt-get", "-y", "install", "xvfb", "libfontconfig", "wkhtmltopdf"]
+RUN ["apt-get", "-y", "install", "libc6-dev"]
+RUN ["apt-get", "-y", "install", "openssl"]
+RUN ["apt-get", "-y", "install", "libssl1.0-dev"]
 
 CMD [ "dotnet", "Farmacio_API.dll" ]

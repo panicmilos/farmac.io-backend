@@ -7,6 +7,7 @@ using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_Services.Implementation.Validation;
 
 namespace Farmacio_Services.Implementation
 {
@@ -69,19 +70,19 @@ namespace Farmacio_Services.Implementation
             var pharmacy = _pharmacyService.TryToRead(pharmacyId);
 
             var workPlace =
-                _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(dermatologistAccount.UserId,
-                    pharmacyId);
+                _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(dermatologistAccount.UserId, pharmacyId);
 
             if (workPlace != null)
                 throw new AlreadyEmployedInPharmacyException("Dermatologist already employed in pharmacy.");
 
-            ValidateWorkTime(workTime);
-
+            WorkTimeValidation.ValidateWorkHours(workTime);
+            
             if (!IsWorkTimeForDermatologistValid(workTime, dermatologistAccount.UserId))
                 throw new WorkTimesOverlapException("Work time overlaps with another.");
 
             var newWorkPlace = new DermatologistWorkPlace
             {
+                DermatologistId = dermatologistAccount.UserId,
                 Pharmacy = pharmacy,
                 WorkTime = workTime
             };
@@ -108,14 +109,6 @@ namespace Farmacio_Services.Implementation
         {
             return accounts.Where(a =>
                 _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(a.UserId, pharmacyId) != null);
-        }
-
-        private static void ValidateWorkTime(WorkTime workTime)
-        {
-            var workTimeHourDiff = Math.Abs(workTime.From.Hour - workTime.To.Hour);
-            var workTimeMinuteDiff = Math.Abs(workTime.From.Minute - workTime.To.Minute);
-            if (workTimeHourDiff < 1 || workTimeHourDiff > 8 || (workTimeHourDiff == 8 && workTimeMinuteDiff != 0))
-                throw new InvalidWorkTimeException("Work time must be minimum 1 hour and maximum 8 hours long.");
         }
 
         private bool IsWorkTimeForDermatologistValid(WorkTime workTime, Guid dermatologistId)
