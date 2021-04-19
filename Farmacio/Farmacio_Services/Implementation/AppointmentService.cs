@@ -154,15 +154,14 @@ namespace Farmacio_Services.Implementation
             return base.Update(appointmentWithDermatologist);
         }
 
-        public IEnumerable<Appointment> SortAppointments(Guid pharmacyId, string criteria, bool isAsc)
+        public IEnumerable<Appointment> SortAppointments(string criteria, bool isAsc, IEnumerable<Appointment> appointments)
         {
             var sortingCriteria = new Dictionary<string, Func<Appointment, object>>()
             {
                 { "grade", a => a.MedicalStaff.AverageGrade },
-                { "price", a => a.Price }
+                { "price", a => a.Price },
+                { "duration", a => a.Duration }
             };
-
-            var appointments = ReadForDermatologistsInPharmacy(pharmacyId);
 
             if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion)) {
                 appointments = isAsc ? appointments.OrderBy(sortingCriterion) : appointments.OrderByDescending(sortingCriterion);

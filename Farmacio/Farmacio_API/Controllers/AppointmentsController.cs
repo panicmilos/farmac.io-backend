@@ -88,9 +88,21 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
         [HttpGet("sort")]
-        public IActionResult SortAppointments(Guid pharmacyId, string criteria, bool isAsc)
+        public IActionResult SortAppointmentsForDermatologist(Guid pharmacyId, string criteria, bool isAsc)
         {
-            return Ok(_appointmentService.SortAppointments(pharmacyId, criteria, isAsc));
+            var appointments = _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId);
+            return Ok(_appointmentService.SortAppointments(criteria, isAsc, appointments));
+        }
+
+        /// <summary>
+        /// Sort history of visiting a dermatologist.
+        /// </summary>
+        /// <response code="200">Sorted appointments.</response>
+        [HttpGet("sort-history-of-visiting")]
+        public IActionResult SortHistoryOfVisitingDermatologist(Guid patientId, string criteria, bool isAsc)
+        {
+            var appointments = _appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId);
+            return Ok(_appointmentService.SortAppointments(criteria, isAsc, appointments));
         }
 
         /// <summary>
