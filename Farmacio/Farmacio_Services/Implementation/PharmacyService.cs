@@ -6,6 +6,7 @@ using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_Services.Implementation.Utils;
 
 namespace Farmacio_Services.Implementation
 {
@@ -118,10 +119,23 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<SmallPharmacyDTO> ReadBy(PharmacySearchParams searchParams)
         {
-            var (name, streetAndCity, sortCriteria, isAscending) = searchParams;
+            var (name, streetAndCity, sortCriteria, isAscending, gradeFrom, gradeTo, distanceFrom, distanceTo, userLat, userLon) = searchParams;
             var pharmacies = ReadForHomePage().Where(pharmacy => string.IsNullOrEmpty(name) || pharmacy.Name.ToLower().Contains(name.ToLower()))
                 .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.City.ToLower()))
-                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()));
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()))
+                .Where(pharmacy => pharmacy.AverageGrade >= gradeFrom && pharmacy.AverageGrade <= gradeTo);
+
+
+            if(distanceFrom != 0 && distanceTo != 0 && LatLngUtils.IsLatValid(userLat) && LatLngUtils.IsLngValid(userLon))
+            {
+                pharmacies = pharmacies.Where(pharmacy =>
+                {
+                    var distance = LatLngUtils.GetDistanceFromLatLngInKm(new CoordinatesDTO 
+                    { Lat = pharmacy.Address.Lat, Lng = pharmacy.Address.Lng }, 
+                    new CoordinatesDTO { Lat = userLat, Lng = userLon });
+                    return distance >= distanceFrom && distance <= distanceTo;
+                });
+            }
 
             var sortingCriteria = new Dictionary<string, Func<SmallPharmacyDTO, object>>()
             {
