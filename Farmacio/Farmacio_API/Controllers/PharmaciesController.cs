@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_API.Contracts.Requests.PharmacyMedicines;
 using Farmacio_API.Contracts.Requests.WorkTimes;
 using Farmacio_API.Contracts.Responses.Dermatologists;
 
@@ -24,12 +25,14 @@ namespace Farmacio_API.Controllers
         private readonly IAppointmentService _appointmentService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPharmacyStockService _pharmacyStockService;
+        private readonly IMedicineService _medicineService;
         private readonly IMapper _mapper;
 
         public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
             , IDermatologistService dermatologistService, IAppointmentService appointmentService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
-            , IPharmacyStockService pharmacyStockService, IMapper mapper)
+            , IPharmacyStockService pharmacyStockService
+            , IMedicineService medicineService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
@@ -38,6 +41,7 @@ namespace Farmacio_API.Controllers
             _appointmentService = appointmentService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _pharmacyStockService = pharmacyStockService;
+            _medicineService = medicineService;
         }
 
         /// <summary>
@@ -175,6 +179,43 @@ namespace Farmacio_API.Controllers
         public IActionResult GetMedicinesInStock(Guid pharmacyId)
         {
             return Ok(_pharmacyStockService.ReadForPharmacyInStock(pharmacyId));
+        }
+        
+        /// <summary>
+        /// Searches through all medicines that are in stock in the pharmacy.
+        /// </summary>
+        /// <response code="200">Searched medicines that are in stock in the pharmacy.</response>
+        [HttpGet("{pharmacyId}/medicines-in-stock/search")]
+        public IActionResult SearchMedicinesInStock(Guid pharmacyId, [FromQuery] string name)
+        {
+            return Ok(_pharmacyStockService.SearchForPharmacyInStock(pharmacyId, name));
+        }
+        
+        /// <summary>
+        /// Add an existing medicine to the pharmacy.
+        /// </summary>
+        /// <response code="200">Added pharmacy medicine.</response>
+        /// <response code="404">Medicine or Pharmacy not found.</response>
+        /// <response code="400">Pharmacy-Medicine already exists in the Pharmacy.</response>
+        [HttpPost("{pharmacyId}/medicines")]
+        public IActionResult AddMedicineToPharmacy(Guid pharmacyId, CreatePharmacyMedicineRequest pharmacyMedicineRequest)
+        {
+            var pharmacyMedicine = _mapper.Map<PharmacyMedicine>(pharmacyMedicineRequest);
+            pharmacyMedicine.PharmacyId = pharmacyId;
+            _pharmacyService.TryToRead(pharmacyMedicine.PharmacyId);
+            _medicineService.TryToRead(pharmacyMedicine.MedicineId);
+            return Ok(_pharmacyStockService.Create(pharmacyMedicine));
+        }
+        
+        /// <summary>
+        /// Remove an existing medicine from the pharmacy.
+        /// </summary>
+        /// <response code="200">Removed pharmacy medicine.</response>
+        /// <response code="404">Pharmacy-Medicine not found.</response>
+        [HttpDelete("{pharmacyId}/medicines/{pharmacyMedicineId}")]
+        public IActionResult RemoveMedicineFromPharmacy(Guid pharmacyId, Guid pharmacyMedicineId)
+        {
+            return Ok(_pharmacyStockService.Delete(pharmacyMedicineId));
         }
 
         /// <summary>

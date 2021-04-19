@@ -4,6 +4,7 @@ using System.Linq;
 using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
@@ -26,6 +27,19 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<PharmacyMedicine> ReadForPharmacyInStock(Guid pharmacyId)
         {
             return ReadForPharmacy(pharmacyId).Where(pharmacyMedicine => pharmacyMedicine.Quantity != 0);
+        }
+
+        public IEnumerable<PharmacyMedicine> SearchForPharmacyInStock(Guid pharmacyId, string name)
+        {
+            return ReadForPharmacyInStock(pharmacyId)
+                .Where(pharmacyMedicine => name == null || pharmacyMedicine.Medicine.Name.Contains(name));
+        }
+
+        public override PharmacyMedicine Create(PharmacyMedicine pharmacyMedicine)
+        {
+            if (ReadForPharmacy(pharmacyMedicine.PharmacyId, pharmacyMedicine.MedicineId) != null)
+                throw new PharmacyMedicineAlreadyExistsException("Pharmacy medicine already exists.");
+            return base.Create(pharmacyMedicine);
         }
     }
 }
