@@ -202,5 +202,14 @@ namespace Farmacio_Services.Implementation
             base.Update(appointment);
             return appointment;
         }
+
+        public IEnumerable<Appointment> ReadPatientsHistoryOfVisitsToDermatologist(Guid patientId)
+        {
+            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exixst in the system.");
+            }
+            return Read().ToList().Where(appointmet => appointmet.PatientId == patientId && appointmet.IsReserved && appointmet.DateTime < DateTime.Now);
+        }
     }
 }

@@ -115,5 +115,17 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_appointmentService.CancelAppointmentWithDermatologist(appointmentId));
         }
+
+
+        /// <summary>
+        /// Returns patients history of visits to a dermatologist.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
+        [HttpGet("history-of-appointments/{patientId}")]
+        public IActionResult ReadPatientsHistoryOfDermatologistsVisits(Guid patientId)
+        {
+            return Ok(_appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId));
+        }
     }
 }
