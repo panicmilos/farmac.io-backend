@@ -29,6 +29,12 @@ namespace Farmacio_Services.Implementation
             return ReadForPharmacy(pharmacyId).Where(pharmacyMedicine => pharmacyMedicine.Quantity != 0);
         }
 
+        public IEnumerable<PharmacyMedicine> SearchForPharmacyInStock(Guid pharmacyId, string name)
+        {
+            return ReadForPharmacyInStock(pharmacyId)
+                .Where(pharmacyMedicine => name == null || pharmacyMedicine.Medicine.Name.Contains(name));
+        }
+
         public override PharmacyMedicine Create(PharmacyMedicine pharmacyMedicine)
         {
             if (ReadForPharmacy(pharmacyMedicine.PharmacyId, pharmacyMedicine.MedicineId) != null)

@@ -182,6 +182,16 @@ namespace Farmacio_API.Controllers
         }
         
         /// <summary>
+        /// Searches through all medicines that are in stock in the pharmacy.
+        /// </summary>
+        /// <response code="200">Searched medicines that are in stock in the pharmacy.</response>
+        [HttpGet("{pharmacyId}/medicines-in-stock/search")]
+        public IActionResult SearchMedicinesInStock(Guid pharmacyId, [FromQuery] string name)
+        {
+            return Ok(_pharmacyStockService.SearchForPharmacyInStock(pharmacyId, name));
+        }
+        
+        /// <summary>
         /// Add an existing medicine to the pharmacy.
         /// </summary>
         /// <response code="200">Added pharmacy medicine.</response>
