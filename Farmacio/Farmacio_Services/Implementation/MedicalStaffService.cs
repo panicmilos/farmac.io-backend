@@ -26,18 +26,18 @@ namespace Farmacio_Services.Implementation
 
             return _appointmentService
                 .ReadForMedicalStaff(medicalAccount.UserId)
-                .Where(ap => ap.IsReserved && ap.PatientId != null)
-                .GroupBy(ap => ap.PatientId)
-                .Select(gr => gr.Where(ap => ap.DateTime == gr.Max(ap => ap.DateTime)).First())
-                .Select(ap => new PatientDTO
+                .Where(appointment => appointment.IsReserved && appointment.PatientId != null)
+                .GroupBy(appointment => appointment.PatientId)
+                .Select(group => group.Where(appointment => appointment.DateTime == group.Max(appointment => appointment.DateTime)).First())
+                .Select(appointment => new PatientDTO
                 {
-                    PatientId = ap.PatientId.Value,
-                    FirstName = ap.Patient.FirstName,
-                    LastName = ap.Patient.LastName,
-                    DateOfBirth = ap.Patient.DateOfBirth,
-                    Address = ap.Patient.Address,
-                    PhoneNumber = ap.Patient.PhoneNumber,
-                    AppointmentDate = ap.DateTime
+                    PatientId = appointment.PatientId.Value,
+                    FirstName = appointment.Patient.FirstName,
+                    LastName = appointment.Patient.LastName,
+                    DateOfBirth = appointment.Patient.DateOfBirth,
+                    Address = appointment.Patient.Address,
+                    PhoneNumber = appointment.Patient.PhoneNumber,
+                    AppointmentDate = appointment.DateTime
                 });
         }
 
