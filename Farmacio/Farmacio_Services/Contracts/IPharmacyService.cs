@@ -14,5 +14,6 @@ namespace Farmacio_Services.Contracts
         MedicineInPharmacyDTO ReadMedicine(Guid pharmacyId, Guid medicineId);
 
         void ChangeStockFor(Guid pharmacyId, Guid medicineId, int changeFor);
+        IEnumerable<SmallPharmacyDTO> ReadBy(PharmacySearchParams searchParams);
     }
 }

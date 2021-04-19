@@ -22,5 +22,10 @@ namespace Farmacio_Services.Implementation
         {
             return Read().Where(pm => pm.PharmacyId == pharmacyId).ToList();
         }
+
+        public IEnumerable<PharmacyMedicine> ReadForPharmacyInStock(Guid pharmacyId)
+        {
+            return ReadForPharmacy(pharmacyId).Where(pharmacyMedicine => pharmacyMedicine.Quantity != 0);
+        }
     }
 }

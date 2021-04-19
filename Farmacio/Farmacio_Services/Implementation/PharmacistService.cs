@@ -4,6 +4,8 @@ using Farmacio_Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_Models.DTO;
+using Farmacio_Services.Implementation.Validation;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
@@ -48,7 +50,26 @@ namespace Farmacio_Services.Implementation
         public override Account Update(Account account)
         {
             ValidatePharmacyId(account);
-            return base.Update(account);
+            WorkTimeValidation.ValidateWorkHours(((Pharmacist) account.User).WorkTime);
+            
+            var existingAccount = TryToRead(account.Id);
+
+            existingAccount.User.FirstName = account.User.FirstName;
+            existingAccount.User.LastName = account.User.LastName;
+            existingAccount.User.PhoneNumber = account.User.PhoneNumber;
+            existingAccount.User.PID = account.User.PID;
+            existingAccount.User.DateOfBirth = account.User.DateOfBirth;
+
+            existingAccount.User.Address.State = account.User.Address.State;
+            existingAccount.User.Address.City = account.User.Address.City;
+            existingAccount.User.Address.StreetName = account.User.Address.StreetName;
+            existingAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
+            existingAccount.User.Address.Lat = account.User.Address.Lat;
+            existingAccount.User.Address.Lng = account.User.Address.Lng;
+            ((Pharmacist) existingAccount.User).PharmacyId = ((Pharmacist) account.User).PharmacyId;
+            ((Pharmacist) existingAccount.User).WorkTime = ((Pharmacist) account.User).WorkTime;
+            
+            return _repository.Update(existingAccount);
         }
 
         public IEnumerable<Account> ReadForPharmacy(Guid pharmacyId)
@@ -66,6 +87,14 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name)
         {
             return FilterByPharmacyId(SearchByName(name), pharmacyId);
+        }
+        
+        public override IEnumerable<Account> ReadBy(MedicalStaffFilterParamsDTO filterParams)
+        {
+            var pharmacyId = filterParams.PharmacyId;
+            return pharmacyId != null
+                ? FilterByPharmacyId(base.ReadBy(filterParams), new Guid(pharmacyId))
+                : base.ReadBy(filterParams);
         }
 
         private void ValidatePharmacyId(Account account)

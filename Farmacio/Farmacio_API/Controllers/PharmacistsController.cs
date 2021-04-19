@@ -2,6 +2,7 @@
 using AutoMapper;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,13 +15,13 @@ namespace Farmacio_API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IPharmacistService _pharmacistService;
-        
+
         public PharmacistsController(IPharmacistService pharmacistService, IMapper mapper)
         {
             _pharmacistService = pharmacistService;
             _mapper = mapper;
         }
-        
+
         /// <summary>
         /// Reads all existing pharmacists in the system.
         /// </summary>
@@ -30,7 +31,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.Read());
         }
-        
+
         /// <summary>
         /// Search all existing pharmacists in the system.
         /// </summary>
@@ -40,6 +41,16 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.SearchByName(name));
         }
+
+        /// <summary>
+        /// Returns pharmacists that match the given params from the system.
+        /// </summary>
+        /// <response code="200">List of pharmacists.</response>
+        [HttpGet("filter")]
+        public IActionResult FilterPharmacists([FromQuery] MedicalStaffFilterParamsDTO filterParams)
+        {
+            return Ok(_pharmacistService.ReadBy(filterParams));
+        }
         
         /// <summary>
         /// Reads an existing pharmacist in the system.
@@ -48,7 +59,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetPharmacist(Guid id)
         {
-            return Ok(_pharmacistService.Read(id));
+            return Ok(_pharmacistService.TryToRead(id));
         }
 
         /// <summary>
@@ -63,7 +74,7 @@ namespace Farmacio_API.Controllers
             var pharmacist = _mapper.Map<Account>(request);
             return Ok(_pharmacistService.Create(pharmacist));
         }
-        
+
         /// <summary>
         /// Updates an existing pharmacist in the system.
         /// </summary>
@@ -76,7 +87,7 @@ namespace Farmacio_API.Controllers
             var pharmacist = _mapper.Map<Account>(request);
             return Ok(_pharmacistService.Update(pharmacist));
         }
-        
+
         /// <summary>
         /// Deletes an existing pharmacist in the system.
         /// </summary>
