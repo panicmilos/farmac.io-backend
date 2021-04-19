@@ -155,7 +155,7 @@ namespace Farmacio_Services.Implementation
                 { "duration", a => a.Duration }
             };
 
-            if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion)) {
+            if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion))
                 appointments = isAsc ? appointments.OrderBy(sortingCriterion) : appointments.OrderByDescending(sortingCriterion);
 
             return appointments;
