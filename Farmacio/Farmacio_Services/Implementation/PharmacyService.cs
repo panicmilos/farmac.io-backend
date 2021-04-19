@@ -6,6 +6,7 @@ using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_Services.Implementation.Utils;
 
 namespace Farmacio_Services.Implementation
 {
@@ -125,10 +126,15 @@ namespace Farmacio_Services.Implementation
                 .Where(pharmacy => pharmacy.AverageGrade >= gradeFrom && pharmacy.AverageGrade <= gradeTo);
 
 
-            if(distanceFrom != 0 && distanceTo != 0 && userLat != 200 && userLon != 200)
+            if(distanceFrom != 0 && distanceTo != 0 && LatLngUtils.IsLatValid(userLat) && LatLngUtils.IsLngValid(userLon))
             {
-                pharmacies = pharmacies.Where(pharmacy => getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) >= distanceFrom &&
-                getDistanceFromLatLonInKm(pharmacy.Address.Lat, pharmacy.Address.Lng, userLat, userLon) <= distanceTo);
+                pharmacies = pharmacies.Where(pharmacy =>
+                {
+                    var distance = LatLngUtils.GetDistanceFromLatLngInKm(new CoordinatesDTO 
+                    { Lat = pharmacy.Address.Lat, Lng = pharmacy.Address.Lng }, 
+                    new CoordinatesDTO { Lat = userLat, Lng = userLon });
+                    return distance >= distanceFrom && distance <= distanceTo;
+                });
             }
 
             var sortingCriteria = new Dictionary<string, Func<SmallPharmacyDTO, object>>()
@@ -144,25 +150,6 @@ namespace Farmacio_Services.Implementation
             }
 
             return pharmacies;
-        }
-
-        private double getDistanceFromLatLonInKm(float lat1, float lon1, float lat2, float lon2)
-        {
-            var R = 6371;
-            var dLat = deg2rad(lat2 - lat1);
-            var dLon = deg2rad(lon2 - lon1);
-            var a =
-                    Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                    Math.Cos(deg2rad(lat1)) * Math.Cos(deg2rad(lat2)) *
-                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            var d = R * c; 
-            return d;
-        }
-
-        private double deg2rad(float deg)
-        {
-            return deg * (Math.PI / 180);
         }
     }
 }
