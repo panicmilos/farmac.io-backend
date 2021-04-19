@@ -23,11 +23,13 @@ namespace Farmacio_API.Controllers
         private readonly IDermatologistService _dermatologistService;
         private readonly IAppointmentService _appointmentService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
+        private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IMapper _mapper;
 
         public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
             , IDermatologistService dermatologistService, IAppointmentService appointmentService
-            , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IMapper mapper)
+            , IDermatologistWorkPlaceService dermatologistWorkPlaceService
+            , IPharmacyStockService pharmacyStockService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
@@ -35,6 +37,7 @@ namespace Farmacio_API.Controllers
             _mapper = mapper;
             _appointmentService = appointmentService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
+            _pharmacyStockService = pharmacyStockService;
         }
 
         /// <summary>
@@ -162,6 +165,16 @@ namespace Farmacio_API.Controllers
         public IActionResult GetDermatologist(Guid pharmacyId, Guid dermatologistId)
         {
             return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
+        }
+        
+        /// <summary>
+        /// Reads all medicines that are in stock in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read medicines that are in stock in the pharmacy.</response>
+        [HttpGet("{pharmacyId}/medicines-in-stock")]
+        public IActionResult GetMedicinesInStock(Guid pharmacyId)
+        {
+            return Ok(_pharmacyStockService.ReadForPharmacyInStock(pharmacyId));
         }
 
         /// <summary>

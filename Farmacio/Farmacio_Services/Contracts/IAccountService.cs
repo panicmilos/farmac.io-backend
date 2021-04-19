@@ -13,5 +13,6 @@ namespace Farmacio_Services.Contracts
         Account Verify(Guid id);
 
         IEnumerable<Account> SearchByName(string name);
+        Account ReadByUserId(Guid userId);
     }
 }
