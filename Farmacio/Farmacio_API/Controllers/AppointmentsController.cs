@@ -91,18 +91,18 @@ namespace Farmacio_API.Controllers
         public IActionResult SortAppointmentsForDermatologist(Guid pharmacyId, string criteria, bool isAsc)
         {
             var appointments = _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId);
-            return Ok(_appointmentService.SortAppointments(criteria, isAsc, appointments));
+            return Ok(_appointmentService.SortAppointments(appointments, criteria, isAsc));
         }
 
         /// <summary>
-        /// Sort history of visiting a dermatologist.
+        /// Sort History of dermatology visits.
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
-        [HttpGet("sort-history-of-visiting")]
+        [HttpGet("history/{patientId}/sort")]
         public IActionResult SortHistoryOfVisitingDermatologist(Guid patientId, string criteria, bool isAsc)
         {
             var appointments = _appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId);
-            return Ok(_appointmentService.SortAppointments(criteria, isAsc, appointments));
+            return Ok(_appointmentService.SortAppointments(appointments, criteria, isAsc));
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
-        [HttpGet("history-of-appointments/{patientId}")]
+        [HttpGet("history/{patientId}")]
         public IActionResult ReadPatientsHistoryOfDermatologistsVisits(Guid patientId)
         {
             return Ok(_appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId));

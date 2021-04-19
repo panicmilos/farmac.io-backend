@@ -154,7 +154,7 @@ namespace Farmacio_Services.Implementation
             return base.Update(appointmentWithDermatologist);
         }
 
-        public IEnumerable<Appointment> SortAppointments(string criteria, bool isAsc, IEnumerable<Appointment> appointments)
+        public IEnumerable<Appointment> SortAppointments(IEnumerable<Appointment> appointments, string criteria, bool isAsc)
         {
             var sortingCriteria = new Dictionary<string, Func<Appointment, object>>()
             {
@@ -175,7 +175,7 @@ namespace Farmacio_Services.Implementation
 
             if (_patientService.Read().Where(account => account.UserId == patientId) == null)
             {
-                throw new MissingEntityException("The given patient does not exixst in the system.");
+                throw new MissingEntityException("The given patient does not exist in the system.");
             }
             return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
         }
@@ -206,9 +206,9 @@ namespace Farmacio_Services.Implementation
         {
             if (_patientService.Read().Where(account => account.UserId == patientId) == null)
             {
-                throw new MissingEntityException("The given patient does not exixst in the system.");
+                throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointmet => appointmet.PatientId == patientId && appointmet.IsReserved && appointmet.DateTime < DateTime.Now);
+            return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now);
         }
     }
 }
