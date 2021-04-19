@@ -1,6 +1,7 @@
 ﻿using Farmacio_Models.Domain;
 using System;
 using System.Collections.Generic;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_Services.Contracts
 {
