@@ -82,7 +82,6 @@ namespace Farmacio_API.Controllers
             return Ok(appointment);
         }
 
-
         /// <summary>
         /// Sort an appointments with a dermatologist in pharmacy.
         /// </summary>
@@ -175,6 +174,20 @@ namespace Farmacio_API.Controllers
             var reportDTO = _mapper.Map<CreateReportDTO>(request);
             reportDTO.AppointmentId = appointmentId;
             return Ok(_appointmentService.NotePatientDidNotShowUp(reportDTO));
+        }
+
+        /// <summary>
+        /// Creates a new appointment in the system.
+        /// </summary>
+        /// <response code="200">Created appointment.</response>
+        /// <response code="404">Something not found.</response>
+        /// <response code="400">Invalid date-time and duration.</response>
+        [HttpPost("pharmacist")]
+        public IActionResult CreatePharmacistAppointment(CreateAppointmentRequest request)
+        {
+            var appointment = _mapper.Map<CreateAppointmentDTO>(request);
+            _appointmentService.CreatePharmacistAppointment(appointment);
+            return Ok(appointment);
         }
     }
 }
