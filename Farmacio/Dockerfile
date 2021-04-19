@@ -29,6 +29,6 @@ RUN ["apt-get", "-y", "install", "libgdiplus"]
 RUN ["apt-get", "-y", "install", "xvfb", "libfontconfig", "wkhtmltopdf"]
 RUN ["apt-get", "-y", "install", "libc6-dev"]
 RUN ["apt-get", "-y", "install", "openssl"]
-RUN ["apt", "-y", "install", "libssl1.0-dev"]
+RUN ["apt-get", "-y", "install", "libssl1.1"]
 
 CMD [ "dotnet", "Farmacio_API.dll" ]
