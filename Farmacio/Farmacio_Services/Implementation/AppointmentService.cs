@@ -22,6 +22,8 @@ namespace Farmacio_Services.Implementation
         private readonly IPatientService _patientService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
+        private readonly IReportService _reportService;
+
 
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
@@ -29,7 +31,8 @@ namespace Farmacio_Services.Implementation
             , IPharmacyPriceListService pharmacyPriceListService
             , IPatientService patientService
             , IEmailDispatcher emailDispatcher
-            , ITemplatesProvider templateProvider) : base(repository)
+            , ITemplatesProvider templateProvider
+            , IReportService reportService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -39,13 +42,14 @@ namespace Farmacio_Services.Implementation
             _patientService = patientService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
+            _reportService = reportService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
             return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
         }
-        
+
         public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
         {
             return Read()
@@ -112,29 +116,19 @@ namespace Farmacio_Services.Implementation
         {
             var appointmentWithDermatologist = base.Read(appointmentRequest.AppointmentId);
             if(appointmentWithDermatologist == null)
-            {
                 throw new MissingEntityException("The given appointment does not exist in the system.");
-            }
 
             if(_patientService.Read().Where(account => account.UserId == appointmentRequest.PatientId) == null)
-            {
                 throw new MissingEntityException("The given patient does not exixst in the system.");
-            }
 
             if (appointmentWithDermatologist.IsReserved)
-            {
                 throw new BadLogicException("The given appointment is already reserved.");
-            }
 
             if (_patientService.HasExceededLimitOfNegativePoints(appointmentRequest.PatientId))
-            {
                 throw new BadLogicException("The given patient has 3 or more negative points.");
-            }
 
             if(appointmentWithDermatologist.DateTime < DateTime.Now)
-            {
                 throw new BadLogicException("The given appointment is in the past.");
-            }
 
             var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentRequest.PatientId);
             foreach(var appointment in patientsAppointments)
@@ -142,9 +136,7 @@ namespace Farmacio_Services.Implementation
                 if(appointment.DateTime.Date == appointmentWithDermatologist.DateTime.Date && TimeIntervalUtils.TimeIntervalTimesOverlap(appointment.DateTime, 
                     appointment.DateTime.AddMinutes(appointment.Duration), appointmentWithDermatologist.DateTime,
                     appointmentWithDermatologist.DateTime.AddMinutes(appointmentWithDermatologist.Duration)))
-                {
                     throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
-                }
             }
 
             appointmentWithDermatologist.IsReserved = true;
@@ -164,9 +156,8 @@ namespace Farmacio_Services.Implementation
 
             var appointments = ReadForDermatologistsInPharmacy(pharmacyId);
 
-            if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion)) {
+            if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion))
                 appointments = isAsc ? appointments.OrderBy(sortingCriterion) : appointments.OrderByDescending(sortingCriterion);
-            }
 
             return appointments;
         }
@@ -175,32 +166,65 @@ namespace Farmacio_Services.Implementation
         {
 
             if (_patientService.Read().Where(account => account.UserId == patientId) == null)
-            {
                 throw new MissingEntityException("The given patient does not exixst in the system.");
-            }
             return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
         }
 
         public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
         {
             var appointment = base.TryToRead(appointmentId);
-            if(appointment.IsReserved == false)
-            {
+            if(!appointment.IsReserved)
                 throw new BadLogicException("Given appointment is not reserved.");
-            }
             if(DateTime.Now.AddHours(24) > appointment.DateTime)
-            {
                 throw new BadLogicException("It is not possible to cancel an appointment if there are less than 24 hours left before the start.");
-            }
             if(appointment.DateTime < DateTime.Now)
-            {
                 throw new BadLogicException("It is not possible to cancel an appointment which date and time in the past.");
-            }
             appointment.IsReserved = false;
             appointment.PatientId = null;
             appointment.Patient = null;
             base.Update(appointment);
             return appointment;
+        }
+
+        public Report CreateReport(CreateReportDTO reportDTO)
+        {
+            var appointment = base.TryToRead(reportDTO.AppointmentId);
+            if (!appointment.IsReserved)
+                throw new BadLogicException("Given appointment is not reserved.");
+            if (appointment.ReportId != null)
+                throw new BadLogicException("Given appointment is already reported.");
+            var report = new Report
+            {
+                Notes = reportDTO.Notes,
+                TherapyDurationInDays = reportDTO.TherapyDurationInDays,
+                ERecipe = new ERecipe
+                {
+                    PatientId = appointment.PatientId.Value
+                    //TODO
+                }
+            };
+            report = _reportService.Create(report);
+            appointment.ReportId = report.Id;
+            base.Update(appointment);
+            return report;
+        }
+
+        public IEnumerable<Appointment> ReadReservedButUnreportedForMedicalStaff(Guid medicalStaffId)
+        {
+            return ReadForMedicalStaff(medicalStaffId).Where(appointment => appointment.IsReserved && appointment.ReportId == null).ToList();
+        }
+
+        public Report NotePatientDidNotShowUp(CreateReportDTO reportDTO)
+        {
+            var report = CreateReport(reportDTO);
+            var appointment = base.TryToRead(reportDTO.AppointmentId);
+            var patient = appointment.Patient;
+            patient.NegativePoints += 1;
+            var patientAccount = _accountService.ReadByUserId(patient.Id);
+            if (patientAccount == null)
+                throw new MissingEntityException("Patient not found.");
+            _patientService.Update(patientAccount);
+            return report;
         }
     }
 }

@@ -115,5 +115,43 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_appointmentService.CancelAppointmentWithDermatologist(appointmentId));
         }
+
+        /// <summary>
+        /// Creates an examination or consultation report for appointment.
+        /// </summary>
+        /// <response code="200">Created report.</response>
+        /// <response code="404">Appointment not found.</response>
+        /// <response code="400">Unable to create report for not reserved appointment.</response>
+        [HttpPost("{appointmentId}/report")]
+        public IActionResult CreateReport(Guid appointmentId, CreateReportRequest request)
+        {
+            var reportDTO = _mapper.Map<CreateReportDTO>(request);
+            reportDTO.AppointmentId = appointmentId;
+            return Ok(_appointmentService.CreateReport(reportDTO));
+        }
+
+        /// <summary>
+        /// Returns medical staff's appointments that are reserved but not reported.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        [HttpGet("my-appointments/{medicalStaffId}")]
+        public IActionResult GetAppointmentsForMedicalStaff(Guid medicalStaffId)
+        {
+            return Ok(_appointmentService.ReadReservedButUnreportedForMedicalStaff(medicalStaffId));
+        }
+
+        /// <summary>
+        /// Creates a report for appointment, with note that patient did not show up.
+        /// </summary>
+        /// <response code="200">Created report.</response>
+        /// <response code="404">Appointment not found.</response>
+        /// <response code="400">Unable to create report for not reserved appointment.</response>
+        [HttpPost("{appointmentId}/not-show-up")]
+        public IActionResult NotePatientDidNotShowUp(Guid appointmentId, CreateReportRequest request)
+        {
+            var reportDTO = _mapper.Map<CreateReportDTO>(request);
+            reportDTO.AppointmentId = appointmentId;
+            return Ok(_appointmentService.NotePatientDidNotShowUp(reportDTO));
+        }
     }
 }

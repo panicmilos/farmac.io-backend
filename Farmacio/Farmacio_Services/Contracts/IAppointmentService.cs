@@ -9,10 +9,13 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId);
         IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId);
+        IEnumerable<Appointment> ReadReservedButUnreportedForMedicalStaff(Guid medicalStaffId);
         Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment);
         Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointment);
         IEnumerable<Appointment> SortAppointments(Guid pharmacyId, string criteria, bool isAsc);
         IEnumerable<Appointment> ReadForPatients(Guid patientId);
         Appointment CancelAppointmentWithDermatologist(Guid appointmentId);
+        Report CreateReport(CreateReportDTO reportDTO);
+        Report NotePatientDidNotShowUp(CreateReportDTO reportDTO);
     }
 }

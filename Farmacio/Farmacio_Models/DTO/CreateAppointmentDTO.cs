@@ -9,5 +9,6 @@ namespace Farmacio_Models.DTO
         public float? Price { get; set; }
         public Guid PharmacyId { get; set; }
         public Guid MedicalStaffId { get; set; }
+        public Guid? PatientId { get; set; }
     }
 }
