@@ -146,17 +146,16 @@ namespace Farmacio_Services.Implementation
             return base.Update(appointmentWithDermatologist);
         }
 
-        public IEnumerable<Appointment> SortAppointments(Guid pharmacyId, string criteria, bool isAsc)
+        public IEnumerable<Appointment> SortAppointments(IEnumerable<Appointment> appointments, string criteria, bool isAsc)
         {
             var sortingCriteria = new Dictionary<string, Func<Appointment, object>>()
             {
                 { "grade", a => a.MedicalStaff.AverageGrade },
-                { "price", a => a.Price }
+                { "price", a => a.Price },
+                { "duration", a => a.Duration }
             };
 
-            var appointments = ReadForDermatologistsInPharmacy(pharmacyId);
-
-            if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion))
+            if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion)) {
                 appointments = isAsc ? appointments.OrderBy(sortingCriterion) : appointments.OrderByDescending(sortingCriterion);
 
             return appointments;
@@ -166,7 +165,9 @@ namespace Farmacio_Services.Implementation
         {
 
             if (_patientService.Read().Where(account => account.UserId == patientId) == null)
-                throw new MissingEntityException("The given patient does not exixst in the system.");
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
             return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
         }
 
@@ -186,6 +187,15 @@ namespace Farmacio_Services.Implementation
             return appointment;
         }
 
+        public IEnumerable<Appointment> ReadPatientsHistoryOfVisitsToDermatologist(Guid patientId)
+        {
+            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+            return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now);
+        }
+        
         public Report CreateReport(CreateReportDTO reportDTO)
         {
             var appointment = base.TryToRead(reportDTO.AppointmentId);
