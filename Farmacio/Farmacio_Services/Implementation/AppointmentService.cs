@@ -69,7 +69,7 @@ namespace Farmacio_Services.Implementation
             if (workPlace == null)
                 throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
             
-            ValidateAppointmentDateTime(appointment, workPlace, appointment.MedicalStaffId);
+            ValidateAppointmentDateTime(appointment, workPlace.WorkTime);
 
             var priceList = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id);
             if(priceList == null)
@@ -89,16 +89,15 @@ namespace Farmacio_Services.Implementation
             });
         }
 
-        private void ValidateAppointmentDateTime(CreateAppointmentDTO appointment, DermatologistWorkPlace workPlace,
-            Guid medicalStaffId)
+        private void ValidateAppointmentDateTime(CreateAppointmentDTO appointment, WorkTime workTime)
         {
             var from = appointment.DateTime;
             var to = @from.AddMinutes(appointment.Duration);
-            if (!TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, workPlace.WorkTime.From, workPlace.WorkTime.To))
+            if (!TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, workTime.From, workTime.To))
                 throw new InvalidAppointmentDateTimeException(
                     "The given date-time and duration do not overlap with dermatologist's work time.");
 
-            var overlap = ReadForMedicalStaff(medicalStaffId).FirstOrDefault(a =>
+            var overlap = ReadForMedicalStaff(appointment.MedicalStaffId).FirstOrDefault(a =>
             {
                 var existingFrom = a.DateTime;
                 var existingTo = a.DateTime.AddMinutes(a.Duration);
@@ -225,6 +224,43 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Patient not found.");
             _patientService.Update(patientAccount);
             return report;
+        }
+
+        public Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointmentDTO)
+        {
+            var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
+
+            var pharmacist = (Pharmacist)medicalAccount.User;
+
+            ValidateAppointmentDateTime(appointmentDTO, pharmacist.WorkTime);
+
+            var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentDTO.PatientId);
+            foreach (var pa in patientsAppointments)
+            {
+                if (pa.DateTime.Date == appointmentDTO.DateTime.Date && TimeIntervalUtils.TimeIntervalTimesOverlap(
+                    pa.DateTime, pa.DateTime.AddMinutes(pa.Duration), appointmentDTO.DateTime,
+                    appointmentDTO.DateTime.AddMinutes(appointmentDTO.Duration)))
+                    throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
+            }
+
+            var priceList = _pharmacyPriceListService.ReadForPharmacy(appointmentDTO.PharmacyId);
+            if (priceList == null)
+                throw new MissingEntityException("Price list not found for the given pharmacy.");
+
+            var price = appointmentDTO.Price ?? priceList.ExaminationPrice;
+            if (price <= 0 || price > 999999)
+                throw new BadLogicException("Price must be a valid number between 0 and 999999.");
+
+            return Create(new Appointment
+            {
+                PharmacyId = appointmentDTO.PharmacyId,
+                MedicalStaffId = appointmentDTO.MedicalStaffId,
+                DateTime = appointmentDTO.DateTime,
+                Duration = appointmentDTO.Duration,
+                Price = price,
+                PatientId = appointmentDTO.PatientId,
+                IsReserved = true
+            });
         }
     }
 }
