@@ -41,13 +41,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetPharmacyAdmin(Guid id)
         {
-            var pharmacyAdmin = _pharmacyAdminService.Read(id);
-            if (pharmacyAdmin == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            return Ok(pharmacyAdmin);
+            return Ok(_pharmacyAdminService.TryToRead(id));
         }
 
         /// <summary>

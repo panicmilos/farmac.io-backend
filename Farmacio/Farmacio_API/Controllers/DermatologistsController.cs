@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using Farmacio_API.Contracts.Responses.Dermatologists;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_API.Controllers
 {
@@ -46,7 +47,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.SearchByName(name));
         }
-        
+
         /// <summary>
         /// Reads all existing dermatologists in the system with their work places.
         /// </summary>
@@ -74,6 +75,30 @@ namespace Farmacio_API.Controllers
                 WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
             }));
         }
+        
+        /// <summary>
+        /// Returns dermatologists that match the given params from the system.
+        /// </summary>
+        /// <response code="200">List of dermatologists.</response>
+        [HttpGet("filter")]
+        public IActionResult FilterDermatologists([FromQuery] MedicalStaffFilterParamsDTO filterParams)
+        {
+            return Ok(_dermatologistService.ReadBy(filterParams));
+        }
+        
+        /// <summary>
+        /// Filter all existing dermatologists in the system with their work places.
+        /// </summary>
+        /// <response code="200">Filtered dermatologists with their work places.</response>
+        [HttpGet("with-work-places/filter")]
+        public IActionResult FilterDermatologistsWithWorkPlaces([FromQuery] MedicalStaffFilterParamsDTO filterParams)
+        {
+            return Ok(_dermatologistService.ReadBy(filterParams).Select(dermatologistAccount => new DermatologistWithWorkPlacesResponse
+            {
+                DermatologistAccount = dermatologistAccount,
+                WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
+            }));
+        }
 
         /// <summary>
         /// Reads an existing dermatologist in the system.
@@ -82,7 +107,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetDermatologist(Guid id)
         {
-            return Ok(_dermatologistService.Read(id));
+            return Ok(_dermatologistService.TryToRead(id));
         }
 
         /// <summary>

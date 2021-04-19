@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_API.Contracts.Requests.WorkTimes;
 using Farmacio_API.Contracts.Responses.Dermatologists;
 
 namespace Farmacio_API.Controllers
@@ -22,11 +23,13 @@ namespace Farmacio_API.Controllers
         private readonly IDermatologistService _dermatologistService;
         private readonly IAppointmentService _appointmentService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
+        private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IMapper _mapper;
 
         public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
             , IDermatologistService dermatologistService, IAppointmentService appointmentService
-            , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IMapper mapper)
+            , IDermatologistWorkPlaceService dermatologistWorkPlaceService
+            , IPharmacyStockService pharmacyStockService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
@@ -34,6 +37,7 @@ namespace Farmacio_API.Controllers
             _mapper = mapper;
             _appointmentService = appointmentService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
+            _pharmacyStockService = pharmacyStockService;
         }
 
         /// <summary>
@@ -162,6 +166,16 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
         }
+        
+        /// <summary>
+        /// Reads all medicines that are in stock in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read medicines that are in stock in the pharmacy.</response>
+        [HttpGet("{pharmacyId}/medicines-in-stock")]
+        public IActionResult GetMedicinesInStock(Guid pharmacyId)
+        {
+            return Ok(_pharmacyStockService.ReadForPharmacyInStock(pharmacyId));
+        }
 
         /// <summary>
         /// Add an existing dermatologist to the pharmacy.
@@ -170,9 +184,9 @@ namespace Farmacio_API.Controllers
         /// <response code="404">Dermatologist or Pharmacy not found.</response>
         /// <response code="400">Dermatologist already employed in the Pharmacy, work time invalid or overlaps with and existing one.</response>
         [HttpPost("{pharmacyId}/dermatologists/{dermatologistId}")]
-        public IActionResult AddDermatologistToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime)
+        public IActionResult AddDermatologistToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTimeRequest workTime)
         {
-            return Ok(_dermatologistService.AddToPharmacy(pharmacyId, dermatologistId, workTime));
+            return Ok(_dermatologistService.AddToPharmacy(pharmacyId, dermatologistId, _mapper.Map<WorkTime>(workTime)));
         }
         
         /// <summary>
@@ -232,6 +246,16 @@ namespace Farmacio_API.Controllers
             var deletedPharmacy = _pharmacyService.Delete(id);
 
             return Ok(deletedPharmacy);
+        }
+
+        /// <summary>
+        /// Returns pharmacies that contains given params.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacies.</response>
+        [HttpGet("search")]
+        public IEnumerable<SmallPharmacyDTO> SearchPharmacies([FromQuery] PharmacySearchParams searchParams)
+        {
+            return _pharmacyService.ReadBy(searchParams);
         }
     }
 }

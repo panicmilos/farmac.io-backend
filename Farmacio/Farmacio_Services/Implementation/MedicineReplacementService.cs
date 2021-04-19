@@ -27,10 +27,15 @@ namespace Farmacio_Services.Implementation
 
             foreach (var replacement in replacements)
             {
-                if (existingReplacementsFor.FirstOrDefault(r => r.ReplacementMedicineId == replacement.ReplacementMedicineId) == null)
+                var existingReplacement = existingReplacementsFor.FirstOrDefault(r => r.ReplacementMedicineId == replacement.ReplacementMedicineId);
+                if (existingReplacement == null)
                 {
                     replacement.MedicineId = medicineId;
                     Create(replacement);
+                }
+                else
+                {
+                    replacement.ReplacementMedicine = existingReplacement.ReplacementMedicine;
                 }
             }
             foreach (var replacement in existingReplacementsFor)

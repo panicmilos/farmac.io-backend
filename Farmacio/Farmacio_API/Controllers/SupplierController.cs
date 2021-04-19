@@ -41,13 +41,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetSupplier(Guid id)
         {
-            var supplier = _supplierService.Read(id);
-            if (supplier == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            return Ok(supplier);
+            return Ok(_supplierService.TryToRead(id));
         }
 
         /// <summary>

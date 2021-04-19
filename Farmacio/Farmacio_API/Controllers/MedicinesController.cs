@@ -17,12 +17,17 @@ namespace Farmacio_API.Controllers
     {
         private readonly IMedicineService _medicineService;
         private readonly IPharmacyService _pharmacyService;
+        private readonly IMedicinePdfService _medicinePdfService;
         private readonly IMapper _mapper;
 
-        public MedicinesController(IMedicineService medicineService, IPharmacyService pharmacyService, IMapper mapper)
+        public MedicinesController(IMedicineService medicineService,
+            IPharmacyService pharmacyService,
+            IMedicinePdfService medicinePdfService,
+            IMapper mapper)
         {
             _medicineService = medicineService;
             _pharmacyService = pharmacyService;
+            _medicinePdfService = medicinePdfService;
             _mapper = mapper;
         }
 
@@ -37,6 +42,16 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns all medicine types from the system.
+        /// </summary>
+        /// <response code="200">Returns list of medicine types.</response>
+        [HttpGet("types")]
+        public IEnumerable<string> GetMedicineTypes()
+        {
+            return _medicineService.ReadTypes();
+        }
+
+        /// <summary>
         /// Returns all medicines from the system for home page with less information.
         /// </summary>
         /// <response code="200">Returns list of small medicines objects.</response>
@@ -44,6 +59,16 @@ namespace Farmacio_API.Controllers
         public IEnumerable<SmallMedicineDTO> ReadForHomePage()
         {
             return _medicineService.ReadForDisplay();
+        }
+
+        /// <summary>
+        /// Returns medicines that contains given params from the system for home page.
+        /// </summary>
+        /// <response code="200">Returns list of medicines.</response>
+        [HttpGet("search")]
+        public IEnumerable<SmallMedicineDTO> SearchMedicines([FromQuery] MedicineSearchParams searchParams)
+        {
+            return _medicineService.ReadBy(searchParams);
         }
 
         /// <summary>
@@ -61,6 +86,24 @@ namespace Farmacio_API.Controllers
             }
 
             return Ok(medicine);
+        }
+
+        /// <summary>
+        /// Returns medicine specification pdf.
+        /// </summary>
+        /// <response code="200">Returns pdf.</response>
+        /// <response code="404">Unable to return medicine specification pdf because medicine does not exist in the system.</response>
+        [HttpGet("details/{id}")]
+        public IActionResult GetMedicinePdf(Guid id)
+        {
+            var medicine = _medicineService.ReadFullMedicine(id);
+            if (medicine == null)
+            {
+                throw new MissingEntityException();
+            }
+
+            var pdfStream = _medicinePdfService.GetPdfStreamFor(medicine);
+            return File(pdfStream, "application/pdf");
         }
 
         /// <summary>
@@ -83,7 +126,8 @@ namespace Farmacio_API.Controllers
         public IActionResult CreateMedicine(CreateMedicineRequest request)
         {
             var fullMedicineDto = _mapper.Map<FullMedicineDTO>(request);
-            _medicineService.Create(fullMedicineDto);
+            var createMedicine = _medicineService.Create(fullMedicineDto);
+            _medicinePdfService.GenerateFor(createMedicine);
 
             return Ok(fullMedicineDto);
         }
@@ -98,6 +142,7 @@ namespace Farmacio_API.Controllers
         {
             var fullMedicineDto = _mapper.Map<FullMedicineDTO>(request);
             var updatedMedicine = _medicineService.Update(fullMedicineDto);
+            _medicinePdfService.GenerateFor(updatedMedicine);
 
             return Ok(updatedMedicine);
         }
@@ -111,6 +156,7 @@ namespace Farmacio_API.Controllers
         public IActionResult DeleteMedicine(Guid id)
         {
             var deletedMedicine = _medicineService.Delete(id);
+            _medicinePdfService.DeleteFor(new FullMedicineDTO { Medicine = deletedMedicine });
 
             return Ok(deletedMedicine);
         }

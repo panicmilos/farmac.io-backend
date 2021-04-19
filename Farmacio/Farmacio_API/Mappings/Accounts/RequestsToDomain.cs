@@ -24,6 +24,7 @@ namespace Farmacio_API.Mappings.Accounts
         private void AddPatientMapping()
         {
             CreateMap<CreatePatientUserRequest, Patient>();
+            CreateMap<UpdatePatientUserRequest, Patient>();
 
             CreateMap<CreatePatientRequest, Account>()
                 .ForMember(dst => dst.Username, opts => opts.MapFrom(src => src.Account.Username))
@@ -31,6 +32,10 @@ namespace Farmacio_API.Mappings.Accounts
                 .ForMember(dst => dst.Email, opts => opts.MapFrom(src => src.Account.Email))
                 .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Patient))
                 .ForMember(dst => dst.ShouldChangePassword, opts => opts.MapFrom(src => false));
+
+            CreateMap<UpdatePatientRequest, Account>()
+                .ForMember(dst => dst.Id, opts => opts.MapFrom(src => src.Account.Id))
+                .ForMember(dst => dst.Role, opts => opts.MapFrom(src => Role.Patient));
         }
 
         private void AddPharmacistMapping()

@@ -41,13 +41,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetSystemAdmin(Guid id)
         {
-            var systemAdmin = _systemAdminService.Read(id);
-            if (systemAdmin == null)
-            {
-                throw new MissingEntityException();
-            }
-
-            return Ok(systemAdmin);
+            return Ok(_systemAdminService.TryToRead(id));
         }
 
         /// <summary>
