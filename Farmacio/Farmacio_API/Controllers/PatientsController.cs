@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
-using Farmacio_Models.DTO;
 using Farmacio_API.Contracts.Requests.Accounts;
+using Farmacio_API.Contracts.Requests.Followings;
+using Farmacio_API.Contracts.Responses.Dermatologists;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
-using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 
 namespace Farmacio_API.Controllers
 {
@@ -17,14 +19,20 @@ namespace Farmacio_API.Controllers
         private readonly IPatientService _patientService;
         private readonly IMedicalStaffService _medicalStaffService;
         private readonly IPatientAllergyService _patientAllergyService;
+        private readonly IPatientFollowingsService _patientFollowingsService;
         private readonly IMapper _mapper;
 
-        public PatientsController(IPatientService patientService, IMedicalStaffService medicalStaffService, IPatientAllergyService patientAllergyService
-            , IMapper mapper)
+        public PatientsController(
+            IPatientService patientService,
+            IMedicalStaffService medicalStaffService,
+            IPatientAllergyService patientAllergyService,
+            IPatientFollowingsService patientFollowingsService,
+            IMapper mapper)
         {
             _patientService = patientService;
             _medicalStaffService = medicalStaffService;
             _patientAllergyService = patientAllergyService;
+            _patientFollowingsService = patientFollowingsService;
             _mapper = mapper;
         }
 
@@ -96,7 +104,7 @@ namespace Farmacio_API.Controllers
 
             return Ok(updatedPatient);
         }
-        
+
         /// <summary>
         /// Add patients allergies.
         /// </summary>
@@ -111,7 +119,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Retruns patients allergies.
+        /// Returns patients allergies.
         /// </summary>
         /// <response code="200">Patients allergies.</response>
         /// <response code="404">Given patient does not exist in the system.</response>
@@ -119,6 +127,18 @@ namespace Farmacio_API.Controllers
         public IActionResult GedPatientsAllergies(Guid patientId)
         {
             return Ok(_patientAllergyService.GetPatientsAllergies(patientId));
+        }
+
+        /// <summary>
+        /// Creates a new patient's follow in the system.
+        /// </summary>
+        /// <response code="200">Returns created patient follow object.</response>
+        /// <response code="400">Unable to follow pharmacy because patient already follow it.</response>
+        /// <response code="404">Given patient or pharmacy does not exist in the system.</response>
+        [HttpPost("{patientId}/followings")]
+        public IActionResult Follow(CreatePatientFollowRequest request)
+        {
+            return Ok(_patientFollowingsService.Follow(request.PatientId, request.PharmacyId));
         }
     }
 }
