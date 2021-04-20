@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Farmacio_API.Contracts.Requests;
+using Farmacio_API.Contracts.Requests.SupplierOffers;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_API.Contracts.Requests.SupplierMedicines;
 using Farmacio_Models.Domain;
@@ -173,6 +173,24 @@ namespace Farmacio_API.Controllers
         public IActionResult GetSuppliersOffers(Guid supplierId)
         {
             return Ok(_supplierOfferService.ReadFor(supplierId));
+        }
+
+        /// <summary>
+        /// Updates an existing supplier's offer for pharmacy order from the system.
+        /// </summary>
+        /// <response code="200">Returns updated supplier's offer.</response>
+        /// <response code="400">
+        /// Unable to update supplier's offer because delivery date is after deadline or
+        /// order is already processed.
+        /// </response>
+        /// <response code="404">Given offer doesn't exist.</response>
+        [HttpPut("{supplierId}/offers")]
+        public IActionResult UpdateSupplierOffer(UpdateSupplierOfferRequest request)
+        {
+            var offer = _mapper.Map<SupplierOffer>(request);
+            var updatedOffer = _supplierOfferService.Update(offer);
+
+            return Ok(updatedOffer);
         }
     }
 }

@@ -43,12 +43,12 @@ namespace Farmacio_Services.Implementation
 
             if (ReadOfferFor(supplier.Id, order.Id) != null)
             {
-                throw new DuplicateOfferException("You can not give offer for same order twice.");
+                throw new DuplicateOfferException("You cannot give offer for same order twice.");
             }
 
             if (order.IsProcessed)
             {
-                throw new OrderIsAlreadyProcessedException("You can not give offer for the order that has already been processed.");
+                throw new OrderIsAlreadyProcessedException("You cannot give offer for the order that has already been processed.");
             }
 
             if (offer.DeliveryDeadline > order.OffersDeadline)
@@ -60,6 +60,26 @@ namespace Farmacio_Services.Implementation
             UpdateSupplierStock(supplier.Id, order.OrderedMedicines);
 
             return base.Create(offer);
+        }
+
+        public override SupplierOffer Update(SupplierOffer offer)
+        {
+            var existingOffer = TryToRead(offer.Id);
+
+            if (existingOffer.PharmacyOrder.IsProcessed)
+            {
+                throw new OrderIsAlreadyProcessedException("You cannot change offer for the order that has already been processed.");
+            }
+
+            if (offer.DeliveryDeadline > existingOffer.PharmacyOrder.OffersDeadline)
+            {
+                throw new DeliveryDateIsAfterDeadlineException("Delivery date must be before deadline.");
+            }
+
+            existingOffer.TotalPrice = offer.TotalPrice;
+            existingOffer.DeliveryDeadline = offer.DeliveryDeadline;
+
+            return base.Update(existingOffer);
         }
 
         private void ValidateSupplierStockForOffer(Guid supplierId, IEnumerable<OrderedMedicine> orderedMedicines)

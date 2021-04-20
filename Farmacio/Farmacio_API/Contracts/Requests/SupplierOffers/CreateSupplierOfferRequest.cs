@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Farmacio_API.Contracts.Requests
+namespace Farmacio_API.Contracts.Requests.SupplierOffers
 {
     public class CreateSupplierOfferRequest
     {

@@ -4,13 +4,11 @@ using System;
 
 namespace Farmacio_API.Validations.SupplierOffers
 {
-    public class CreateSupplierOfferRequestValidator : AbstractValidator<CreateSupplierOfferRequest>
+    public class UpdateSupplierOfferRequestValidator : AbstractValidator<UpdateSupplierOfferRequest>
     {
-        public CreateSupplierOfferRequestValidator()
+        public UpdateSupplierOfferRequestValidator()
         {
-            RuleFor(request => request.SupplierId).NotNull().WithMessage("SupplierId must be provided.");
-
-            RuleFor(request => request.PharmacyOrderId).NotNull().WithMessage("PharmacyOrderId must be provided.");
+            RuleFor(request => request.Id).NotNull().WithMessage("Id must be provided.");
 
             RuleFor(request => request.TotalPrice).GreaterThan(0).WithMessage("Total price must be greater than 0.");
 

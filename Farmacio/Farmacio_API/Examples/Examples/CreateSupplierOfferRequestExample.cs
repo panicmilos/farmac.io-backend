@@ -1,4 +1,4 @@
-﻿using Farmacio_API.Contracts.Requests;
+﻿using Farmacio_API.Contracts.Requests.SupplierOffers;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 
