@@ -35,8 +35,4 @@
     <ProjectReference Include="..\Farmacio_Services\Farmacio_Services.csproj" />
     <ProjectReference Include="..\GlobalExceptionHandler\GlobalExceptionHandler.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations" />
-  </ItemGroup>
 </Project>

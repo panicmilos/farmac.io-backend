@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Farmacio_API.Contracts.Requests;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_API.Contracts.Requests.SupplierMedicines;
 using Farmacio_Models.Domain;
@@ -16,12 +17,18 @@ namespace Farmacio_API.Controllers
     {
         private readonly ISupplierService _supplierService;
         private readonly ISupplierStockService _supplierStockService;
+        private readonly ISupplierOfferService _supplierOfferService;
         private readonly IMapper _mapper;
 
-        public SupplierController(ISupplierService supplierService, ISupplierStockService supplierStockService, IMapper mapper)
+        public SupplierController(
+            ISupplierService supplierService,
+            ISupplierStockService supplierStockService,
+            ISupplierOfferService supplierOfferService,
+            IMapper mapper)
         {
             _supplierService = supplierService;
             _supplierStockService = supplierStockService;
+            _supplierOfferService = supplierOfferService;
             _mapper = mapper;
         }
 
@@ -137,6 +144,25 @@ namespace Farmacio_API.Controllers
             var deletedMedicine = _supplierStockService.Delete(id);
 
             return Ok(deletedMedicine);
+        }
+
+        /// <summary>
+        /// Creates a new supplier's offer for pharmacy order in the system.
+        /// </summary>
+        /// <response code="200">Returns created supplier's offer.</response>
+        /// <response code="400">
+        /// Unable to create supplier's offer because supplier already gave offer
+        /// for given order or delivery date is after deadline or
+        /// order is already processed or supplier don't have enough medicines.
+        /// </response>
+        /// <response code="404">Given supplier or pharmacy order doesn't exist.</response>
+        [HttpPost("{supplierId}/offers")]
+        public IActionResult CreateSupplierOffer(CreateSupplierOfferRequest request)
+        {
+            var offer = _mapper.Map<SupplierOffer>(request);
+            _supplierOfferService.Create(offer);
+
+            return Ok(offer);
         }
     }
 }
