@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.Accounts;
+using Farmacio_API.Contracts.Requests.SupplierMedicines;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
-using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,11 +15,13 @@ namespace Farmacio_API.Controllers
     public class SupplierController : ControllerBase
     {
         private readonly ISupplierService _supplierService;
+        private readonly ISupplierStockService _supplierStockService;
         private readonly IMapper _mapper;
 
-        public SupplierController(ISupplierService supplierService, IMapper mapper)
+        public SupplierController(ISupplierService supplierService, ISupplierStockService supplierStockService, IMapper mapper)
         {
             _supplierService = supplierService;
+            _supplierStockService = supplierStockService;
             _mapper = mapper;
         }
 
@@ -83,6 +85,58 @@ namespace Farmacio_API.Controllers
             var deletedSupplier = _supplierService.Delete(id);
 
             return Ok(deletedSupplier);
+        }
+
+        /// <summary>
+        /// Returns all supplier's medicines from the stock.
+        /// </summary>
+        /// <response code="200">Returns list of supplier's medicines.</response>
+        [HttpGet("{supplierId}/medicines-in-stock")]
+        public IActionResult GetMedicinesInStock(Guid supplierId)
+        {
+            return Ok(_supplierStockService.ReadFor(supplierId));
+        }
+
+        /// <summary>
+        /// Adds a medicine to the supplier's stock.
+        /// </summary>
+        /// <response code="200">Returns created supplier's medicine.</response>
+        /// <response code="400">Unable to add medicine to supplier's stock because it is already there.</response>
+        /// <response code="404">Given supplier or medicine doesn't exist.</response>
+        [HttpPost("{supplierId}/medicines-in-stock")]
+        public IActionResult AddMedicineToSupplierStock(CreateSupplierMedicineRequest request)
+        {
+            var medicine = _mapper.Map<SupplierMedicine>(request);
+            _supplierStockService.Create(medicine);
+
+            return Ok(medicine);
+        }
+
+        /// <summary>
+        /// Updates quantity of medicine from the supplier's stock.
+        /// </summary>
+        /// <response code="200">Returns updated supplier's medicine.</response>
+        /// <response code="404">Given supplier's medicine doesn't exist.</response>
+        [HttpPut("{supplierId}/medicines-in-stock")]
+        public IActionResult UpdateMedicineFromSupplierStock(UpdateSupplierMedicineRequest request)
+        {
+            var medicine = _mapper.Map<SupplierMedicine>(request);
+            var updatedMedicine = _supplierStockService.Update(medicine);
+
+            return Ok(updatedMedicine);
+        }
+
+        /// <summary>
+        /// Deletes supplier's medicine from the stock.
+        /// </summary>
+        /// <response code="200">Returns deleted supplier's medicine.</response>
+        /// <response code="404">Given supplier's medicine doesn't exist.</response>
+        [HttpDelete("{supplierId}/medicines-in-stock/{id}")]
+        public IActionResult UpdateMedicineFromSupplierStock(Guid id)
+        {
+            var deletedMedicine = _supplierStockService.Delete(id);
+
+            return Ok(deletedMedicine);
         }
     }
 }
