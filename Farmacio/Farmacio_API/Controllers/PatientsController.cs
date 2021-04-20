@@ -157,5 +157,16 @@ namespace Farmacio_API.Controllers
                 Pharmacy = follow.Pharmacy
             }));
         }
+
+        /// <summary>
+        /// Deletes an existing patient follow from the system.
+        /// </summary>
+        /// <response code="200">Returns deleted patient follow object.</response>
+        /// <response code="404">Given follow does not exist in the system.</response>
+        [HttpDelete("{patientId}/followings")]
+        public IActionResult Unfollow(Guid followId)
+        {
+            return Ok(_patientFollowingsService.Unfollow(followId));
+        }
     }
 }

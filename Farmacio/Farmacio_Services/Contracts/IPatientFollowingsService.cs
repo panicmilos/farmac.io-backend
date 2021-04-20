@@ -9,5 +9,7 @@ namespace Farmacio_Services.Contracts
         PatientPharmacyFollow Follow(Guid patientAccountId, Guid pharmacyId);
 
         IEnumerable<PatientPharmacyFollow> ReadFollowingsOf(Guid patientAccountId);
+
+        PatientPharmacyFollow Unfollow(Guid followId);
     }
 }

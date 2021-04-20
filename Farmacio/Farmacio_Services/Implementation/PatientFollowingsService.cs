@@ -52,5 +52,12 @@ namespace Farmacio_Services.Implementation
 
             return _followingsService.Read().Where(follow => follow.PatientId == patient.UserId).ToList();
         }
+
+        public PatientPharmacyFollow Unfollow(Guid followId)
+        {
+            _followingsService.TryToRead(followId);
+
+            return _followingsService.Delete(followId);
+        }
     }
 }
