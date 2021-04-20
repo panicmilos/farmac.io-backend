@@ -3,7 +3,6 @@ using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,6 +24,11 @@ namespace Farmacio_Services.Implementation
             _supplierService = supplierService;
             _supplierStockService = supplierStockService;
             _pharmacyOrderService = pharmacyOrderService;
+        }
+
+        public IEnumerable<SupplierOffer> ReadFor(Guid supplierId)
+        {
+            return Read().Where(offer => offer.SupplierId == supplierId).ToList();
         }
 
         public SupplierOffer ReadOfferFor(Guid supplierId, Guid offerId)
