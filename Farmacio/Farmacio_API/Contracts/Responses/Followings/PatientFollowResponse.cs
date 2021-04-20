@@ -6,6 +6,7 @@ namespace Farmacio_API.Contracts.Responses.Dermatologists
     public class PatientFollowResponse
     {
         public Guid FollowId { get; set; }
+        public DateTime Since { get; set; }
         public Pharmacy Pharmacy { get; set; }
     }
 }

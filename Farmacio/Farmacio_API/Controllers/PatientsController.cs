@@ -154,6 +154,7 @@ namespace Farmacio_API.Controllers
             return Ok(patientFollowings.Select(follow => new PatientFollowResponse
             {
                 FollowId = follow.Id,
+                Since = follow.CreatedAt,
                 Pharmacy = follow.Pharmacy
             }));
         }
@@ -163,7 +164,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted patient follow object.</response>
         /// <response code="404">Given follow does not exist in the system.</response>
-        [HttpDelete("{patientId}/followings")]
+        [HttpDelete("{patientId}/followings/{followId}")]
         public IActionResult Unfollow(Guid followId)
         {
             return Ok(_patientFollowingsService.Unfollow(followId));
