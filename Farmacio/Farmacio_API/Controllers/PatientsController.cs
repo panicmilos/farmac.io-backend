@@ -140,5 +140,22 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_patientFollowingsService.Follow(request.PatientId, request.PharmacyId));
         }
+
+        /// <summary>
+        /// Reads all followings for specific patient.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacies that patient follow.</response>
+        /// <response code="404">Given patient does not exist in the system.</response>
+        [HttpGet("{patientId}/followings")]
+        public IActionResult GetPatientFollowings(Guid patientId)
+        {
+            var patientFollowings = _patientFollowingsService.ReadFollowingsOf(patientId);
+
+            return Ok(patientFollowings.Select(follow => new PatientFollowResponse
+            {
+                FollowId = follow.Id,
+                Pharmacy = follow.Pharmacy
+            }));
+        }
     }
 }

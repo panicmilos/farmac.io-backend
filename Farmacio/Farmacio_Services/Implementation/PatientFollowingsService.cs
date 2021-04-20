@@ -45,5 +45,12 @@ namespace Farmacio_Services.Implementation
         {
             return _followingsService.Read().Where(follow => follow.PatientId == patientId && follow.PharmacyId == pharmacyId).FirstOrDefault() != null;
         }
+
+        public IEnumerable<PatientPharmacyFollow> ReadFollowingsOf(Guid patientAccountId)
+        {
+            var patient = _patientService.TryToRead(patientAccountId);
+
+            return _followingsService.Read().Where(follow => follow.PatientId == patient.UserId).ToList();
+        }
     }
 }
