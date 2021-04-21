@@ -16,6 +16,7 @@ namespace Farmacio_Models.Domain
 
     public class OrderedMedicine : BaseEntity
     {
+        public Guid PharmacyOrderId { get; set; }
         public int Quantity { get; set; }
         public Guid MedicineId { get; set; }
         public virtual Medicine Medicine { get; set; }

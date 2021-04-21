@@ -35,7 +35,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created pharmacy order.</response>
         /// <response code="404">Medicine, Pharmacy admin or Pharmacy not found.</response>
         [HttpPost("{pharmacyId}")]
-        public IActionResult AddMedicineToPharmacy(Guid pharmacyId, CreatePharmacyOrderRequest pharmacyOrderRequest)
+        public IActionResult CreatePharmacyOrder(Guid pharmacyId, CreatePharmacyOrderRequest pharmacyOrderRequest)
         {
             var pharmacyOrder = _mapper.Map<PharmacyOrder>(pharmacyOrderRequest);
             pharmacyOrder.PharmacyId = pharmacyId;
@@ -46,6 +46,26 @@ namespace Farmacio_API.Controllers
                 _medicineService.TryToRead(orderedMedicine.MedicineId));
 
             return Ok(_pharmacyOrderService.Create(pharmacyOrder));
+        }
+        
+        /// <summary>
+        /// Update existing pharmacy order.
+        /// </summary>
+        /// <response code="200">Updated pharmacy order.</response>
+        /// <response code="404">Medicine, Pharmacy admin or Pharmacy not found.</response>
+        /// <response code="400">Supplier offer has been created for the provided pharmacy order.</response>
+        [HttpPut("{pharmacyId}")]
+        public IActionResult UpdatePharmacyOrder(Guid pharmacyId, CreatePharmacyOrderRequest pharmacyOrderRequest)
+        {
+            var pharmacyOrder = _mapper.Map<PharmacyOrder>(pharmacyOrderRequest);
+            pharmacyOrder.PharmacyId = pharmacyId;
+            
+            _pharmacyService.TryToRead(pharmacyOrder.PharmacyId);
+            _pharmacyAdminService.TryToRead(pharmacyOrder.PharmacyAdminId);
+            pharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
+                _medicineService.TryToRead(orderedMedicine.MedicineId));
+
+            return Ok(_pharmacyOrderService.Update(pharmacyOrder));
         }
     }
 }
