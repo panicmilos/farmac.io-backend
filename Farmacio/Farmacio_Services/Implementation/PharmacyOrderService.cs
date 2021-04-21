@@ -9,20 +9,43 @@ namespace Farmacio_Services.Implementation
 {
     public class PharmacyOrderService : CrudService<PharmacyOrder>, IPharmacyOrderService
     {
+        private readonly IPharmacyService _pharmacyService;
+        private readonly IPharmacyAdminService _pharmacyAdminService;
+        private readonly IMedicineService _medicineService;
         private readonly ICrudService<SupplierOffer> _supplierOffersService;
-        public PharmacyOrderService(ICrudService<SupplierOffer> supplierOffersService
+        public PharmacyOrderService(IPharmacyService pharmacyService, IPharmacyAdminService pharmacyAdminService
+            , IMedicineService medicineService, ICrudService<SupplierOffer> supplierOffersService
             , IRepository<PharmacyOrder> repository) : base(repository)
         {
+            _pharmacyService = pharmacyService;
+            _pharmacyAdminService = pharmacyAdminService;
+            _medicineService = medicineService;
             _supplierOffersService = supplierOffersService;
+        }
+
+        public override PharmacyOrder Create(PharmacyOrder pharmacyOrder)
+        {
+            _pharmacyService.TryToRead(pharmacyOrder.PharmacyId);
+            if(_pharmacyAdminService.ReadByUserId(pharmacyOrder.PharmacyAdminId) == null)
+                throw new MissingEntityException("Pharmacy admin user not found.");
+            pharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
+                _medicineService.TryToRead(orderedMedicine.MedicineId));
+            
+            return base.Create(pharmacyOrder);
         }
 
         public override PharmacyOrder Update(PharmacyOrder pharmacyOrder)
         {
             var existingPharmacyOrder = TryToRead(pharmacyOrder.Id);
+            _pharmacyService.TryToRead(pharmacyOrder.PharmacyId);
             if (_supplierOffersService.Read()
                 .FirstOrDefault(supplierOffer => supplierOffer.PharmacyOrderId == pharmacyOrder.Id) != null)
                 throw new BadLogicException("Supplier offer has been created for the provided pharmacy order.");
-
+            if(_pharmacyAdminService.ReadByUserId(pharmacyOrder.PharmacyAdminId) == null)
+                throw new MissingEntityException("Pharmacy admin user not found.");
+            pharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
+                _medicineService.TryToRead(orderedMedicine.MedicineId));
+            
             existingPharmacyOrder.OffersDeadline = pharmacyOrder.OffersDeadline;
             existingPharmacyOrder.OrderedMedicines = pharmacyOrder.OrderedMedicines;
             
