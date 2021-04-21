@@ -8,13 +8,24 @@ namespace Farmacio_Services.Implementation
 {
     public class PharmacyPriceListService : CrudService<PharmacyPriceList>, IPharmacyPriceListService
     {
-        public PharmacyPriceListService(IRepository<PharmacyPriceList> repository) : base(repository)
+        public PharmacyPriceListService(IRepository<PharmacyPriceList> repository) 
+            : base(repository)
         {
         }
 
         public PharmacyPriceList ReadForPharmacy(Guid pharmacyId)
         {
             return Read().ToList().FirstOrDefault(pl => pl.PharmacyId == pharmacyId);
+        }
+
+        public override PharmacyPriceList Create(PharmacyPriceList pharmacyPriceList)
+        {
+            pharmacyPriceList.MedicinePriceList.ForEach(medicinePrice =>
+            {
+                medicinePrice.ActiveFrom = DateTime.Now;
+            });
+            
+            return base.Create(pharmacyPriceList);
         }
     }
 }
