@@ -11,6 +11,7 @@ namespace Farmacio_API.Mappings.PharmacyOrders
     {
         public RequestsToDomain()
         {
+            CreateMap<UpdatePharmacyOrderRequest, PharmacyOrder>();
             CreateMap<CreatePharmacyOrderRequest, PharmacyOrder>();
             CreateMap<CreatePharmacyMedicineRequest, OrderedMedicine>();
         }
