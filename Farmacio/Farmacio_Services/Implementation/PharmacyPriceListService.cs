@@ -27,5 +27,20 @@ namespace Farmacio_Services.Implementation
             
             return base.Create(pharmacyPriceList);
         }
+
+        public override PharmacyPriceList Update(PharmacyPriceList pharmacyPriceList)
+        {
+            var existingPharmacyPriceList = TryToRead(pharmacyPriceList.Id);
+            pharmacyPriceList.MedicinePriceList.ForEach(medicinePrice =>
+            {
+                medicinePrice.ActiveFrom = DateTime.Now;
+            });
+
+            existingPharmacyPriceList.ConsultationPrice = pharmacyPriceList.ConsultationPrice;
+            existingPharmacyPriceList.ExaminationPrice = pharmacyPriceList.ExaminationPrice;
+            existingPharmacyPriceList.MedicinePriceList.AddRange(pharmacyPriceList.MedicinePriceList);
+            
+            return base.Update(existingPharmacyPriceList);
+        }
     }
 }

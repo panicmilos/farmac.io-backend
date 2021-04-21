@@ -11,7 +11,7 @@ namespace Farmacio_API.Mappings.PharmacyPriceLists
     {
         public RequestsToDomain()
         {
-            CreateMap<CreatePharmacyPriceListsRequest, PharmacyPriceList>();
+            CreateMap<CreatePharmacyPriceListRequest, PharmacyPriceList>();
             CreateMap<UpdatePharmacyPriceListRequest, PharmacyPriceList>();
             CreateMap<CreateMedicinePriceRequest, MedicinePrice>();
         }

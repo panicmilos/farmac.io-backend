@@ -4,7 +4,7 @@ using Farmacio_API.Contracts.Requests.PharmacyMedicines;
 
 namespace Farmacio_API.Contracts.Requests.PharmacyPriceLists
 {
-    public class CreatePharmacyPriceListsRequest
+    public class CreatePharmacyPriceListRequest
     {
         public Guid PharmacyId { get; set; }
         public float ExaminationPrice { get; set; }

@@ -46,7 +46,24 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created pharmacy price list.</response>
         /// <response code="404">Medicine or Pharmacy not found.</response>
         [HttpPost("/pharmacy/{pharmacyId}/price-list")]
-        public IActionResult CreatePharmacyOrder(Guid pharmacyId, CreatePharmacyPriceListsRequest pharmacyPriceListsRequest)
+        public IActionResult CreatePharmacyOrder(Guid pharmacyId, CreatePharmacyPriceListRequest pharmacyPriceListRequest)
+        {
+            var pharmacyPriceList = _mapper.Map<PharmacyPriceList>(pharmacyPriceListRequest);
+            _pharmacyService.TryToRead(pharmacyPriceList.PharmacyId);
+            pharmacyPriceList.MedicinePriceList.ForEach(orderedMedicine =>
+                _medicineService.TryToRead(orderedMedicine.MedicineId));
+            pharmacyPriceList.PharmacyId = pharmacyId;
+
+            return Ok(_pharmacyPriceListService.Create(pharmacyPriceList));
+        }
+        
+        /// <summary>
+        /// Update an existing pharmacy price list.
+        /// </summary>
+        /// <response code="200">Updated pharmacy price list.</response>
+        /// <response code="404">Medicine, PharmacyPriceList or Pharmacy not found.</response>
+        [HttpPut("/pharmacy/{pharmacyId}/price-list")]
+        public IActionResult UpdatePharmacyOrder(Guid pharmacyId, UpdatePharmacyPriceListRequest pharmacyPriceListsRequest)
         {
             var pharmacyPriceList = _mapper.Map<PharmacyPriceList>(pharmacyPriceListsRequest);
             _pharmacyService.TryToRead(pharmacyPriceList.PharmacyId);
@@ -54,7 +71,7 @@ namespace Farmacio_API.Controllers
                 _medicineService.TryToRead(orderedMedicine.MedicineId));
             pharmacyPriceList.PharmacyId = pharmacyId;
 
-            return Ok(_pharmacyPriceListService.Create(pharmacyPriceList));
+            return Ok(_pharmacyPriceListService.Update(pharmacyPriceList));
         }
     }
 }

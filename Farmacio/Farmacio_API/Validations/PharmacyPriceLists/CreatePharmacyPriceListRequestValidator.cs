@@ -5,7 +5,7 @@ using FluentValidation;
 
 namespace Farmacio_API.Validations.PharmacyPriceLists
 {
-    public class CreatePharmacyPriceListRequestValidator : AbstractValidator<CreatePharmacyPriceListsRequest>
+    public class CreatePharmacyPriceListRequestValidator : AbstractValidator<CreatePharmacyPriceListRequest>
     {
         public CreatePharmacyPriceListRequestValidator()
         {
