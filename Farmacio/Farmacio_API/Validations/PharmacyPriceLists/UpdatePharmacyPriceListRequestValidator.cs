@@ -17,6 +17,8 @@ namespace Farmacio_API.Validations.PharmacyPriceLists
                 .WithMessage("Consultation price must be grater than 0.");
             RuleFor(request => request.MedicinePriceList).NotNull().NotEmpty()
                 .WithMessage("Medicine price list must be provided.");
+            RuleForEach(request => request.MedicinePriceList).NotNull()
+                .SetValidator(new CreateMedicinePriceRequestValidator()).WithMessage("Invalid medicine price.");
         }
     }
 }
