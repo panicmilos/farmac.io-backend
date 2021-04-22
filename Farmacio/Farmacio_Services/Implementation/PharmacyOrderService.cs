@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts;
@@ -53,6 +54,13 @@ namespace Farmacio_Services.Implementation
             existingPharmacyOrder.OrderedMedicines = pharmacyOrder.OrderedMedicines;
             
             return base.Update(existingPharmacyOrder);
+        }
+
+        public IEnumerable<PharmacyOrder> ReadFor(Guid pharmacyId, bool? isProcessed)
+        {
+            return Read().Where(pharmacyOrder => pharmacyOrder.PharmacyId == pharmacyId &&
+                                                 (isProcessed == null ||
+                                                  pharmacyOrder.IsProcessed == isProcessed.Value)).ToList();
         }
     }
 }
