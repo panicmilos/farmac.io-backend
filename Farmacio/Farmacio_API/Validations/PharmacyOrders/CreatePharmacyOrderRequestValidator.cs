@@ -9,7 +9,6 @@ namespace Farmacio_API.Validations.PharmacyOrders
     {
         public CreatePharmacyOrderRequestValidator()
         {
-            RuleFor(request => request.PharmacyId).NotNull().NotEmpty().WithMessage("Pharmacy id must be provided.");
             RuleFor(request => request.PharmacyAdminId).NotNull().NotEmpty()
                 .WithMessage("Pharmacy administrator id must be provided.");
             RuleFor(request => request.OffersDeadline).NotNull().NotEmpty()
