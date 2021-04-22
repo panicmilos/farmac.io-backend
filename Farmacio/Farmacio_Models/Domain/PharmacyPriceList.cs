@@ -13,6 +13,7 @@ namespace Farmacio_Models.Domain
 
     public class MedicinePrice : BaseEntity
     {
+        public Guid PharmacyPriceListId { get; set; }
         public float Price { get; set; }
         public DateTime ActiveFrom { get; set; }
         public Guid MedicineId { get; set; }

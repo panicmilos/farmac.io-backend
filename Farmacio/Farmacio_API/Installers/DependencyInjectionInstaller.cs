@@ -32,6 +32,7 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IAccountService), typeof(AccountService));
             _services.AddScoped(typeof(IPatientService), typeof(PatientService));
             _services.AddScoped(typeof(IPharmacyService), typeof(PharmacyService));
+            _services.AddScoped(typeof(IPharmacyOrderService), typeof(PharmacyOrderService));
             _services.AddScoped(typeof(IPharmacistService), typeof(PharmacistService));
             _services.AddScoped(typeof(IDermatologistService), typeof(DermatologistService));
             _services.AddScoped(typeof(IPharmacyAdminService), typeof(PharmacyAdminService));
