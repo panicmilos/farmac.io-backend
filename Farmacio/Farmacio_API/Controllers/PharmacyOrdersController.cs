@@ -37,6 +37,18 @@ namespace Farmacio_API.Controllers
         }
         
         /// <summary>
+        /// Filter existing pharmacy orders by processed status.
+        /// </summary>
+        /// <response code="200">Filtered pharmacy orders.</response>
+        /// <response code="404">Pharmacy not found.</response>
+        [HttpGet("/pharmacy/{pharmacyId}/pharmacy-orders/filter")]
+        public IActionResult FilterPharmacyOrders(Guid pharmacyId, [FromQuery] bool? isProcessed)
+        {
+            _pharmacyService.TryToRead(pharmacyId);
+            return Ok(_pharmacyOrderService.ReadFor(pharmacyId, isProcessed));
+        }
+        
+        /// <summary>
         /// Create a pharmacy order.
         /// </summary>
         /// <response code="200">Created pharmacy order.</response>
