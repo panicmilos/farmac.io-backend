@@ -13,10 +13,11 @@ namespace Farmacio_Repositories.Implementation
         public DbSet<PharmacyAdmin> PharmacyAdmins { get; set; }
         public DbSet<SystemAdmin> SystemAdmins { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<SupplierMedicine> SupplierMedicines { get; set; }
         public DbSet<Pharmacy> Pharmacies { get; set; }
         public DbSet<Medicine> Medicines { get; set; }
         public DbSet<MedicineReplacement> MedicineReplacements { get; set; }
-        public DbSet<MedicineIngredient> MedicineIngrediens { get; set; }
+        public DbSet<MedicineIngredient> MedicineIngredients { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<ERecipe> ERecipes { get; set; }
