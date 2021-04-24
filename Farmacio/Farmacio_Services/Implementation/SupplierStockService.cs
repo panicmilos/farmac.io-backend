@@ -23,24 +23,24 @@ namespace Farmacio_Services.Implementation
             _medicineService = medicineService;
         }
 
-        public override SupplierMedicine Create(SupplierMedicine medicine)
+        public override SupplierMedicine Create(SupplierMedicine supplierMedicine)
         {
-            _supplierService.TryToRead(medicine.SupplierId);
-            _medicineService.TryToRead(medicine.MedicineId);
+            _supplierService.TryToRead(supplierMedicine.SupplierId);
+            _medicineService.TryToRead(supplierMedicine.MedicineId);
 
-            if (ReadMedicineFor(medicine.SupplierId, medicine.MedicineId) != null)
+            if (ReadMedicineFor(supplierMedicine.SupplierId, supplierMedicine.MedicineId) != null)
             {
                 throw new SupplierMedicineAlreadyExistsException("Supplier already have given medicine in his stock.");
             }
 
-            return base.Create(medicine);
+            return base.Create(supplierMedicine);
         }
 
-        public override SupplierMedicine Update(SupplierMedicine medicine)
+        public override SupplierMedicine Update(SupplierMedicine supplierMedicine)
         {
-            var existingMedicine = TryToRead(medicine.Id);
+            var existingMedicine = TryToRead(supplierMedicine.Id);
 
-            existingMedicine.Quantity = medicine.Quantity;
+            existingMedicine.Quantity = supplierMedicine.Quantity;
 
             return base.Update(existingMedicine);
         }
@@ -54,12 +54,12 @@ namespace Farmacio_Services.Implementation
 
         public SupplierMedicine ReadMedicineFor(Guid supplierId, Guid medicineId)
         {
-            return Read().FirstOrDefault(medicine => medicine.SupplierId == supplierId && medicine.MedicineId == medicineId);
+            return Read().FirstOrDefault(supplierMedicine => supplierMedicine.SupplierId == supplierId && supplierMedicine.MedicineId == medicineId);
         }
 
         public IEnumerable<SupplierMedicine> ReadFor(Guid supplierId)
         {
-            return Read().Where(medicine => medicine.SupplierId == supplierId).ToList();
+            return Read().Where(supplierMedicine => supplierMedicine.SupplierId == supplierId).ToList();
         }
     }
 }

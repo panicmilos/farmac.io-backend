@@ -85,25 +85,25 @@ namespace Farmacio_Services.Implementation
         private void ValidateSupplierStockForOffer(Guid supplierId, IEnumerable<OrderedMedicine> orderedMedicines)
         {
             var supplierMedicines = _supplierStockService.ReadFor(supplierId);
-            foreach (var orderedMedicine in orderedMedicines)
+            orderedMedicines.ToList().ForEach(orderedMedicine =>
             {
                 var medicineOfSupplier = supplierMedicines.FirstOrDefault(medicine => medicine.MedicineId == orderedMedicine.MedicineId);
                 if (medicineOfSupplier == null || medicineOfSupplier.Quantity < orderedMedicine.Quantity)
                 {
                     throw new NotEnoughtMedicinesToGiveAOfferException($"Supplier doesn't have enough {orderedMedicine.Medicine.Name}.");
                 }
-            }
+            });
         }
 
         private void UpdateSupplierStock(Guid supplierId, IEnumerable<OrderedMedicine> orderedMedicines)
         {
             var supplierMedicines = _supplierStockService.ReadFor(supplierId);
-            foreach (var orderedMedicine in orderedMedicines)
+            orderedMedicines.ToList().ForEach(orderedMedicine =>
             {
                 var medicineOfSupplier = supplierMedicines.FirstOrDefault(medicine => medicine.MedicineId == orderedMedicine.MedicineId);
                 medicineOfSupplier.Quantity -= orderedMedicine.Quantity;
                 _supplierStockService.Update(medicineOfSupplier);
-            }
+            });
         }
     }
 }
