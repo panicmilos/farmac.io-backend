@@ -26,12 +26,14 @@ namespace Farmacio_API.Controllers
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IMedicineService _medicineService;
+        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IMapper _mapper;
 
         public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
             , IDermatologistService dermatologistService, IAppointmentService appointmentService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IPharmacyStockService pharmacyStockService
+            , IPharmacyPriceListService pharmacyPriceListService
             , IMedicineService medicineService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
@@ -42,6 +44,7 @@ namespace Farmacio_API.Controllers
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _pharmacyStockService = pharmacyStockService;
             _medicineService = medicineService;
+            _pharmacyPriceListService = pharmacyPriceListService;
         }
 
         /// <summary>
@@ -297,6 +300,29 @@ namespace Farmacio_API.Controllers
         public IEnumerable<SmallPharmacyDTO> SearchPharmacies([FromQuery] PharmacySearchParams searchParams)
         {
             return _pharmacyService.ReadBy(searchParams);
+        }
+
+        [HttpGet("available")]
+        public IEnumerable<PharmacyDTO> Search([FromQuery] PharmaciesForAppointmentsSearchParams searchParams)
+        {
+            var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
+            var pharmacies = new List<PharmacyDTO>();
+            foreach (var pharmacistAccount in pharmacists)
+            {
+                var pharmacist = (Pharmacist)pharmacistAccount.User;
+                if (pharmacies.Where(pharmacy => pharmacy.Id == pharmacist.PharmacyId).FirstOrDefault() == null)
+                    pharmacies.Add(new PharmacyDTO
+                    {
+                        Name = pharmacist.Pharmacy.Name,
+                        Id = pharmacist.Pharmacy.Id,
+                        Address = pharmacist.Pharmacy.Address,
+                        AverageGrade = pharmacist.Pharmacy.AverageGrade,
+                        Description = pharmacist.Pharmacy.Description,
+                        ConsultationPrice = _pharmacyPriceListService.ReadForPharmacy(pharmacist.PharmacyId).ConsultationPrice
+                    });
+            }
+
+            return pharmacies;
         }
     }
 }
