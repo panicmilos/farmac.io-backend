@@ -23,6 +23,7 @@ namespace Farmacio_Services.Implementation
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
+        private readonly IERecipeService _eRecipeService;
 
 
         public AppointmentService(IRepository<Appointment> repository
@@ -32,7 +33,8 @@ namespace Farmacio_Services.Implementation
             , IPatientService patientService
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
-            , IReportService reportService) : base(repository)
+            , IReportService reportService
+            , IERecipeService eRecipeService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -43,6 +45,7 @@ namespace Farmacio_Services.Implementation
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
+            _eRecipeService = eRecipeService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
@@ -207,6 +210,31 @@ namespace Farmacio_Services.Implementation
                 Notes = reportDTO.Notes,
                 TherapyDurationInDays = reportDTO.TherapyDurationInDays,
             };
+            if (reportDTO.PrescribedMedicines.Count > 0)
+            {
+                ERecipe recipe = new ERecipe
+                {
+                    IssuingDate = DateTime.Now,
+                    PatientId = appointment.PatientId.Value,
+                    Medicines = new List<ERecipeMedicine>()
+                };
+                foreach (var prescribed in reportDTO.PrescribedMedicines)
+                {
+                    var medicineInPharmacy = _pharmacyService.ReadMedicine(appointment.PharmacyId, prescribed.MedicineId);
+                    if (medicineInPharmacy.InStock < prescribed.Quantity)
+                        throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
+                    recipe.Medicines.Add(new ERecipeMedicine
+                    {
+                        MedicineId = prescribed.MedicineId,
+                        Quantity = prescribed.Quantity
+                    });
+                }
+                foreach (var prescribed in reportDTO.PrescribedMedicines)
+                    _pharmacyService.ChangeStockFor(appointment.PharmacyId, prescribed.MedicineId, prescribed.Quantity * -1);
+
+                recipe = _eRecipeService.Create(recipe);
+                report.ERecipeId = recipe.Id;
+            }
             report = _reportService.Create(report);
             appointment.ReportId = report.Id;
             base.Update(appointment);

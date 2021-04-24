@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.ERecipes;
-using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_API.Mappings.ERecipes
 {
@@ -8,8 +8,7 @@ namespace Farmacio_API.Mappings.ERecipes
     {
         public RequestsToDomain()
         {
-            CreateMap<CreateERecipeMedicineRequest, ERecipeMedicine>();
-            CreateMap<CreateERecipeRequest, ERecipe>();
+            CreateMap<CreateERecipeMedicineRequest, MedicineQuantityDTO>();
         }
     }
 }

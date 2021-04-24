@@ -80,15 +80,19 @@ namespace Farmacio_Services.Implementation
             {
                 var medicineInPharmacy = _pharmacyService.ReadMedicine(reservation.PharmacyId, reservedMedicine.MedicineId);
                 if (medicineInPharmacy.InStock < reservedMedicine.Quantity)
-                {
                     throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
-                }
                 reservedMedicine.Price = medicineInPharmacy.Price;
-                _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity * -1);
             }
+            foreach (var reservedMedicine in reservation.Medicines)
+                _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity * -1);
 
             var createdReservation = base.Create(reservation);
-            var email = _templatesProvider.FromTemplate<Email>("Reservation", new { Name = patient.FirstName, Id = reservation.UniqueId, Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm") });
+            var email = _templatesProvider.FromTemplate<Email>("Reservation", new
+            {
+                Name = patient.FirstName,
+                Id = reservation.UniqueId,
+                Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm")
+            });
             _emailDispatcher.Dispatch(email);
 
             return createdReservation;
