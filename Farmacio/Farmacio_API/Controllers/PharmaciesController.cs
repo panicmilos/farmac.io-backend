@@ -303,7 +303,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns pharmacies that have free pharmacists in shosen time.
+        /// Returns pharmacies that have free pharmacists in chosen time.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
         [HttpGet("available")]
@@ -312,6 +312,17 @@ namespace Farmacio_API.Controllers
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
             return _pharmacyService.GetPharmaciesOfPharmacists(pharmacists.ToList(), searchParams);
             
+        }
+
+        [HttpGet("available/{pharmacyId}/pharmacists")]
+        public IEnumerable<Pharmacist> GetFreePharmacist([FromRoute] Guid pharmacyId, [FromQuery] PharmaciesForAppointmentsSearchParams searchParams)
+        {
+            var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams).Where(pharmacistAccount =>
+            {
+                var pharmacist = (Pharmacist)pharmacistAccount.User;
+                return pharmacist.PharmacyId == pharmacyId;
+            }).Select(pharmacistAccount => (Pharmacist)pharmacistAccount.User);
+            return pharmacists;
         }
     }
 }
