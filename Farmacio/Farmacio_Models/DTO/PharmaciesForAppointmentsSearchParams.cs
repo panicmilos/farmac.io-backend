@@ -6,7 +6,9 @@ namespace Farmacio_Models.DTO
 {
     public class PharmaciesForAppointmentsSearchParams
     {
-        public DateTime DateTime { get; set; }
+        public DateTime ConsultationDateTime { get; set; }
         public int Duration { get; set; }
+        public String SortCriteria { get; set; }
+        public bool IsAsc { get; set; }
     }
 }

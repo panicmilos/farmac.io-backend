@@ -151,5 +151,50 @@ namespace Farmacio_Services.Implementation
 
             return pharmacies;
         }
+
+        public IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(List<Account> pharmacists, PharmaciesForAppointmentsSearchParams searchParams)
+        {
+            var pharmacies = new List<PharmacyDTO>();
+            foreach (var pharmacistAccount in pharmacists)
+
+            {
+                var pharmacist = (Pharmacist)pharmacistAccount.User;
+                Console.WriteLine(pharmacist.Pharmacy.Name);
+                if (pharmacies.Where(pharmacy => pharmacy.Id == pharmacist.PharmacyId).FirstOrDefault() == null)
+                {
+                    pharmacies.Add(new PharmacyDTO
+                    {
+                        Name = pharmacist.Pharmacy.Name,
+                        Id = pharmacist.Pharmacy.Id,
+                        Address = pharmacist.Pharmacy.Address,
+                        AverageGrade = pharmacist.Pharmacy.AverageGrade,
+                        Description = pharmacist.Pharmacy.Description,
+                        ConsultationPrice = _pharmacyPriceListService.ReadForPharmacy(pharmacist.PharmacyId).ConsultationPrice
+                    });
+                }
+            }
+
+            string sortCriteria = searchParams.SortCriteria;
+            bool isAscending = searchParams.IsAsc;
+            Console.WriteLine(sortCriteria);
+            Console.WriteLine(isAscending);
+
+            var sortingCriteria = new Dictionary<string, Func<PharmacyDTO, object>>()
+            {
+                { "price", p => p.ConsultationPrice },
+                { "grade", p => p.AverageGrade }
+            };
+
+            Console.WriteLine(pharmacies.Count);
+
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
+            {
+                pharmacies = isAscending ? pharmacies.OrderBy(sortingCriterion).ToList() : pharmacies.OrderByDescending(sortingCriterion).ToList();
+            }
+
+            Console.WriteLine(pharmacies.Count);
+
+            return pharmacies;
+        }
     }
 }

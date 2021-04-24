@@ -279,18 +279,20 @@ namespace Farmacio_Services.Implementation
             .Where(pharmacistAccount =>
             {
                 var pharmacist = (Pharmacist)pharmacistAccount.User;
-                return pharmacist.WorkTime.From.TimeOfDay <= searchParams.DateTime.TimeOfDay && searchParams.DateTime.AddMinutes(searchParams.Duration).TimeOfDay <= pharmacist.WorkTime.To.TimeOfDay;
+                return pharmacist.WorkTime.From.TimeOfDay <= searchParams.ConsultationDateTime.TimeOfDay &&
+                searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration).TimeOfDay <= pharmacist.WorkTime.To.TimeOfDay;
             })
             .Where(pharmacistAccount =>
             {
                 var pharmacist = (Pharmacist)pharmacistAccount.User;
                 var appointments = ReadForMedicalStaff(pharmacist.Id)
                 .Where(appointment =>
-                    Utils.TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.DateTime, searchParams.DateTime.AddMinutes(searchParams.Duration), 
+                    appointment.MedicalStaffId == pharmacist.Id &&
+                    appointment.DateTime.Date == searchParams.ConsultationDateTime.Date && 
+                    Utils.TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration), 
                     appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
-                return appointments.FirstOrDefault() == null;
+                return appointments.Count() == 0;
             });
-
         }
     }
 }

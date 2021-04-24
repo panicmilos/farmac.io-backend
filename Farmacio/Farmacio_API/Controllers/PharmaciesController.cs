@@ -302,27 +302,16 @@ namespace Farmacio_API.Controllers
             return _pharmacyService.ReadBy(searchParams);
         }
 
+        /// <summary>
+        /// Returns pharmacies that have free pharmacists in shosen time.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacies.</response>
         [HttpGet("available")]
-        public IEnumerable<PharmacyDTO> Search([FromQuery] PharmaciesForAppointmentsSearchParams searchParams)
+        public IEnumerable<PharmacyDTO> SearchAvailableForConsultations([FromQuery] PharmaciesForAppointmentsSearchParams searchParams)
         {
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
-            var pharmacies = new List<PharmacyDTO>();
-            foreach (var pharmacistAccount in pharmacists)
-            {
-                var pharmacist = (Pharmacist)pharmacistAccount.User;
-                if (pharmacies.Where(pharmacy => pharmacy.Id == pharmacist.PharmacyId).FirstOrDefault() == null)
-                    pharmacies.Add(new PharmacyDTO
-                    {
-                        Name = pharmacist.Pharmacy.Name,
-                        Id = pharmacist.Pharmacy.Id,
-                        Address = pharmacist.Pharmacy.Address,
-                        AverageGrade = pharmacist.Pharmacy.AverageGrade,
-                        Description = pharmacist.Pharmacy.Description,
-                        ConsultationPrice = _pharmacyPriceListService.ReadForPharmacy(pharmacist.PharmacyId).ConsultationPrice
-                    });
-            }
-
-            return pharmacies;
+            return _pharmacyService.GetPharmaciesOfPharmacists(pharmacists.ToList(), searchParams);
+            
         }
     }
 }
