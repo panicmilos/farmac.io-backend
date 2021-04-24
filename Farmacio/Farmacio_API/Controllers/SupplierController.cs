@@ -139,14 +139,24 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns deleted supplier's medicine.</response>
         /// <response code="404">Given supplier's medicine doesn't exist.</response>
         [HttpDelete("{supplierId}/medicines-in-stock/{id}")]
-        public IActionResult UpdateMedicineFromSupplierStock(Guid id)
+        public IActionResult DeleteMedicineFromSupplierStock(Guid id)
         {
             var deletedMedicine = _supplierStockService.Delete(id);
 
             return Ok(deletedMedicine);
-        }
+        }  
 
         /// <summary>
+        /// Returns all supplier's offers from the system.
+        /// </summary>
+        /// <response code="200">Returns list of supplier's offers.</response>
+        [HttpGet("{supplierId}/offers")]
+        public IActionResult GetSuppliersOffers(Guid supplierId)
+        {
+            return Ok(_supplierOfferService.ReadFor(supplierId));
+        }
+        
+         /// <summary>
         /// Creates a new supplier's offer for pharmacy order in the system.
         /// </summary>
         /// <response code="200">Returns created supplier's offer.</response>
@@ -163,16 +173,6 @@ namespace Farmacio_API.Controllers
             _supplierOfferService.Create(offer);
 
             return Ok(offer);
-        }
-
-        /// <summary>
-        /// Returns all supplier's offers from the system.
-        /// </summary>
-        /// <response code="200">Returns list of supplier's offers.</response>
-        [HttpGet("{supplierId}/offers")]
-        public IActionResult GetSuppliersOffers(Guid supplierId)
-        {
-            return Ok(_supplierOfferService.ReadFor(supplierId));
         }
 
         /// <summary>

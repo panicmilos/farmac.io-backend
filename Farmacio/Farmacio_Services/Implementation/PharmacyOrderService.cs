@@ -53,7 +53,6 @@ namespace Farmacio_Services.Implementation
             return Read().Where(pharmacyOrder => pharmacyOrder.PharmacyId == pharmacyId &&
                                                  (isProcessed == null ||
                                                   pharmacyOrder.IsProcessed == isProcessed.Value)).ToList();
-                                                  
         }
         
         private void ValidatePharmacyOrder(PharmacyOrder pharmacyOrder, Guid pharmacyId, Guid pharmacyAdminId)
