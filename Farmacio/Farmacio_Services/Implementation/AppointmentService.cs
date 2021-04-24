@@ -206,11 +206,6 @@ namespace Farmacio_Services.Implementation
             {
                 Notes = reportDTO.Notes,
                 TherapyDurationInDays = reportDTO.TherapyDurationInDays,
-                ERecipe = new ERecipe
-                {
-                    PatientId = appointment.PatientId.Value
-                    //TODO
-                }
             };
             report = _reportService.Create(report);
             appointment.ReportId = report.Id;
@@ -241,6 +236,9 @@ namespace Farmacio_Services.Implementation
             var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
 
             var pharmacist = (Pharmacist)medicalAccount.User;
+
+            if (pharmacist.PharmacyId != appointmentDTO.PharmacyId)
+                throw new BadLogicException("Pharmacist must work in that pharmacy.");
 
             ValidateAppointmentDateTime(appointmentDTO, pharmacist.WorkTime);
 

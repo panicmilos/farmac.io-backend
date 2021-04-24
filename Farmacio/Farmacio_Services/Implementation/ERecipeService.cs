@@ -2,14 +2,15 @@
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 
-
 namespace Farmacio_Services.Implementation
 {
-    public class ReportService : CrudService<Report>, IReportService
+    public class ERecipeService : CrudService<ERecipe>, IERecipeService
     {
-        public ReportService(IRepository<Report> repository) : base(repository)
+        public ERecipeService(IRepository<ERecipe> repository) : base(repository)
         {
 
         }
+
+
     }
 }

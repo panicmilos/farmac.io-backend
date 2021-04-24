@@ -2,7 +2,7 @@
 
 namespace Farmacio_Services.Contracts
 {
-    public interface IReportService: ICrudService<Report>
+    public interface IERecipeService : ICrudService<ERecipe>
     {
 
     }
