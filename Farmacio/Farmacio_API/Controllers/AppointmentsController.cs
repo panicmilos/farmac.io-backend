@@ -221,5 +221,11 @@ namespace Farmacio_API.Controllers
             
             return Ok(appointment);
         }
+
+        [HttpDelete("pharmacist/{appointmentId}")]
+        public IActionResult CancelAppointmentWithPharmacist(Guid appointmentId)
+        {
+            return Ok(_appointmentService.CancelAppointmentWithPharmacist(appointmentId));
+        }
     }
 }

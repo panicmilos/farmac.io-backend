@@ -323,5 +323,20 @@ namespace Farmacio_Services.Implementation
             return Read().ToList().Where(appointment =>
                                 appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now && appointment.MedicalStaff is Pharmacist);
         }
+
+        public Appointment CancelAppointmentWithPharmacist(Guid appointmentId)
+        {
+            var appointment = base.TryToRead(appointmentId);
+
+            if (DateTime.Now.AddHours(24) > appointment.DateTime)
+                throw new BadLogicException("It is not possible to cancel an appointment if there are less than 24 hours left before the start.");
+
+            if (appointment.DateTime < DateTime.Now)
+                throw new BadLogicException("It is not possible to cancel an appointment which date and time in the past.");
+
+            base.Delete(appointment.Id);
+
+            return appointment;
+        }
     }
 }
