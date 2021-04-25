@@ -189,5 +189,17 @@ namespace Farmacio_API.Controllers
             _appointmentService.CreatePharmacistAppointment(appointment);
             return Ok(appointment);
         }
+
+
+        /// <summary>
+        /// Returns appointments with pharmacists in future.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        /// <response code="404">Given patient does not exist in the system.</response>
+        [HttpGet("future-with-pharmacists/{patientId}")]
+        public IActionResult GetFutureAppointmentsWithPharmacists(Guid patientId)
+        {
+            return Ok(_appointmentService.ReadFuturePharmacistsAppointments(patientId));
+        }
     }
 }

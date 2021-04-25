@@ -167,7 +167,8 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
+            return Read().ToList().Where(appointment => appointment.MedicalStaff is Dermatologist &&
+                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
         }
 
         public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
@@ -192,7 +193,8 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now);
+            return Read().ToList().Where(appointment => appointment.MedicalStaff is Dermatologist &&
+                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now);
         }
         
         public Report CreateReport(CreateReportDTO reportDTO)
@@ -271,6 +273,16 @@ namespace Farmacio_Services.Implementation
                 PatientId = appointmentDTO.PatientId,
                 IsReserved = true
             });
+        }
+
+        public IEnumerable<Appointment> ReadFuturePharmacistsAppointments(Guid patientId)
+        {
+            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+            return Read().ToList().Where(appointment => appointment.MedicalStaff is Pharmacist &&
+                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
         }
     }
 }

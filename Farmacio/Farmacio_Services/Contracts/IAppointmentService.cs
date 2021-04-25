@@ -19,5 +19,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadPatientsHistoryOfVisitsToDermatologist(Guid patientId);
         Report CreateReport(CreateReportDTO reportDTO);
         Report NotePatientDidNotShowUp(CreateReportDTO reportDTO);
+        IEnumerable<Appointment> ReadFuturePharmacistsAppointments(Guid patientId);
     }
 }
