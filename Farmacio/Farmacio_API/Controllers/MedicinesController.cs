@@ -182,8 +182,7 @@ namespace Farmacio_API.Controllers
         public IActionResult ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name, Guid patientId)
         {
             var medicineDTOs = _medicineService.ReadMedicinesOrReplacementsByName(pharmacyId, name);
-            if (patientId != null)
-                medicineDTOs = _patientAllergyService.CheckIfAllegric(medicineDTOs, patientId);
+            medicineDTOs = _patientAllergyService.CheckIfAllegric(medicineDTOs, patientId);
             return Ok(medicineDTOs);
         }
     }
