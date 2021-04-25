@@ -271,7 +271,7 @@ namespace Farmacio_Services.Implementation
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
-            return Create(new Appointment
+            var appointmentWithPharmacist = Create(new Appointment
             {
                 PharmacyId = appointmentDTO.PharmacyId,
                 MedicalStaffId = appointmentDTO.MedicalStaffId,
@@ -281,6 +281,13 @@ namespace Farmacio_Services.Implementation
                 PatientId = appointmentDTO.PatientId,
                 IsReserved = true
             });
+
+            var patient = _patientService.ReadByUserId(appointmentDTO.PatientId.Value);
+
+            var email = _templatesProvider.FromTemplate<Email>("Consultation", new { Name = patient.User.FirstName, Date = appointmentWithPharmacist.DateTime.ToString("dd-MM-yyyy HH:mm") });
+            _emailDispatcher.Dispatch(email);
+
+            return appointmentWithPharmacist;
         }
 
         public IEnumerable<Account> ReadPharmacistsForAppointment(IEnumerable<Account> pharmacists, SearhSortParamsForAppointments searchParams)
@@ -294,12 +301,12 @@ namespace Farmacio_Services.Implementation
             })
             .Where(pharmacistAccount =>
             {
-                var pharmacist = (Pharmacist)pharmacistAccount.User;
+                var pharmacist = pharmacistAccount.User as Pharmacist;
                 var overlapingAppointments = ReadForMedicalStaff(pharmacist.Id)
                 .Where(appointment =>
                     appointment.MedicalStaffId == pharmacist.Id &&
                     appointment.DateTime.Date == searchParams.ConsultationDateTime.Date && 
-                    Utils.TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration), 
+                    TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration), 
                     appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
                 return overlapingAppointments.Count() == 0;
             });

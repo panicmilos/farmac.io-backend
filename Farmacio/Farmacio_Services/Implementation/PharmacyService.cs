@@ -202,5 +202,14 @@ namespace Farmacio_Services.Implementation
 
             return pharmacies;
         }
+
+        public float GetPriceOfPharmacistConsultation(Guid pharmacyId)
+        {
+            TryToRead(pharmacyId);
+            var priceList = _pharmacyPriceListService.ReadForPharmacy(pharmacyId);
+            if (priceList == null)
+                throw new MissingEntityException("Price list not found for the given pharmacy.");
+            return priceList.ConsultationPrice;
+        }
     }
 }
