@@ -155,13 +155,45 @@ namespace Farmacio_Services.Implementation
                 .MedicinePriceList.Select(mp => mp.Medicine.Name);
         }
 
-        public IEnumerable<MedicineInPharmacyDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name)
+        public IEnumerable<CheckMedicineDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name)
         {
             var medicines = _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
                 .MedicinePriceList.Select(mp => mp.Medicine).Where(m => m.Name == name)
                 .Select(m => _pharmacyService.ReadMedicine(pharmacyId, m.Id));
-            // TODO: Find replacements if there is 0 in stock.
-            return medicines;
+
+            List<MedicineInPharmacyDTO> replacements = new List<MedicineInPharmacyDTO>();
+            foreach (var medicine in medicines)
+            {
+                var replacementsOfMed = _replacementService.GetReplacementsFor(medicine.MedicineId);
+                foreach (var replacement in replacementsOfMed)
+                {
+                    try
+                    {
+                        var m = _pharmacyService.ReadMedicine(pharmacyId, replacement.Id);
+                        replacements.Add(m);
+                    }
+                    catch (MissingEntityException)
+                    {
+                        continue;
+                    }
+                }
+            }
+            var result = medicines.Select(m => new CheckMedicineDTO
+            {
+                MedicineId = m.MedicineId,
+                InStock = m.InStock,
+                IsReplacement = false,
+                Name = m.Name,
+                Price = m.Price
+            });
+            return result.Concat(replacements.Select(m => new CheckMedicineDTO
+            {
+                MedicineId = m.MedicineId,
+                InStock = m.InStock,
+                IsReplacement = true,
+                Name = m.Name,
+                Price = m.Price
+            }));
         }
     }
 }

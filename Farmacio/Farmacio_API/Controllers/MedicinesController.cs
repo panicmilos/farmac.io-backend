@@ -18,16 +18,19 @@ namespace Farmacio_API.Controllers
         private readonly IMedicineService _medicineService;
         private readonly IPharmacyService _pharmacyService;
         private readonly IMedicinePdfService _medicinePdfService;
+        private readonly IPatientAllergyService _patientAllergyService;
         private readonly IMapper _mapper;
 
         public MedicinesController(IMedicineService medicineService,
             IPharmacyService pharmacyService,
             IMedicinePdfService medicinePdfService,
+            IPatientAllergyService patientAllergyService,
             IMapper mapper)
         {
             _medicineService = medicineService;
             _pharmacyService = pharmacyService;
             _medicinePdfService = medicinePdfService;
+            _patientAllergyService = patientAllergyService;
             _mapper = mapper;
         }
 
@@ -176,9 +179,12 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns medicines.</response>
         [HttpGet("in-pharmacy/{pharmacyId}/search")]
-        public IActionResult ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name)
+        public IActionResult ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name, Guid patientId)
         {
-            return Ok(_medicineService.ReadMedicinesOrReplacementsByName(pharmacyId, name));
+            var medicineDTOs = _medicineService.ReadMedicinesOrReplacementsByName(pharmacyId, name);
+            if (patientId != null)
+                medicineDTOs = _patientAllergyService.CheckIfAllegric(medicineDTOs, patientId);
+            return Ok(medicineDTOs);
         }
     }
 }

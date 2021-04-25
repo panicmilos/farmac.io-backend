@@ -22,6 +22,14 @@ namespace Farmacio_Services.Implementation
             _patientService = patientService;
         }
 
+        public IEnumerable<CheckMedicineDTO> CheckIfAllegric(IEnumerable<CheckMedicineDTO> medicineDTOs, Guid patientId)
+        {
+            var allergies = GetPatientsAllergies(patientId).Select(m => m.Id);
+            foreach (var medicineDTO in medicineDTOs)
+                medicineDTO.IsAllergy = allergies.Contains(medicineDTO.MedicineId);
+            return medicineDTOs;
+        }
+
         public IEnumerable<PatientAllergy> CreateAllergies(PatientAllergyDTO request)
         {
             _patientService.TryToRead(request.patientId);
