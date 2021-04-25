@@ -167,8 +167,8 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => appointment.MedicalStaff is Dermatologist &&
-                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
+            return Read().ToList().Where(appointment =>
+                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now && appointment.MedicalStaff is Dermatologist);
         }
 
         public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
@@ -193,8 +193,8 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => appointment.MedicalStaff is Dermatologist &&
-                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now);
+            return Read().ToList().Where(appointment => 
+                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Dermatologist);
         }
         
         public Report CreateReport(CreateReportDTO reportDTO)
@@ -275,14 +275,14 @@ namespace Farmacio_Services.Implementation
             });
         }
 
-        public IEnumerable<Appointment> ReadFuturePharmacistsAppointments(Guid patientId)
+        public IEnumerable<Appointment> ReadFuturePharmacistsAppointmentsFor(Guid patientId)
         {
-            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
+            if (_patientService.ReadByUserId(patientId) == null)
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => appointment.MedicalStaff is Pharmacist &&
-                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
+            return Read().ToList().Where(appointment =>
+                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now && appointment.MedicalStaff is Pharmacist);
         }
     }
 }
