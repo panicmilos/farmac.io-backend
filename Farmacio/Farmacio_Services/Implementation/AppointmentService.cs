@@ -239,6 +239,11 @@ namespace Farmacio_Services.Implementation
 
         public Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointmentDTO)
         {
+            if(appointmentDTO.DateTime < DateTime.Now)
+            {
+                throw new BadLogicException("The given date and time is in the past.");
+            }
+
             var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
 
             var pharmacist = (Pharmacist)medicalAccount.User;

@@ -39,7 +39,8 @@ namespace Farmacio_Services.Implementation
                 {
                     new Claim(ClaimTypes.Name, account.Id.ToString()),
                     new Claim(ClaimTypes.Role, account.Role.ToString()),
-                    new Claim("ShouldChangePassword", account.ShouldChangePassword.ToString().ToLower())
+                    new Claim("ShouldChangePassword", account.ShouldChangePassword.ToString().ToLower()),
+                    new Claim("UserId", account?.User?.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(expiresFor),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
