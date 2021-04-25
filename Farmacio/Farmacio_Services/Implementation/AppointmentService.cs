@@ -273,7 +273,7 @@ namespace Farmacio_Services.Implementation
             });
         }
 
-        public IEnumerable<Account> ReadPharmacistsForAppointment(IEnumerable<Account> pharmacists, PharmaciesForAppointmentsSearchParams searchParams)
+        public IEnumerable<Account> ReadPharmacistsForAppointment(IEnumerable<Account> pharmacists, SearhSortParamsForAppointments searchParams)
         {
             return pharmacists
             .Where(pharmacistAccount =>

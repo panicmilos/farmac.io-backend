@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Farmacio_Models.DTO
 {
-    public class PharmaciesForAppointmentsSearchParams
+    public class SearhSortParamsForAppointments
     {
         public DateTime ConsultationDateTime { get; set; }
         public int Duration { get; set; }

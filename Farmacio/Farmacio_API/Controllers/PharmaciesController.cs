@@ -307,21 +307,33 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
         [HttpGet("available")]
-        public IEnumerable<PharmacyDTO> SearchAvailableForConsultations([FromQuery] PharmaciesForAppointmentsSearchParams searchParams)
+        public IEnumerable<PharmacyDTO> SearchAvailableForConsultations([FromQuery] SearhSortParamsForAppointments searchParams)
         {
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
             return _pharmacyService.GetPharmaciesOfPharmacists(pharmacists.ToList(), searchParams);
             
         }
 
+
+        /// <summary>
+        /// Returns free pharmacist from pharmacy.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacists.</response>
         [HttpGet("available/{pharmacyId}/pharmacists")]
-        public IEnumerable<Pharmacist> GetFreePharmacist([FromRoute] Guid pharmacyId, [FromQuery] PharmaciesForAppointmentsSearchParams searchParams)
+        public IEnumerable<Pharmacist> GetFreePharmacist([FromRoute] Guid pharmacyId, [FromQuery] SearhSortParamsForAppointments searchParams)
         {
+            _pharmacyService.TryToRead(pharmacyId);
+
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams).Where(pharmacistAccount =>
             {
                 var pharmacist = (Pharmacist)pharmacistAccount.User;
                 return pharmacist.PharmacyId == pharmacyId;
             }).Select(pharmacistAccount => (Pharmacist)pharmacistAccount.User);
+
+            if(searchParams.SortCriteria != "")
+            {
+                pharmacists = searchParams.IsAsc ? pharmacists.OrderBy(p => p.AverageGrade).ToList() : pharmacists.OrderByDescending(p => p.AverageGrade).ToList();
+            }
             return pharmacists;
         }
     }

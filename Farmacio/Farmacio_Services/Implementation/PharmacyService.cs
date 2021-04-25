@@ -152,14 +152,13 @@ namespace Farmacio_Services.Implementation
             return pharmacies;
         }
 
-        public IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(List<Account> pharmacists, PharmaciesForAppointmentsSearchParams searchParams)
+        public IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(List<Account> pharmacists, SearhSortParamsForAppointments searchParams)
         {
             var pharmacies = new List<PharmacyDTO>();
             foreach (var pharmacistAccount in pharmacists)
 
             {
                 var pharmacist = (Pharmacist)pharmacistAccount.User;
-                Console.WriteLine(pharmacist.Pharmacy.Name);
                 if (pharmacies.Where(pharmacy => pharmacy.Id == pharmacist.PharmacyId).FirstOrDefault() == null)
                 {
                     pharmacies.Add(new PharmacyDTO
@@ -176,8 +175,6 @@ namespace Farmacio_Services.Implementation
 
             string sortCriteria = searchParams.SortCriteria;
             bool isAscending = searchParams.IsAsc;
-            Console.WriteLine(sortCriteria);
-            Console.WriteLine(isAscending);
 
             var sortingCriteria = new Dictionary<string, Func<PharmacyDTO, object>>()
             {
@@ -185,14 +182,11 @@ namespace Farmacio_Services.Implementation
                 { "grade", p => p.AverageGrade }
             };
 
-            Console.WriteLine(pharmacies.Count);
 
             if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
             {
                 pharmacies = isAscending ? pharmacies.OrderBy(sortingCriterion).ToList() : pharmacies.OrderByDescending(sortingCriterion).ToList();
             }
-
-            Console.WriteLine(pharmacies.Count);
 
             return pharmacies;
         }
