@@ -54,6 +54,16 @@
         "Recipients": [ "panic.milos99@gmail.com" ],
         "Body": "<p>Dear {{name}},</p><p>Your appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
       }
+    },
+    {
+      "type": "Email",
+      "name": "Consultation",
+      "template": {
+        "Subject": "Successfull reserving consultation with pharmacist on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "panic.milos99@gmail.com" ],
+        "Body": "<p>Dear {{name}},</p><p>Your appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
+      }
     }
   ]
 }

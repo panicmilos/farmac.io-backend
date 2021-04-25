@@ -20,5 +20,6 @@ namespace Farmacio_Services.Contracts
         Report CreateReport(CreateReportDTO reportDTO);
         Report NotePatientDidNotShowUp(CreateReportDTO reportDTO);
         IEnumerable<Appointment> ReadFuturePharmacistsAppointmentsFor(Guid patientId);
+        IEnumerable<Account> ReadPharmacistsForAppointment(IEnumerable<Account> pharmacists, SearhSortParamsForAppointments searchParams);
     }
 }

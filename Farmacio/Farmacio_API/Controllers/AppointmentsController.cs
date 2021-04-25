@@ -17,11 +17,13 @@ namespace Farmacio_API.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
+        private readonly IPharmacyService _pharmacyService;
         private readonly IMapper _mapper;
 
-        public AppointmentsController(IAppointmentService appointmentService, IMapper mapper)
+        public AppointmentsController(IAppointmentService appointmentService, IPharmacyService pharmacyService, IMapper mapper)
         {
             _appointmentService = appointmentService;
+            _pharmacyService = pharmacyService;
             _mapper = mapper;
         }
 
@@ -200,6 +202,24 @@ namespace Farmacio_API.Controllers
         public IActionResult GetFutureAppointmentsWithPharmacists(Guid patientId)
         {
             return Ok(_appointmentService.ReadFuturePharmacistsAppointmentsFor(patientId));
+        }
+
+        /// <summary>
+        /// Creates a new appointment in the system.
+        /// </summary>
+        /// <response code="200">Created appointment.</response>
+        /// <response code="404">Something not found.</response>
+        /// <response code="400">Invalid date-time and duration.</response>
+        [HttpPost("pharmacist/as-user")]
+        public IActionResult CreatePharmacistAppointmentPatientAsUser(CreateAppointmentRequest request)
+        {
+            var appointment = _mapper.Map<CreateAppointmentDTO>(request);
+
+            _pharmacyService.TryToRead(appointment.PharmacyId);
+            appointment.Price = _pharmacyService.GetPriceOfPharmacistConsultation(appointment.PharmacyId);
+            _appointmentService.CreatePharmacistAppointment(appointment);
+            
+            return Ok(appointment);
         }
     }
 }
