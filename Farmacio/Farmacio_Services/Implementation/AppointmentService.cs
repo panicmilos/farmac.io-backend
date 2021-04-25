@@ -243,7 +243,9 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadReservedButUnreportedForMedicalStaff(Guid medicalStaffId)
         {
-            return ReadForMedicalStaff(medicalStaffId).Where(appointment => appointment.IsReserved && appointment.ReportId == null).ToList();
+            return ReadForMedicalStaff(medicalStaffId).Where(appointment => appointment.IsReserved
+                                                                && appointment.ReportId == null
+                                                                && appointment.PatientId != null).ToList();
         }
 
         public Report NotePatientDidNotShowUp(CreateReportDTO reportDTO)
