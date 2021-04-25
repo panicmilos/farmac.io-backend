@@ -199,7 +199,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("future-with-pharmacists/{patientId}")]
         public IActionResult GetFutureAppointmentsWithPharmacists(Guid patientId)
         {
-            return Ok(_appointmentService.ReadFuturePharmacistsAppointments(patientId));
+            return Ok(_appointmentService.ReadFuturePharmacistsAppointmentsFor(patientId));
         }
     }
 }
