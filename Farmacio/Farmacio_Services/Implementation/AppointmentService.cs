@@ -168,7 +168,8 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now);
+            return Read().ToList().Where(appointment =>
+                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now && appointment.MedicalStaff is Dermatologist);
         }
 
         public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
@@ -193,7 +194,8 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now);
+            return Read().ToList().Where(appointment => 
+                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Dermatologist);
         }
         
         public Report CreateReport(CreateReportDTO reportDTO)
@@ -310,6 +312,16 @@ namespace Farmacio_Services.Implementation
                     appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
                 return overlapingAppointments.Count() == 0;
             });
+        }
+
+        public IEnumerable<Appointment> ReadFuturePharmacistsAppointmentsFor(Guid patientId)
+        {
+            if (_patientService.ReadByUserId(patientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+            return Read().ToList().Where(appointment =>
+                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now && appointment.MedicalStaff is Pharmacist);
         }
     }
 }
