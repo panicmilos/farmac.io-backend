@@ -106,5 +106,14 @@ namespace Farmacio_Services.Implementation
         {
             return accounts.Where(p => ((Pharmacist) p.User).PharmacyId == pharmacyId);
         }
+
+        public IEnumerable<Pharmacist> SortByGrade(IList<Pharmacist> pharmacists, SearhSortParamsForAppointments searchSortParams)
+        {
+            if (searchSortParams.SortCriteria != "")
+            {
+                pharmacists = searchSortParams.IsAsc ? pharmacists.OrderBy(p => p.AverageGrade).ToList() : pharmacists.OrderByDescending(p => p.AverageGrade).ToList();
+            }
+            return pharmacists;
+        }
     }
 }

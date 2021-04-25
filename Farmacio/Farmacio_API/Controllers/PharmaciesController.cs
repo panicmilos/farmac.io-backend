@@ -303,38 +303,34 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns pharmacies that have free pharmacists in chosen time.
+        /// Returns pharmacies that have available pharmacists in chosen time.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
         [HttpGet("available")]
-        public IEnumerable<PharmacyDTO> SearchAvailableForConsultations([FromQuery] SearhSortParamsForAppointments searchParams)
+        public IActionResult SearchAvailableForConsultations([FromQuery] SearhSortParamsForAppointments searchParams)
         {
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
-            return _pharmacyService.GetPharmaciesOfPharmacists(pharmacists.ToList(), searchParams);
+            return Ok(_pharmacyService.GetPharmaciesOfPharmacists(pharmacists.ToList(), searchParams));
             
         }
 
 
         /// <summary>
-        /// Returns free pharmacist from pharmacy.
+        /// Returns available pharmacist from pharmacy.
         /// </summary>
         /// <response code="200">Returns list of pharmacists.</response>
         [HttpGet("available/{pharmacyId}/pharmacists")]
-        public IEnumerable<Pharmacist> GetFreePharmacist([FromRoute] Guid pharmacyId, [FromQuery] SearhSortParamsForAppointments searchParams)
+        public IActionResult GetFreePharmacist(Guid pharmacyId, [FromQuery] SearhSortParamsForAppointments searchParams)
         {
             _pharmacyService.TryToRead(pharmacyId);
 
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams).Where(pharmacistAccount =>
             {
-                var pharmacist = (Pharmacist)pharmacistAccount.User;
+                var pharmacist = pharmacistAccount.User as Pharmacist;
                 return pharmacist.PharmacyId == pharmacyId;
             }).Select(pharmacistAccount => (Pharmacist)pharmacistAccount.User);
 
-            if(searchParams.SortCriteria != "")
-            {
-                pharmacists = searchParams.IsAsc ? pharmacists.OrderBy(p => p.AverageGrade).ToList() : pharmacists.OrderByDescending(p => p.AverageGrade).ToList();
-            }
-            return pharmacists;
+            return Ok(_pharmacistService.SortByGrade(pharmacists.ToList(), searchParams));
         }
     }
 }

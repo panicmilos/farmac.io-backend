@@ -137,6 +137,13 @@ namespace Farmacio_Services.Implementation
                 });
             }
 
+            
+
+            return SortSmallPharmacyDTO(pharmacies, sortCriteria, isAscending);
+        }
+
+        private IEnumerable<SmallPharmacyDTO> SortSmallPharmacyDTO(IEnumerable<SmallPharmacyDTO> pharmacies, string sortCriteria, bool isAscending)
+        {
             var sortingCriteria = new Dictionary<string, Func<SmallPharmacyDTO, object>>()
             {
                 { "name", p => p.Name },
@@ -152,7 +159,7 @@ namespace Farmacio_Services.Implementation
             return pharmacies;
         }
 
-        public IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(List<Account> pharmacists, SearhSortParamsForAppointments searchParams)
+        public IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(IList<Account> pharmacists, SearhSortParamsForAppointments searchParams)
         {
             var pharmacies = new List<PharmacyDTO>();
             foreach (var pharmacistAccount in pharmacists)
@@ -176,6 +183,11 @@ namespace Farmacio_Services.Implementation
             string sortCriteria = searchParams.SortCriteria;
             bool isAscending = searchParams.IsAsc;
 
+            return SortPharmacyDTO(pharmacies, sortCriteria, isAscending);
+        }
+
+        private IEnumerable<PharmacyDTO> SortPharmacyDTO(IEnumerable<PharmacyDTO> pharmacies, string sortCriteria, bool isAscending)
+        {
             var sortingCriteria = new Dictionary<string, Func<PharmacyDTO, object>>()
             {
                 { "price", p => p.ConsultationPrice },

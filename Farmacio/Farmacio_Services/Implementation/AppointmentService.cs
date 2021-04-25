@@ -241,7 +241,7 @@ namespace Farmacio_Services.Implementation
         {
             if(appointmentDTO.DateTime < DateTime.Now)
             {
-                throw new BadLogicException("The given date and time is in the past.");
+                throw new BadLogicException("The given date and time are in the past.");
             }
 
             var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
@@ -288,20 +288,20 @@ namespace Farmacio_Services.Implementation
             return pharmacists
             .Where(pharmacistAccount =>
             {
-                var pharmacist = (Pharmacist)pharmacistAccount.User;
+                var pharmacist = pharmacistAccount.User as Pharmacist;
                 return pharmacist.WorkTime.From.TimeOfDay <= searchParams.ConsultationDateTime.TimeOfDay &&
                 searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration).TimeOfDay <= pharmacist.WorkTime.To.TimeOfDay;
             })
             .Where(pharmacistAccount =>
             {
                 var pharmacist = (Pharmacist)pharmacistAccount.User;
-                var appointments = ReadForMedicalStaff(pharmacist.Id)
+                var overlapingAppointments = ReadForMedicalStaff(pharmacist.Id)
                 .Where(appointment =>
                     appointment.MedicalStaffId == pharmacist.Id &&
                     appointment.DateTime.Date == searchParams.ConsultationDateTime.Date && 
                     Utils.TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration), 
                     appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
-                return appointments.Count() == 0;
+                return overlapingAppointments.Count() == 0;
             });
         }
     }
