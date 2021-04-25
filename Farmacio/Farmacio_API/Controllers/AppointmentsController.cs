@@ -208,10 +208,10 @@ namespace Farmacio_API.Controllers
         /// Creates a new appointment in the system.
         /// </summary>
         /// <response code="200">Created appointment.</response>
-        /// <response code="404">Something not found.</response>
         /// <response code="400">Invalid date-time and duration.</response>
+        /// <response code="404">Something not found.</response>
         [HttpPost("pharmacist/as-user")]
-        public IActionResult CreatePharmacistAppointmentPatientAsUser(CreateAppointmentRequest request)
+        public IActionResult CreatePharmacistAppointmenAsUser(CreateAppointmentRequest request)
         {
             var appointment = _mapper.Map<CreateAppointmentDTO>(request);
 
@@ -220,6 +220,19 @@ namespace Farmacio_API.Controllers
             _appointmentService.CreatePharmacistAppointment(appointment);
             
             return Ok(appointment);
+        }
+
+
+        /// <summary>
+        /// Cancel appointment with pharmacist.
+        /// </summary>
+        /// <response code="200">Returns canceled appointment.</response>
+        /// <response code="400">Unable to cancel appointment in the past or that starts in less than 24 hours or that is not reserved.</response>
+        /// <response code="404">Given appointment does not exist in the system.</response>
+        [HttpDelete("pharmacist/{appointmentId}")]
+        public IActionResult CancelAppointmentWithPharmacist(Guid appointmentId)
+        {
+            return Ok(_appointmentService.CancelAppointmentWithPharmacist(appointmentId));
         }
     }
 }
