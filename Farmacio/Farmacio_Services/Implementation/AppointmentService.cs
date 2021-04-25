@@ -332,7 +332,7 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("It is not possible to cancel an appointment if there are less than 24 hours left before the start.");
 
             if (appointment.DateTime < DateTime.Now)
-                throw new BadLogicException("It is not possible to cancel an appointment which date and time in the past.");
+                throw new BadLogicException("It is not possible to cancel an appointment which date and time are in the past.");
 
             base.Delete(appointment.Id);
 
