@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Farmacio_API.Contracts.Requests.Pharmacies;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
@@ -179,21 +178,6 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Creates a new appointment in the system.
-        /// </summary>
-        /// <response code="200">Created appointment.</response>
-        /// <response code="404">Something not found.</response>
-        /// <response code="400">Invalid date-time and duration.</response>
-        [HttpPost("pharmacist")]
-        public IActionResult CreatePharmacistAppointment(CreateAppointmentRequest request)
-        {
-            var appointment = _mapper.Map<CreateAppointmentDTO>(request);
-            _appointmentService.CreatePharmacistAppointment(appointment);
-            return Ok(appointment);
-        }
-
-
-        /// <summary>
         /// Returns appointments with pharmacists in future.
         /// </summary>
         /// <response code="200">Returns appointments.</response>
@@ -214,14 +198,10 @@ namespace Farmacio_API.Controllers
         public IActionResult CreatePharmacistAppointmenAsUser(CreateAppointmentRequest request)
         {
             var appointment = _mapper.Map<CreateAppointmentDTO>(request);
-
-            _pharmacyService.TryToRead(appointment.PharmacyId);
-            appointment.Price = _pharmacyService.GetPriceOfPharmacistConsultation(appointment.PharmacyId);
+            appointment.Price = null; // then service method will get price from the pharmacy
             _appointmentService.CreatePharmacistAppointment(appointment);
-            
             return Ok(appointment);
         }
-
 
         /// <summary>
         /// Cancel appointment with pharmacist.
@@ -233,6 +213,20 @@ namespace Farmacio_API.Controllers
         public IActionResult CancelAppointmentWithPharmacist(Guid appointmentId)
         {
             return Ok(_appointmentService.CancelAppointmentWithPharmacist(appointmentId));
+        }
+
+        /// <summary>
+        /// Creates a new appointment in the system.
+        /// </summary>
+        /// <response code="200">Created appointment.</response>
+        /// <response code="404">Something not found.</response>
+        /// <response code="400">Invalid date-time and duration.</response>
+        [HttpPost("another")]
+        public IActionResult CreateAnotherAppointment(CreateAppointmentRequest request)
+        {
+            var appointment = _mapper.Map<CreateAppointmentDTO>(request);
+            _appointmentService.CreateAnotherAppointmentByMedicalStaff(appointment);
+            return Ok(appointment);
         }
     }
 }

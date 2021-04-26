@@ -211,5 +211,14 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Price list not found for the given pharmacy.");
             return priceList.ConsultationPrice;
         }
+
+        public float GetPriceOfDermatologistExamination(Guid pharmacyId)
+        {
+            TryToRead(pharmacyId);
+            var priceList = _pharmacyPriceListService.ReadForPharmacy(pharmacyId);
+            if (priceList == null)
+                throw new MissingEntityException("Price list not found for the given pharmacy.");
+            return priceList.ExaminationPrice;
+        }
     }
 }
