@@ -63,34 +63,49 @@ namespace Farmacio_Services.Implementation
                 .ToList();
         }
 
-        public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment)
+        public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO)
         {
-            var pharmacy = _pharmacyService.TryToRead(appointment.PharmacyId);
+            if (appointmentDTO.DateTime < DateTime.Now)
+                throw new BadLogicException("The given date and time are in the past.");
+
+            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
             var workPlace = _dermatologistWorkPlaceService
-                .GetWorkPlaceInPharmacyFor(appointment.MedicalStaffId, pharmacy.Id);
+                .GetWorkPlaceInPharmacyFor(appointmentDTO.MedicalStaffId, pharmacy.Id);
             if (workPlace == null)
                 throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
             
-            ValidateAppointmentDateTime(appointment, workPlace.WorkTime, "The given date-time and duration do not overlap with dermatologist's work time.",
+            ValidateAppointmentDateTime(appointmentDTO, workPlace.WorkTime, "The given date-time and duration do not overlap with dermatologist's work time.",
                 "Dermatologist already has an appointment defined on the given date-time.");
 
-            var priceList = _pharmacyPriceListService.ReadForPharmacy(pharmacy.Id);
-            if(priceList == null)
-                throw new MissingEntityException("Price list not found for the given pharmacy.");
+            bool withPatient = appointmentDTO.PatientId != null;
+
+            if (withPatient)
+                ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
             
-            var price = appointment.Price ?? priceList.ExaminationPrice;
+            var price = appointmentDTO.Price ?? _pharmacyService.GetPriceOfDermatologistExamination(pharmacy.Id);
             if(price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
-            return Create(new Appointment
+            var newAppointment = Create(new Appointment
             {
-                PharmacyId = appointment.PharmacyId,
-                MedicalStaffId = appointment.MedicalStaffId,
-                DateTime = appointment.DateTime,
-                Duration = appointment.Duration,
-                Price = price
+                PharmacyId = appointmentDTO.PharmacyId,
+                MedicalStaffId = appointmentDTO.MedicalStaffId,
+                DateTime = appointmentDTO.DateTime,
+                Duration = appointmentDTO.Duration,
+                Price = price,
+                PatientId = appointmentDTO.PatientId,
+                IsReserved = withPatient
             });
+
+            if (withPatient)
+            {
+                var patient = _patientService.ReadByUserId(appointmentDTO.PatientId.Value);
+
+                var email = _templatesProvider.FromTemplate<Email>("Appointment", new { Name = patient.User.FirstName, Date = newAppointment.DateTime.ToString("dd-MM-yyyy HH:mm") });
+                _emailDispatcher.Dispatch(email);
+            }
+            return newAppointment;
         }
 
         private void ValidateAppointmentDateTime(CreateAppointmentDTO appointment, WorkTime workTime, String medicalStaffDontWorkMMessage, String medicalStaffIsBusyMessage)
@@ -133,14 +148,7 @@ namespace Farmacio_Services.Implementation
             if(appointmentWithDermatologist.DateTime < DateTime.Now)
                 throw new BadLogicException("The given appointment is in the past.");
 
-            var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentRequest.PatientId);
-            foreach(var appointment in patientsAppointments)
-            {
-                if(appointment.DateTime.Date == appointmentWithDermatologist.DateTime.Date && TimeIntervalUtils.TimeIntervalTimesOverlap(appointment.DateTime, 
-                    appointment.DateTime.AddMinutes(appointment.Duration), appointmentWithDermatologist.DateTime,
-                    appointmentWithDermatologist.DateTime.AddMinutes(appointmentWithDermatologist.Duration)))
-                    throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
-            }
+            ValidateTimeForPatient(appointmentWithDermatologist.PatientId.Value, appointmentWithDermatologist.DateTime, appointmentWithDermatologist.Duration);
 
             appointmentWithDermatologist.IsReserved = true;
             appointmentWithDermatologist.PatientId = appointmentRequest.PatientId;
@@ -270,9 +278,7 @@ namespace Farmacio_Services.Implementation
         public Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointmentDTO)
         {
             if(appointmentDTO.DateTime < DateTime.Now)
-            {
                 throw new BadLogicException("The given date and time are in the past.");
-            }
 
             var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
 
@@ -284,22 +290,11 @@ namespace Farmacio_Services.Implementation
             ValidateAppointmentDateTime(appointmentDTO, pharmacist.WorkTime, "The given date-time and duration do not overlap with pharmacist's work time.",
                 "Pharmacist already has an appointment defined on the given date-time.");
 
-            var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentDTO.PatientId);
-            foreach (var pa in patientsAppointments)
-            {
-                if (pa.DateTime.Date == appointmentDTO.DateTime.Date && TimeIntervalUtils.TimeIntervalTimesOverlap(
-                    pa.DateTime, pa.DateTime.AddMinutes(pa.Duration), appointmentDTO.DateTime,
-                    appointmentDTO.DateTime.AddMinutes(appointmentDTO.Duration)))
-                    throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
-            }
+            ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
 
-            _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
+            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
-            var priceList = _pharmacyPriceListService.ReadForPharmacy(appointmentDTO.PharmacyId);
-            if (priceList == null)
-                throw new MissingEntityException("Price list not found for the given pharmacy.");
-
-            var price = appointmentDTO.Price ?? priceList.ExaminationPrice;
+            var price = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
@@ -367,6 +362,28 @@ namespace Farmacio_Services.Implementation
             base.Delete(appointment.Id);
 
             return appointment;
+        }
+
+        public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment)
+        {
+            var medicalAccount = _accountService.ReadByUserId(appointment.MedicalStaffId);
+            if (medicalAccount.Role == Role.Dermatologist)
+                return CreateDermatologistAppointment(appointment);
+            else if (medicalAccount.Role == Role.Pharmacist)
+                return CreatePharmacistAppointment(appointment);
+            return new Appointment();
+        }
+
+        private void ValidateTimeForPatient(Guid patientId, DateTime dateTime, int duration)
+        {
+            var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == patientId);
+            foreach (var pa in patientsAppointments)
+            {
+                if (pa.DateTime.Date == dateTime.Date && TimeIntervalUtils.TimeIntervalTimesOverlap(
+                    pa.DateTime, pa.DateTime.AddMinutes(pa.Duration), dateTime,
+                    dateTime.AddMinutes(duration)))
+                    throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
+            }
         }
     }
 }
