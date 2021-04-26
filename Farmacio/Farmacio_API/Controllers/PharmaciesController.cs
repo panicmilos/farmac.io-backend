@@ -26,12 +26,14 @@ namespace Farmacio_API.Controllers
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IMedicineService _medicineService;
+        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IMapper _mapper;
 
         public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
             , IDermatologistService dermatologistService, IAppointmentService appointmentService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IPharmacyStockService pharmacyStockService
+            , IPharmacyPriceListService pharmacyPriceListService
             , IMedicineService medicineService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
@@ -42,6 +44,7 @@ namespace Farmacio_API.Controllers
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _pharmacyStockService = pharmacyStockService;
             _medicineService = medicineService;
+            _pharmacyPriceListService = pharmacyPriceListService;
         }
 
         /// <summary>
@@ -297,6 +300,37 @@ namespace Farmacio_API.Controllers
         public IEnumerable<SmallPharmacyDTO> SearchPharmacies([FromQuery] PharmacySearchParams searchParams)
         {
             return _pharmacyService.ReadBy(searchParams);
+        }
+
+        /// <summary>
+        /// Returns pharmacies that have available pharmacists in chosen time.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacies.</response>
+        [HttpGet("available")]
+        public IActionResult SearchAvailableForConsultations([FromQuery] SearhSortParamsForAppointments searchParams)
+        {
+            var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
+            return Ok(_pharmacyService.GetPharmaciesOfPharmacists(pharmacists.ToList(), searchParams));
+            
+        }
+
+
+        /// <summary>
+        /// Returns available pharmacist from pharmacy.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacists.</response>
+        [HttpGet("available/{pharmacyId}/pharmacists")]
+        public IActionResult GetFreePharmacist(Guid pharmacyId, [FromQuery] SearhSortParamsForAppointments searchParams)
+        {
+            _pharmacyService.TryToRead(pharmacyId);
+
+            var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams).Where(pharmacistAccount =>
+            {
+                var pharmacist = pharmacistAccount.User as Pharmacist;
+                return pharmacist.PharmacyId == pharmacyId;
+            }).Select(pharmacistAccount => (Pharmacist)pharmacistAccount.User);
+
+            return Ok(_pharmacistService.SortByGrade(pharmacists.ToList(), searchParams));
         }
     }
 }

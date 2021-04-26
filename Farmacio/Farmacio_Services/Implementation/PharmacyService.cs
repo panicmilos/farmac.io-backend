@@ -137,6 +137,13 @@ namespace Farmacio_Services.Implementation
                 });
             }
 
+            
+
+            return SortSmallPharmacyDTO(pharmacies, sortCriteria, isAscending);
+        }
+
+        private IEnumerable<SmallPharmacyDTO> SortSmallPharmacyDTO(IEnumerable<SmallPharmacyDTO> pharmacies, string sortCriteria, bool isAscending)
+        {
             var sortingCriteria = new Dictionary<string, Func<SmallPharmacyDTO, object>>()
             {
                 { "name", p => p.Name },
@@ -150,6 +157,59 @@ namespace Farmacio_Services.Implementation
             }
 
             return pharmacies;
+        }
+
+        public IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(IList<Account> pharmacists, SearhSortParamsForAppointments searchParams)
+        {
+            var pharmacies = new List<PharmacyDTO>();
+            foreach (var pharmacistAccount in pharmacists)
+
+            {
+                var pharmacist = (Pharmacist)pharmacistAccount.User;
+                if (pharmacies.Where(pharmacy => pharmacy.Id == pharmacist.PharmacyId).FirstOrDefault() == null)
+                {
+                    pharmacies.Add(new PharmacyDTO
+                    {
+                        Name = pharmacist.Pharmacy.Name,
+                        Id = pharmacist.Pharmacy.Id,
+                        Address = pharmacist.Pharmacy.Address,
+                        AverageGrade = pharmacist.Pharmacy.AverageGrade,
+                        Description = pharmacist.Pharmacy.Description,
+                        ConsultationPrice = _pharmacyPriceListService.ReadForPharmacy(pharmacist.PharmacyId).ConsultationPrice
+                    });
+                }
+            }
+
+            string sortCriteria = searchParams.SortCriteria;
+            bool isAscending = searchParams.IsAsc;
+
+            return SortPharmacyDTO(pharmacies, sortCriteria, isAscending);
+        }
+
+        private IEnumerable<PharmacyDTO> SortPharmacyDTO(IEnumerable<PharmacyDTO> pharmacies, string sortCriteria, bool isAscending)
+        {
+            var sortingCriteria = new Dictionary<string, Func<PharmacyDTO, object>>()
+            {
+                { "price", p => p.ConsultationPrice },
+                { "grade", p => p.AverageGrade }
+            };
+
+
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
+            {
+                pharmacies = isAscending ? pharmacies.OrderBy(sortingCriterion).ToList() : pharmacies.OrderByDescending(sortingCriterion).ToList();
+            }
+
+            return pharmacies;
+        }
+
+        public float GetPriceOfPharmacistConsultation(Guid pharmacyId)
+        {
+            TryToRead(pharmacyId);
+            var priceList = _pharmacyPriceListService.ReadForPharmacy(pharmacyId);
+            if (priceList == null)
+                throw new MissingEntityException("Price list not found for the given pharmacy.");
+            return priceList.ConsultationPrice;
         }
     }
 }

@@ -3,14 +3,16 @@ using System;
 using Farmacio_Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Farmacio_API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210420212214_Added pharmacy orders")]
+    partial class Addedpharmacyorders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -910,40 +912,6 @@ namespace Farmacio_API.Migrations
                     b.ToTable("SupplierMedicines");
                 });
 
-            modelBuilder.Entity("Farmacio_Models.Domain.SupplierOffer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DeliveryDeadline")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("PharmacyOrderId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SupplierId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<float>("TotalPrice")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PharmacyOrderId");
-
-                    b.ToTable("SupplierOffers");
-                });
-
             modelBuilder.Entity("Farmacio_Models.Domain.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1345,15 +1313,6 @@ namespace Farmacio_API.Migrations
                     b.HasOne("Farmacio_Models.Domain.Medicine", "Medicine")
                         .WithMany()
                         .HasForeignKey("MedicineId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.SupplierOffer", b =>
-                {
-                    b.HasOne("Farmacio_Models.Domain.PharmacyOrder", "PharmacyOrder")
-                        .WithMany()
-                        .HasForeignKey("PharmacyOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

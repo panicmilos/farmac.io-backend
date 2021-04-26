@@ -114,7 +114,6 @@ namespace Farmacio_API.Controllers
         [HttpPost("add-allergies")]
         public IActionResult CreateAllergies(PatientAllergyDTO request)
         {
-            var pharmacy = _mapper.Map<PatientAllergyDTO>(request);
             return Ok(_patientAllergyService.CreateAllergies(request));
         }
 

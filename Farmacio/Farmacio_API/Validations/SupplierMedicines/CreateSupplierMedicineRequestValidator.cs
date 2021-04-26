@@ -7,9 +7,9 @@ namespace Farmacio_API.Validations.SupplierMedicines
     {
         public CreateSupplierMedicineRequestValidator()
         {
-            RuleFor(request => request.SupplierId).NotNull().WithMessage("SupplierId must be provided.");
+            RuleFor(request => request.SupplierId).NotNull().WithMessage("Supplier Id must be provided.");
 
-            RuleFor(request => request.MedicineId).NotNull().WithMessage("MedicineId must be provided.");
+            RuleFor(request => request.MedicineId).NotNull().WithMessage("Medicine Id must be provided.");
 
             RuleFor(request => request.Quantity).GreaterThanOrEqualTo(0).WithMessage("Quantity must be positive number.");
         }

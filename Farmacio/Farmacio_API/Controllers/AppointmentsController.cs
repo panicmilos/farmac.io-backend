@@ -17,11 +17,13 @@ namespace Farmacio_API.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
+        private readonly IPharmacyService _pharmacyService;
         private readonly IMapper _mapper;
 
-        public AppointmentsController(IAppointmentService appointmentService, IMapper mapper)
+        public AppointmentsController(IAppointmentService appointmentService, IPharmacyService pharmacyService, IMapper mapper)
         {
             _appointmentService = appointmentService;
+            _pharmacyService = pharmacyService;
             _mapper = mapper;
         }
 
@@ -188,6 +190,49 @@ namespace Farmacio_API.Controllers
             var appointment = _mapper.Map<CreateAppointmentDTO>(request);
             _appointmentService.CreatePharmacistAppointment(appointment);
             return Ok(appointment);
+        }
+
+
+        /// <summary>
+        /// Returns appointments with pharmacists in future.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        /// <response code="404">Given patient does not exist in the system.</response>
+        [HttpGet("future-with-pharmacists/{patientId}")]
+        public IActionResult GetFutureAppointmentsWithPharmacists(Guid patientId)
+        {
+            return Ok(_appointmentService.ReadFuturePharmacistsAppointmentsFor(patientId));
+        }
+
+        /// <summary>
+        /// Creates a new appointment in the system.
+        /// </summary>
+        /// <response code="200">Created appointment.</response>
+        /// <response code="400">Invalid date-time and duration.</response>
+        /// <response code="404">Something not found.</response>
+        [HttpPost("pharmacist/as-user")]
+        public IActionResult CreatePharmacistAppointmenAsUser(CreateAppointmentRequest request)
+        {
+            var appointment = _mapper.Map<CreateAppointmentDTO>(request);
+
+            _pharmacyService.TryToRead(appointment.PharmacyId);
+            appointment.Price = _pharmacyService.GetPriceOfPharmacistConsultation(appointment.PharmacyId);
+            _appointmentService.CreatePharmacistAppointment(appointment);
+            
+            return Ok(appointment);
+        }
+
+
+        /// <summary>
+        /// Cancel appointment with pharmacist.
+        /// </summary>
+        /// <response code="200">Returns canceled appointment.</response>
+        /// <response code="400">Unable to cancel appointment in the past or that starts in less than 24 hours or that is not reserved.</response>
+        /// <response code="404">Given appointment does not exist in the system.</response>
+        [HttpDelete("pharmacist/{appointmentId}")]
+        public IActionResult CancelAppointmentWithPharmacist(Guid appointmentId)
+        {
+            return Ok(_appointmentService.CancelAppointmentWithPharmacist(appointmentId));
         }
     }
 }
