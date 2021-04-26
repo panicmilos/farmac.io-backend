@@ -73,5 +73,15 @@ namespace Farmacio_Services.Implementation
                 name == null ||
                 $"{p.FirstName.ToLower()} {p.LastName.ToLower()}".Contains(name.ToLower()));
         }
+
+        public Account UpdateGrade(MedicalStaff medicalStaff)
+        {
+            var staffAccount = ReadByUserId(medicalStaff.Id);
+            var staffUser = staffAccount.User as MedicalStaff;
+            staffUser.NumberOfGrades = medicalStaff.NumberOfGrades;
+            staffUser.AverageGrade = medicalStaff.AverageGrade;
+            staffAccount.User = staffUser;
+            return base.Update(staffAccount);
+        }
     }
 }

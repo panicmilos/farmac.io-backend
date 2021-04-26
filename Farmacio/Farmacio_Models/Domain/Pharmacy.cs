@@ -9,6 +9,7 @@ namespace Farmacio_Models.Domain
         public virtual Address Address { get; set; }
         public string Description { get; set; }
         public int AverageGrade { get; set; }
+        public int NumberOfGrades { get; set; }
     }
 
     public class PharmacyMedicine : BaseEntity

@@ -43,6 +43,7 @@ namespace Farmacio_Services.Implementation
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
+            //_medicalStaffService = medicalStaffService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
@@ -337,6 +338,13 @@ namespace Farmacio_Services.Implementation
             base.Delete(appointment.Id);
 
             return appointment;
+        }
+
+        public bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistAccountId)
+        {
+            var patient = _patientService.TryToRead(patientId);
+            return ReadForMedicalStaff(dermatologistAccountId).Where(appointment => appointment.IsReserved
+                             && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now).Count() != 0;
         }
     }
 }

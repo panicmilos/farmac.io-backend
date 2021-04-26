@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using Farmacio_API.Contracts.Responses.Dermatologists;
 using Farmacio_Models.DTO;
+using Farmacio_API.Contracts.Requests.Grades;
 
 namespace Farmacio_API.Controllers
 {
@@ -17,13 +18,16 @@ namespace Farmacio_API.Controllers
     {
         private readonly IDermatologistService _dermatologistService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
+        private readonly IMedicalStaffGradeService _medicalStaffGradeService;
         private readonly IMapper _mapper;
 
         public DermatologistsController(IDermatologistService dermatologistService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
+            , IMedicalStaffGradeService medicalStaffGradeService
             , IMapper mapper)
         {
             _dermatologistService = dermatologistService;
+            _medicalStaffGradeService = medicalStaffGradeService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _mapper = mapper;
         }
@@ -149,6 +153,51 @@ namespace Farmacio_API.Controllers
             var deletedDermatologist = _dermatologistService.Delete(id);
 
             return Ok(deletedDermatologist);
+        }
+
+
+        /// <summary>
+        /// Rate the dermatologist.
+        /// </summary>
+        /// <response code="200">Returns grade.</response>
+        /// <response code="400">Patient cannot the rate dermatologist or already has rated.</response>
+        /// <response code="404">Given patients or dermatologist does not exist in the system.</response>
+        [HttpPost("rate")]
+        public IActionResult RateTheDermatologist(CreateDermatologistGradeRequest request)
+        {
+            var dermatologistGrade = _mapper.Map<MedicalStaffGrade>(request);
+            return Ok(_dermatologistService.GradeDermatologist(dermatologistGrade));
+        }
+
+
+        /// <summary>
+        /// Reads an existing dermatologist in the system that patietn can rate.
+        /// </summary>
+        /// <response code="200">Read dermatologist.</response>
+        [HttpGet("{patientId}/can-rate")]
+        public IActionResult GetDermatologistToRate(Guid patientId)
+        {
+            return Ok(_dermatologistService.ReadThatPatientCanRate(patientId));
+        }
+
+        /// <summary>
+        /// Reads an existing dermatologist in the system that patietn rated.
+        /// </summary>
+        /// <response code="200">Read dermatologist.</response>
+        [HttpGet("{patientId}/rated")]
+        public IActionResult GetRatedDermatologist(Guid patientId)
+        {
+            return Ok(_dermatologistService.ReadThatPatientRated(patientId));
+        }
+
+        /// <summary>
+        /// Return dermatologist's grade.
+        /// </summary>
+        /// <response code="200">Read grade.</response>
+        [HttpGet("{dermatologistId}/grade/{patientId}")]
+        public IActionResult GetDermatologistGrade(Guid dermatologistId, Guid patientId)
+        {
+            return Ok(_medicalStaffGradeService.Read(patientId, dermatologistId));
         }
     }
 }

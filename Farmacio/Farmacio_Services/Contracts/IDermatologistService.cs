@@ -16,5 +16,8 @@ namespace Farmacio_Services.Contracts
         Account AddToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime);
 
         Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistId);
+        Grade GradeDermatologist(MedicalStaffGrade grade);
+        IEnumerable<Account> ReadThatPatientCanRate(Guid patientId);
+        IEnumerable<Account> ReadThatPatientRated(Guid patientId);
     }
 }
