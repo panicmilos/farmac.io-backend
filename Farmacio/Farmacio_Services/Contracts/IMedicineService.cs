@@ -17,10 +17,10 @@ namespace Farmacio_Services.Contracts
 
         IEnumerable<string> ReadMedicineNames(Guid pharmacyId);
 
-        IEnumerable<MedicineInPharmacyDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name);
+        IEnumerable<CheckMedicineDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name);
 
         IEnumerable<SmallMedicineDTO> ReadBy(MedicineSearchParams searchParams);
 
-        IEnumerable<String> ReadTypes();
+        IEnumerable<string> ReadMedicineTypes();
     }
 }

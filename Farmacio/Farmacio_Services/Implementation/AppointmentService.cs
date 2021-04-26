@@ -23,6 +23,7 @@ namespace Farmacio_Services.Implementation
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
+        private readonly IERecipeService _eRecipeService;
 
 
         public AppointmentService(IRepository<Appointment> repository
@@ -32,7 +33,8 @@ namespace Farmacio_Services.Implementation
             , IPatientService patientService
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
-            , IReportService reportService) : base(repository)
+            , IReportService reportService
+            , IERecipeService eRecipeService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -43,6 +45,7 @@ namespace Farmacio_Services.Implementation
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
+            _eRecipeService = eRecipeService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
@@ -197,7 +200,7 @@ namespace Farmacio_Services.Implementation
             return Read().ToList().Where(appointment => 
                 appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Dermatologist);
         }
-        
+
         public Report CreateReport(CreateReportDTO reportDTO)
         {
             var appointment = base.TryToRead(reportDTO.AppointmentId);
@@ -209,12 +212,35 @@ namespace Farmacio_Services.Implementation
             {
                 Notes = reportDTO.Notes,
                 TherapyDurationInDays = reportDTO.TherapyDurationInDays,
-                ERecipe = new ERecipe
-                {
-                    PatientId = appointment.PatientId.Value
-                    //TODO
-                }
             };
+            if (reportDTO.PrescribedMedicines.Count == 0)
+            {
+                report = _reportService.Create(report);
+                appointment.ReportId = report.Id;
+                base.Update(appointment);
+                return report;
+            }
+            ERecipe recipe = new ERecipe
+            {
+                IssuingDate = DateTime.Now,
+                PatientId = appointment.PatientId.Value,
+                Medicines = new List<ERecipeMedicine>()
+            };
+            foreach (var prescribedMedicine in reportDTO.PrescribedMedicines)
+            {
+                var medicineInPharmacy = _pharmacyService.ReadMedicine(appointment.PharmacyId, prescribedMedicine.MedicineId);
+                if (medicineInPharmacy.InStock < prescribedMedicine.Quantity)
+                    throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
+                recipe.Medicines.Add(new ERecipeMedicine
+                {
+                    MedicineId = prescribedMedicine.MedicineId,
+                    Quantity = prescribedMedicine.Quantity
+                });
+            }
+            foreach (var prescribed in reportDTO.PrescribedMedicines)
+                _pharmacyService.ChangeStockFor(appointment.PharmacyId, prescribed.MedicineId, prescribed.Quantity * -1);
+            recipe = _eRecipeService.Create(recipe);
+            report.ERecipeId = recipe.Id;
             report = _reportService.Create(report);
             appointment.ReportId = report.Id;
             base.Update(appointment);
@@ -223,7 +249,9 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadReservedButUnreportedForMedicalStaff(Guid medicalStaffId)
         {
-            return ReadForMedicalStaff(medicalStaffId).Where(appointment => appointment.IsReserved && appointment.ReportId == null).ToList();
+            return ReadForMedicalStaff(medicalStaffId).Where(appointment => appointment.IsReserved
+                                                                && appointment.ReportId == null
+                                                                && appointment.PatientId != null).ToList();
         }
 
         public Report NotePatientDidNotShowUp(CreateReportDTO reportDTO)
@@ -250,9 +278,11 @@ namespace Farmacio_Services.Implementation
 
             var pharmacist = (Pharmacist)medicalAccount.User;
 
+            if (pharmacist.PharmacyId != appointmentDTO.PharmacyId)
+                throw new BadLogicException("Pharmacist must work in that pharmacy.");
+                
             ValidateAppointmentDateTime(appointmentDTO, pharmacist.WorkTime, "The given date-time and duration do not overlap with pharmacist's work time.",
                 "Pharmacist already has an appointment defined on the given date-time.");
-
 
             var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == appointmentDTO.PatientId);
             foreach (var pa in patientsAppointments)
