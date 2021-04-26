@@ -51,7 +51,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("types")]
         public IEnumerable<string> GetMedicineTypes()
         {
-            return _medicineService.ReadTypes();
+            return _medicineService.ReadMedicineTypes();
         }
 
         /// <summary>
@@ -179,10 +179,10 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns medicines.</response>
         [HttpGet("in-pharmacy/{pharmacyId}/search")]
-        public IActionResult ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name, Guid patientId)
+        public IActionResult ReadMedicinesOrReplacementsByName(Guid pharmacyId, Guid patientId, string name)
         {
             var medicineDTOs = _medicineService.ReadMedicinesOrReplacementsByName(pharmacyId, name);
-            medicineDTOs = _patientAllergyService.CheckIfAllegric(medicineDTOs, patientId);
+            medicineDTOs = _patientAllergyService.ForEachMedicineInListCheckIfPatientHasAnAllergyToIt(medicineDTOs, patientId);
             return Ok(medicineDTOs);
         }
     }

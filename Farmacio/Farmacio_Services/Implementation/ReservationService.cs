@@ -84,7 +84,7 @@ namespace Farmacio_Services.Implementation
                 reservedMedicine.Price = medicineInPharmacy.Price;
             }
             foreach (var reservedMedicine in reservation.Medicines)
-                _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity * -1);
+                _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, -reservedMedicine.Quantity);
 
             var createdReservation = base.Create(reservation);
             var email = _templatesProvider.FromTemplate<Email>("Reservation", new

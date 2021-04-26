@@ -197,7 +197,7 @@ namespace Farmacio_Services.Implementation
             }
             return Read().ToList().Where(appointment => appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now);
         }
-        
+
         public Report CreateReport(CreateReportDTO reportDTO)
         {
             var appointment = base.TryToRead(reportDTO.AppointmentId);
@@ -210,31 +210,34 @@ namespace Farmacio_Services.Implementation
                 Notes = reportDTO.Notes,
                 TherapyDurationInDays = reportDTO.TherapyDurationInDays,
             };
-            if (reportDTO.PrescribedMedicines.Count > 0)
+            if (reportDTO.PrescribedMedicines.Count == 0)
             {
-                ERecipe recipe = new ERecipe
-                {
-                    IssuingDate = DateTime.Now,
-                    PatientId = appointment.PatientId.Value,
-                    Medicines = new List<ERecipeMedicine>()
-                };
-                foreach (var prescribed in reportDTO.PrescribedMedicines)
-                {
-                    var medicineInPharmacy = _pharmacyService.ReadMedicine(appointment.PharmacyId, prescribed.MedicineId);
-                    if (medicineInPharmacy.InStock < prescribed.Quantity)
-                        throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
-                    recipe.Medicines.Add(new ERecipeMedicine
-                    {
-                        MedicineId = prescribed.MedicineId,
-                        Quantity = prescribed.Quantity
-                    });
-                }
-                foreach (var prescribed in reportDTO.PrescribedMedicines)
-                    _pharmacyService.ChangeStockFor(appointment.PharmacyId, prescribed.MedicineId, prescribed.Quantity * -1);
-
-                recipe = _eRecipeService.Create(recipe);
-                report.ERecipeId = recipe.Id;
+                report = _reportService.Create(report);
+                appointment.ReportId = report.Id;
+                base.Update(appointment);
+                return report;
             }
+            ERecipe recipe = new ERecipe
+            {
+                IssuingDate = DateTime.Now,
+                PatientId = appointment.PatientId.Value,
+                Medicines = new List<ERecipeMedicine>()
+            };
+            foreach (var prescribedMedicine in reportDTO.PrescribedMedicines)
+            {
+                var medicineInPharmacy = _pharmacyService.ReadMedicine(appointment.PharmacyId, prescribedMedicine.MedicineId);
+                if (medicineInPharmacy.InStock < prescribedMedicine.Quantity)
+                    throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
+                recipe.Medicines.Add(new ERecipeMedicine
+                {
+                    MedicineId = prescribedMedicine.MedicineId,
+                    Quantity = prescribedMedicine.Quantity
+                });
+            }
+            foreach (var prescribed in reportDTO.PrescribedMedicines)
+                _pharmacyService.ChangeStockFor(appointment.PharmacyId, prescribed.MedicineId, prescribed.Quantity * -1);
+            recipe = _eRecipeService.Create(recipe);
+            report.ERecipeId = recipe.Id;
             report = _reportService.Create(report);
             appointment.ReportId = report.Id;
             base.Update(appointment);

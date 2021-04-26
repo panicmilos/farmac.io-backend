@@ -139,7 +139,7 @@ namespace Farmacio_Services.Implementation
                                    .Where(m => m.AverageGrade >= gradeFrom && m.AverageGrade <= gradeTo);
         }
 
-        public IEnumerable<string> ReadTypes()
+        public IEnumerable<string> ReadMedicineTypes()
         {
             return Read().ToList().Select(m => m.Type.TypeName.ToLower()).ToHashSet();
         }
