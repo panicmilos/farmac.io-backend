@@ -22,6 +22,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadFuturePharmacistsAppointmentsFor(Guid patientId);
         IEnumerable<Account> ReadPharmacistsForAppointment(IEnumerable<Account> pharmacists, SearhSortParamsForAppointments searchParams);
         Appointment CancelAppointmentWithPharmacist(Guid appointmentId);
+        bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistUserId);
         Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment);
     }
 }

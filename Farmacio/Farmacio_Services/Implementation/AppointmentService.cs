@@ -45,6 +45,7 @@ namespace Farmacio_Services.Implementation
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
+            //_medicalStaffService = medicalStaffService;
             _eRecipeService = eRecipeService;
         }
 
@@ -364,6 +365,12 @@ namespace Farmacio_Services.Implementation
             return appointment;
         }
 
+        public bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistUserId)
+        {
+            var patient = _patientService.TryToRead(patientId);
+            return ReadForMedicalStaff(dermatologistUserId).Where(appointment => appointment.IsReserved
+                             && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now).Count() != 0;
+       }
         public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment)
         {
             var medicalAccount = _accountService.ReadByUserId(appointment.MedicalStaffId);

@@ -11,5 +11,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<PatientDTO> ReadSortedPatientsForMedicalStaff(Guid medicalId, string crit, bool isAsc);
         IEnumerable<PatientDTO> SearchPatientsForMedicalStaff(Guid medicalId, string name);
         public IEnumerable<Account> ReadBy(MedicalStaffFilterParamsDTO filterParams);
+        public Account UpdateGrade(MedicalStaff medicalStaff);
     }
 }

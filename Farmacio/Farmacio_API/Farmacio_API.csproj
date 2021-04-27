@@ -38,6 +38,5 @@
 
   <ItemGroup>
     <Folder Include="Contracts\Responses\Followings\" />
-    <Folder Include="Migrations" />
   </ItemGroup>
 </Project>
