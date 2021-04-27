@@ -166,6 +166,16 @@ namespace Farmacio_API.Controllers
             return Ok(_supplierOfferService.ReadForPharmacyOrder(pharmacyOrderId));
         }
         
+        /// <summary>
+        /// Accepts an existing supplier offer for a pharmacy order.
+        /// </summary>
+        /// <response code="200">Accepted supplier offer.</response>
+        [HttpPost("offers/{offerId}")]
+        public IActionResult AcceptSupplierOffer(Guid offerId)
+        {
+            return Ok(_supplierOfferService.AcceptOffer(offerId));
+        }
+        
          /// <summary>
         /// Creates a new supplier's offer for pharmacy order in the system.
         /// </summary>
