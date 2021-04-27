@@ -5,13 +5,17 @@ using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
+using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
     public class PharmacyStockService : CrudService<PharmacyMedicine>, IPharmacyStockService
     {
-        public PharmacyStockService(IRepository<PharmacyMedicine> repository) : base(repository)
+        private readonly IPharmacyPriceListService _pharmacyPriceListService;
+        public PharmacyStockService(IPharmacyPriceListService pharmacyPriceListService
+            , IRepository<PharmacyMedicine> repository) : base(repository)
         {
+            _pharmacyPriceListService = pharmacyPriceListService;
         }
 
         public PharmacyMedicine ReadForPharmacy(Guid pharmacyId, Guid medicineId)
@@ -39,6 +43,9 @@ namespace Farmacio_Services.Implementation
         {
             if (ReadForPharmacy(pharmacyMedicine.PharmacyId, pharmacyMedicine.MedicineId) != null)
                 throw new PharmacyMedicineAlreadyExistsException("Pharmacy medicine already exists.");
+            if(!_pharmacyPriceListService.TryToReadFor(pharmacyMedicine.PharmacyId).MedicinePriceList.Exists(
+                medicinePrice => medicinePrice.MedicineId == pharmacyMedicine.MedicineId))
+                throw new MissingEntityException("Medicine is not defined in pharmacy price list.");
             return base.Create(pharmacyMedicine);
         }
     }

@@ -14,16 +14,18 @@ namespace Farmacio_Services.Implementation
         private readonly IMedicineReplacementService _replacementService;
         private readonly IMedicineIngredientService _ingredientService;
         private readonly IPharmacyPriceListService _pharmacyPriceListService;
+        private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IPharmacyService _pharmacyService;
 
         public MedicineService(IMedicineReplacementService replacementService, IMedicineIngredientService ingredientService,
-            IPharmacyPriceListService pharmacyPriceListService, IPharmacyService pharmacyService,
+            IPharmacyPriceListService pharmacyPriceListService, IPharmacyService pharmacyService, IPharmacyStockService pharmacyStockService,
             IRepository<Medicine> repository) :
             base(repository)
         {
             _replacementService = replacementService;
             _ingredientService = ingredientService;
             _pharmacyPriceListService = pharmacyPriceListService;
+            _pharmacyStockService = pharmacyStockService;
             _pharmacyService = pharmacyService;
         }
 
@@ -151,14 +153,13 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<string> ReadMedicineNames(Guid pharmacyId)
         {
-            return _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
-                .MedicinePriceList.Select(mp => mp.Medicine.Name);
+            return _pharmacyStockService.ReadForPharmacy(pharmacyId)?.Select(mp => mp.Medicine.Name);
         }
 
         public IEnumerable<CheckMedicineDTO> ReadMedicinesOrReplacementsByName(Guid pharmacyId, string name)
         {
-            var medicines = _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
-                .MedicinePriceList.Select(mp => mp.Medicine).Where(m => m.Name == name)
+            var medicines = _pharmacyStockService.ReadForPharmacy(pharmacyId)?
+                .Select(mp => mp.Medicine).Where(m => m.Name == name)
                 .Select(m => _pharmacyService.ReadMedicine(pharmacyId, m.Id));
 
             List<MedicineInPharmacyDTO> replacements = new List<MedicineInPharmacyDTO>();
