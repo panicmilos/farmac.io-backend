@@ -31,6 +31,11 @@ namespace Farmacio_Services.Implementation
             return Read().Where(offer => offer.SupplierId == supplierId).ToList();
         }
 
+        public IEnumerable<SupplierOffer> ReadForPharmacyOrder(Guid pharmacyOrderId)
+        {
+            return Read().Where(offer => offer.PharmacyOrderId == pharmacyOrderId).ToList();
+        }
+
         public SupplierOffer ReadOfferFor(Guid supplierId, Guid offerId)
         {
             return Read().FirstOrDefault(offer => offer.PharmacyOrderId == offerId && offer.SupplierId == supplierId);

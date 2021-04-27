@@ -156,6 +156,16 @@ namespace Farmacio_API.Controllers
             return Ok(_supplierOfferService.ReadFor(supplierId));
         }
         
+        /// <summary>
+        /// Returns all supplier's offers for a pharmacy order.
+        /// </summary>
+        /// <response code="200">Returns list of supplier's offers for a pharmacy order.</response>
+        [HttpGet("offers/pharmacy-order/{pharmacyOrderId}")]
+        public IActionResult GetSuppliersOffersForPharmacyOrder(Guid pharmacyOrderId)
+        {
+            return Ok(_supplierOfferService.ReadForPharmacyOrder(pharmacyOrderId));
+        }
+        
          /// <summary>
         /// Creates a new supplier's offer for pharmacy order in the system.
         /// </summary>
