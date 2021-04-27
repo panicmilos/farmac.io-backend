@@ -17,5 +17,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<SmallPharmacyDTO> ReadBy(PharmacySearchParams searchParams);
         IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(IList<Account> pharmacists, SearhSortParamsForAppointments searchParams);
         float GetPriceOfPharmacistConsultation(Guid pharmacyId);
+        float GetPriceOfDermatologistExamination(Guid pharmacyId);
     }
 }

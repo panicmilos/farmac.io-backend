@@ -2,7 +2,6 @@
 using Farmacio_Models.DTO;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Farmacio_Services.Contracts
 {
@@ -10,5 +9,6 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<PatientAllergy> CreateAllergies(PatientAllergyDTO request);
         IEnumerable<SmallMedicineDTO> GetPatientsAllergies(Guid patientId);
+        IEnumerable<CheckMedicineDTO> ForEachMedicineInListCheckIfPatientHasAnAllergyToIt(IEnumerable<CheckMedicineDTO> medicineDTOs, Guid patientId);
     }
 }

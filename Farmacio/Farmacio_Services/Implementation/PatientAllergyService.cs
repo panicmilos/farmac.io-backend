@@ -6,7 +6,6 @@ using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Farmacio_Services.Implementation
 {
@@ -20,6 +19,16 @@ namespace Farmacio_Services.Implementation
         {
             _medicineService = medicineService;
             _patientService = patientService;
+        }
+
+        public IEnumerable<CheckMedicineDTO> ForEachMedicineInListCheckIfPatientHasAnAllergyToIt(IEnumerable<CheckMedicineDTO> medicineDTOs, Guid patientId)
+        {
+            var account = _patientService.ReadByUserId(patientId);
+            _patientService.TryToRead(account.Id);
+            var allergies = GetPatientsAllergies(account.Id).Select(m => m.Id);
+            foreach (var medicineDTO in medicineDTOs)
+                medicineDTO.IsAllergy = allergies.Contains(medicineDTO.MedicineId);
+            return medicineDTOs;
         }
 
         public IEnumerable<PatientAllergy> CreateAllergies(PatientAllergyDTO request)
