@@ -160,8 +160,8 @@ namespace Farmacio_API.Controllers
         /// Rate the dermatologist.
         /// </summary>
         /// <response code="200">Returns grade.</response>
-        /// <response code="400">Patient cannot the rate dermatologist or already has rated.</response>
-        /// <response code="404">Given patients or dermatologist does not exist in the system.</response>
+        /// <response code="400">Patient cannot rate the dermatologist or already has rated.</response>
+        /// <response code="404">Given patient or dermatologist does not exist in the system.</response>
         [HttpPost("rate")]
         public IActionResult RateTheDermatologist(CreateDermatologistGradeRequest request)
         {
@@ -173,7 +173,7 @@ namespace Farmacio_API.Controllers
         /// <summary>
         /// Reads an existing dermatologist in the system that patietn can rate.
         /// </summary>
-        /// <response code="200">Read dermatologist.</response>
+        /// <response code="200">Read dermatologists.</response>
         [HttpGet("{patientId}/can-rate")]
         public IActionResult GetDermatologistToRate(Guid patientId)
         {
@@ -181,7 +181,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Reads an existing dermatologist in the system that patietn rated.
+        /// Reads an existing dermatologists in the system that patient rated.
         /// </summary>
         /// <response code="200">Read dermatologist.</response>
         [HttpGet("{patientId}/rated")]

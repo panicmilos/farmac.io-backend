@@ -340,10 +340,10 @@ namespace Farmacio_Services.Implementation
             return appointment;
         }
 
-        public bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistAccountId)
+        public bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistUserId)
         {
             var patient = _patientService.TryToRead(patientId);
-            return ReadForMedicalStaff(dermatologistAccountId).Where(appointment => appointment.IsReserved
+            return ReadForMedicalStaff(dermatologistUserId).Where(appointment => appointment.IsReserved
                              && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now).Count() != 0;
         }
     }
