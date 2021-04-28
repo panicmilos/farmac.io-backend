@@ -65,18 +65,7 @@ namespace Farmacio_Services.Implementation
             ReadForPharmacyOrder(offer.PharmacyOrderId)
                 .Where(readOffer => readOffer.Id != offerId)
                 .ToList()
-                .ForEach(otherOffer =>
-                {
-                    otherOffer.PharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
-                    {
-                        var supplierMedicine =
-                            _supplierStockService.ReadMedicineFor(offer.SupplierId, orderedMedicine.MedicineId);
-                        supplierMedicine.Quantity += orderedMedicine.Quantity;
-                        _supplierStockService.Update(supplierMedicine);
-                    });
-                    otherOffer.Status = OfferStatus.Refused;
-                    Update(otherOffer);
-                });
+                .ForEach(RefuseOffer);
             
             order.OrderedMedicines.ForEach(orderedMedicine =>
             {
@@ -98,6 +87,19 @@ namespace Farmacio_Services.Implementation
             _emailDispatcher.Dispatch(offerAcceptedEmail);
             
             return updatedOffer;
+        }
+
+        private void RefuseOffer(SupplierOffer otherOffer)
+        {
+            otherOffer.PharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
+            {
+                var supplierMedicine =
+                    _supplierStockService.ReadMedicineFor(otherOffer.SupplierId, orderedMedicine.MedicineId);
+                supplierMedicine.Quantity += orderedMedicine.Quantity;
+                _supplierStockService.Update(supplierMedicine);
+            });
+            otherOffer.Status = OfferStatus.Refused;
+            Update(otherOffer);
         }
 
         public override SupplierOffer Create(SupplierOffer offer)
