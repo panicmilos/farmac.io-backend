@@ -47,6 +47,26 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns existing complaint from the system specified by id.
+        /// </summary>
+        /// <response code="200">Return complaint.</response>
+        [HttpGet("{id}")]
+        public IActionResult ReadComplaint(Guid id)
+        {
+            return Ok(_complaintService.TryToRead(id));
+        }
+
+        /// <summary>
+        /// Returns all existing complaints from the system writen by given writerId.
+        /// </summary>
+        /// <response code="200">Returns list of complaints.</response>
+        [HttpGet("by/{writerId}")]
+        public IActionResult ReadComplaintsBy(Guid writerId)
+        {
+            return Ok(_complaintService.ReadBy(writerId));
+        }
+
+        /// <summary>
         /// Returns all dermatologists from the system that given patient can complaint about.
         /// </summary>
         /// <response code="200">Returns list of dermatologists.</response>
