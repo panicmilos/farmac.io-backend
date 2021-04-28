@@ -5,6 +5,8 @@ using Farmacio_Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EmailService.Constracts;
+using EmailService.Models;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
@@ -14,6 +16,8 @@ namespace Farmacio_Services.Implementation
         private readonly ISupplierService _supplierService;
         private readonly ISupplierStockService _supplierStockService;
         private readonly IPharmacyStockService _pharmacyStockService;
+        private readonly IEmailDispatcher _emailDispatcher;
+        private readonly ITemplatesProvider _templatesProvider;
         private readonly ICrudService<PharmacyOrder> _pharmacyOrderService;
 
         public SupplierOfferService(
@@ -21,6 +25,8 @@ namespace Farmacio_Services.Implementation
             ICrudService<PharmacyOrder> pharmacyOrderService,
             ISupplierStockService supplierStockService,
             IPharmacyStockService pharmacyStockService,
+            ITemplatesProvider templatesProvider,
+            IEmailDispatcher emailDispatcher,
             IRepository<SupplierOffer> repository) :
             base(repository)
         {
@@ -28,6 +34,8 @@ namespace Farmacio_Services.Implementation
             _supplierStockService = supplierStockService;
             _pharmacyOrderService = pharmacyOrderService;
             _pharmacyStockService = pharmacyStockService;
+            _emailDispatcher = emailDispatcher;
+            _templatesProvider = templatesProvider;
         }
 
         public IEnumerable<SupplierOffer> ReadFor(Guid supplierId)
@@ -69,8 +77,6 @@ namespace Farmacio_Services.Implementation
                     otherOffer.Status = OfferStatus.Refused;
                     Update(otherOffer);
                 });
-
-            
             
             order.OrderedMedicines.ForEach(orderedMedicine =>
             {
@@ -85,6 +91,12 @@ namespace Farmacio_Services.Implementation
             var updatedOffer = Update(offer);
             order.IsProcessed = true;
             _pharmacyOrderService.Update(order);
+
+            var supplier = _supplierService.TryToRead(offer.SupplierId);
+            var offerAcceptedEmail = _templatesProvider.FromTemplate<Email>("OfferAccepted",
+                new {To = supplier.Email, Name = supplier.User.FirstName});
+            _emailDispatcher.Dispatch(offerAcceptedEmail);
+            
             return updatedOffer;
         }
 
