@@ -29,6 +29,11 @@ namespace Farmacio_Services.Implementation
             _templatesProvider = templatesProvider;
         }
 
+        public IEnumerable<Reservation> ReadFor(Guid pharmacyId)
+        {
+            return Read().Where(reservation => reservation.PharmacyId == pharmacyId).ToList();
+        }
+
         public Reservation CancelMedicineReservation(Guid reservationId)
         {
             var reservation = TryToRead(reservationId);

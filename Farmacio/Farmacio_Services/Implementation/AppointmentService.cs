@@ -380,50 +380,6 @@ namespace Farmacio_Services.Implementation
             return new Appointment();
         }
 
-        public IEnumerable<PharmacyReportRecordDTO> GenerateExaminationsReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
-        {
-            var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
-            var appointmentsForPharmacyInTimePeriod = ReadForDermatologistsInPharmacy(pharmacyId)
-                .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To)
-                .ToList();
-
-            // Fill empty days or months
-            (isPeriodLongerThanAMonth ? EachMonth(timePeriod) : EachDay(timePeriod)).ToList()
-                .ForEach(dateTime =>
-                {
-                    if (appointmentsForPharmacyInTimePeriod.FirstOrDefault(appointment =>
-                        isPeriodLongerThanAMonth
-                            ? appointment.DateTime.Month == dateTime.Month
-                            : appointment.DateTime.Day == dateTime.Day) == null)
-                        appointmentsForPharmacyInTimePeriod.Add(new Appointment
-                        {
-                            IsReserved = false,
-                            DateTime = dateTime
-                        });
-                });
-            
-            return appointmentsForPharmacyInTimePeriod.OrderBy(appointment => appointment.DateTime)
-                .GroupBy(appointment => isPeriodLongerThanAMonth ? appointment.DateTime.Month : appointment.DateTime.Day)
-                .Select(group => new PharmacyReportRecordDTO
-                {
-                    Group = group.Key.ToString(),
-                    Value = group.Count(appointment => appointment.IsReserved)
-                })
-                .ToList();
-        }
-        
-        private static IEnumerable<DateTime> EachDay(TimePeriodDTO timePeriod)
-        {
-            for(var day = timePeriod.From.Date; day.Date <= timePeriod.To.Date; day = day.AddDays(1))
-                yield return day;
-        }
-        
-        private static IEnumerable<DateTime> EachMonth(TimePeriodDTO timePeriod)
-        {
-            for(var day = timePeriod.From.Date; day.Date <= timePeriod.To.Date; day = day.AddMonths(1))
-                yield return day;
-        }
-
         private void ValidateTimeForPatient(Guid patientId, DateTime dateTime, int duration)
         {
             var patientsAppointments = base.Read().Where(appointment => appointment.PatientId == patientId);
