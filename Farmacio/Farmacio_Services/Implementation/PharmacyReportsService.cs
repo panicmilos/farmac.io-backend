@@ -21,7 +21,75 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<PharmacyReportRecordDTO> GenerateExaminationsReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
         {
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
-            var appointmentsForPharmacyInTimePeriod = _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId)
+            var appointmentsForPharmacyInTimePeriod = AppointmentsForPharmacyInTimePeriod(pharmacyId, timePeriod, true);
+
+            return appointmentsForPharmacyInTimePeriod.OrderBy(appointment => appointment.DateTime)
+                .GroupBy(appointment => isPeriodLongerThanAMonth ? appointment.DateTime.Month : appointment.DateTime.Day)
+                .Select(group => new PharmacyReportRecordDTO
+                {
+                    Group = group.Key.ToString(),
+                    Value = group.Count(appointment => appointment.IsReserved)
+                })
+                .ToList();
+        }
+
+        public IEnumerable<PharmacyReportRecordDTO> GenerateMedicineConsumptionReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
+        {
+            var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
+            var doneReservationsForPharmacyInTimePeriod = DoneReservationsForPharmacyInTimePeriod(pharmacyId, timePeriod);
+
+            return doneReservationsForPharmacyInTimePeriod.OrderBy(reservation => reservation.CreatedAt)
+                .GroupBy(reservation => isPeriodLongerThanAMonth ? reservation.CreatedAt.Month : reservation.CreatedAt.Day)
+                .Select(group => new PharmacyReportRecordDTO
+                {
+                    Group = group.Key.ToString(),
+                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ? 
+                        reservation.Medicines.Sum(orderedMedicine => orderedMedicine.Quantity) : 0)
+                })
+                .ToList();
+        }
+
+        public IEnumerable<PharmacyReportRecordDTO> GeneratePharmacyIncomeReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
+        {
+            var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
+            var appointmentsForPharmacyInTimePeriod = AppointmentsForPharmacyInTimePeriod(pharmacyId, timePeriod, false);
+            var doneReservationsForPharmacyInTimePeriod = DoneReservationsForPharmacyInTimePeriod(pharmacyId, timePeriod);
+            
+            var groupedAppointmentsByDate = appointmentsForPharmacyInTimePeriod.OrderBy(appointment => appointment.DateTime)
+                .GroupBy(appointment => isPeriodLongerThanAMonth ? appointment.DateTime.Month : appointment.DateTime.Day)
+                .Select(group => new PharmacyReportRecordDTO
+                {
+                    Group = group.Key.ToString(),
+                    Value = group.Sum(appointment => appointment.Price)
+                })
+                .ToList();
+            
+            var groupedReservationsByDate = doneReservationsForPharmacyInTimePeriod.OrderBy(reservation => reservation.CreatedAt)
+                .GroupBy(reservation => isPeriodLongerThanAMonth ? reservation.CreatedAt.Month : reservation.CreatedAt.Day)
+                .Select(group => new PharmacyReportRecordDTO
+                {
+                    Group = group.Key.ToString(),
+                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ? 
+                        reservation.Medicines.Sum(orderedMedicine => orderedMedicine.Price) : 0)
+                })
+                .ToList();
+            return groupedAppointmentsByDate.Concat(groupedReservationsByDate)
+                .GroupBy(pharmacyReportRecord => pharmacyReportRecord.Group)
+                .Select(group => new PharmacyReportRecordDTO
+                {
+                    Group = group.Key,
+                    Value = group.Sum(pharmacyReportRecord => pharmacyReportRecord.Value)
+                })
+                .ToList();
+        }
+
+        private IEnumerable<Appointment> AppointmentsForPharmacyInTimePeriod(Guid pharmacyId, TimePeriodDTO timePeriod
+            , bool dermatologistsOnly)
+        {
+            var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
+            var appointmentsForPharmacyInTimePeriod = 
+                (dermatologistsOnly ? _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId)
+                    : _appointmentService.Read().Where(appointment => appointment.PharmacyId == pharmacyId))
                 .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To)
                 .ToList();
 
@@ -39,25 +107,17 @@ namespace Farmacio_Services.Implementation
                             DateTime = dateTime
                         });
                 });
-            
-            return appointmentsForPharmacyInTimePeriod.OrderBy(appointment => appointment.DateTime)
-                .GroupBy(appointment => isPeriodLongerThanAMonth ? appointment.DateTime.Month : appointment.DateTime.Day)
-                .Select(group => new PharmacyReportRecordDTO
-                {
-                    Group = group.Key.ToString(),
-                    Value = group.Count(appointment => appointment.IsReserved)
-                })
-                .ToList();
+            return appointmentsForPharmacyInTimePeriod;
         }
 
-        public IEnumerable<PharmacyReportRecordDTO> GenerateMedicineConsumptionReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
+        private IEnumerable<Reservation> DoneReservationsForPharmacyInTimePeriod(Guid pharmacyId, TimePeriodDTO timePeriod)
         {
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
             var doneReservationsForPharmacyInTimePeriod = _reservationService.ReadFor(pharmacyId)
                 .Where(reservation =>
                     reservation.CreatedAt >= timePeriod.From && reservation.CreatedAt <= timePeriod.To)
                 .ToList();
-            
+
             // Fill empty days or months
             (isPeriodLongerThanAMonth ? EachMonth(timePeriod) : EachDay(timePeriod)).ToList()
                 .ForEach(dateTime =>
@@ -72,15 +132,7 @@ namespace Farmacio_Services.Implementation
                             CreatedAt = dateTime
                         });
                 });
-            
-            return doneReservationsForPharmacyInTimePeriod.OrderBy(reservation => reservation.CreatedAt)
-                .GroupBy(reservation => isPeriodLongerThanAMonth ? reservation.CreatedAt.Month : reservation.CreatedAt.Day)
-                .Select(group => new PharmacyReportRecordDTO
-                {
-                    Group = group.Key.ToString(),
-                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ? reservation.Medicines.Count : 0)
-                })
-                .ToList();
+            return doneReservationsForPharmacyInTimePeriod;
         }
 
         private static IEnumerable<DateTime> EachDay(TimePeriodDTO timePeriod)

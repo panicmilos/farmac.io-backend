@@ -46,5 +46,16 @@ namespace Farmacio_API.Controllers
             return Ok(_pharmacyReportsService.GenerateMedicineConsumptionReportFor(pharmacyId, timePeriodDto));
         }
         
+        /// <summary>
+        /// Generates a pharmacy medicine consumption report based on the given time interval.
+        /// </summary>
+        /// <response code="200">Generated report.</response>
+        [HttpPost("pharmacy/{pharmacyId}/pharmacy-income-report")]
+        public IActionResult PharmacyIncomeReport(Guid pharmacyId, TimePeriodRequest timePeriodRequest)
+        {
+            var timePeriodDto = _mapper.Map<TimePeriodDTO>(timePeriodRequest);
+            return Ok(_pharmacyReportsService.GeneratePharmacyIncomeReportFor(pharmacyId, timePeriodDto));
+        }
+        
     }
 }

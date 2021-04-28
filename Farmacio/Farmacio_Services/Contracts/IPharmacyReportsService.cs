@@ -8,5 +8,6 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<PharmacyReportRecordDTO> GenerateExaminationsReportFor(Guid pharmacyId, TimePeriodDTO timePeriod);
         IEnumerable<PharmacyReportRecordDTO> GenerateMedicineConsumptionReportFor(Guid pharmacyId, TimePeriodDTO timePeriod);
+        IEnumerable<PharmacyReportRecordDTO> GeneratePharmacyIncomeReportFor(Guid pharmacyId, TimePeriodDTO timePeriod);
     }
 }
