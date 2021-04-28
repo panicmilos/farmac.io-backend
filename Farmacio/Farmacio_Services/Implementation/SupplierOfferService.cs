@@ -177,5 +177,15 @@ namespace Farmacio_Services.Implementation
                 _supplierStockService.Update(medicineOfSupplier);
             });
         }
+
+        public IEnumerable<SupplierOffer> ReadByStatusFor(Guid supplierId, OfferStatus? status)
+        {
+            if (status == null)
+            {
+                return ReadFor(supplierId);
+            }
+
+            return ReadFor(supplierId).Where(offer => offer.Status == status);
+        }
     }
 }
