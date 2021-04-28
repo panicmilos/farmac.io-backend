@@ -24,5 +24,7 @@ namespace Farmacio_Services.Contracts
         Appointment CancelAppointmentWithPharmacist(Guid appointmentId);
         bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistUserId);
         Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment);
+
+        IEnumerable<PharmacyReportRecordDTO> GenerateExaminationsReportFor(Guid pharmacyId, TimePeriodDTO timePeriod);
     }
 }

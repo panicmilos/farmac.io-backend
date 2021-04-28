@@ -59,8 +59,7 @@ namespace Farmacio_Services.Implementation
             return Read()
                 .ToList()
                 .Where(a => a.PharmacyId == pharmacyId &&
-                            _accountService.Read().ToList()
-                                .FirstOrDefault(acc => acc.UserId == a.MedicalStaffId)?.Role == Role.Dermatologist)
+                            _accountService.ReadByUserId(a.MedicalStaffId)?.Role == Role.Dermatologist)
                 .ToList();
         }
 
@@ -379,6 +378,23 @@ namespace Farmacio_Services.Implementation
             else if (medicalAccount.Role == Role.Pharmacist)
                 return CreatePharmacistAppointment(appointment);
             return new Appointment();
+        }
+
+        public IEnumerable<PharmacyReportRecordDTO> GenerateExaminationsReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
+        {
+            var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
+            var appointmentsForPharmacyInTimePeriod = ReadForDermatologistsInPharmacy(pharmacyId)
+                .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To)
+                .OrderBy(appointment => appointment.DateTime)
+                .ToList();
+            return appointmentsForPharmacyInTimePeriod
+                .GroupBy(appointment => isPeriodLongerThanAMonth ? appointment.DateTime.Month : appointment.DateTime.Day)
+                .Select(group => new PharmacyReportRecordDTO
+                {
+                    Group = group.Key.ToString(),
+                    Value = group.Count(appointment => appointment.IsReserved)
+                })
+                .ToList();
         }
 
         private void ValidateTimeForPatient(Guid patientId, DateTime dateTime, int duration)
