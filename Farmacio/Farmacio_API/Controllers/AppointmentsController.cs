@@ -228,5 +228,15 @@ namespace Farmacio_API.Controllers
             _appointmentService.CreateAnotherAppointmentByMedicalStaff(appointment);
             return Ok(appointment);
         }
+
+        /// <summary>
+        /// Returns medical staff's appointments for work calendar.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        [HttpGet("for-calendar/{medicalStaffId}")]
+        public IActionResult GetAppointmentsForCalendar(Guid medicalStaffId)
+        {
+            return Ok(_appointmentService.ReadAppointmentsForCalendar(medicalStaffId));
+        }
     }
 }
