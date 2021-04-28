@@ -9,5 +9,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<SupplierOffer> ReadFor(Guid supplierId);
 
         SupplierOffer ReadOfferFor(Guid supplierId, Guid offerId);
+
+        IEnumerable<SupplierOffer> ReadByStatusFor(Guid supplierId, OfferStatus? status);
     }
 }

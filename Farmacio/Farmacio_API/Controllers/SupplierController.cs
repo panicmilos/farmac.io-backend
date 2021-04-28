@@ -144,7 +144,7 @@ namespace Farmacio_API.Controllers
             var deletedMedicine = _supplierStockService.Delete(id);
 
             return Ok(deletedMedicine);
-        }  
+        }
 
         /// <summary>
         /// Returns all supplier's offers from the system.
@@ -155,8 +155,18 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_supplierOfferService.ReadFor(supplierId));
         }
-        
-         /// <summary>
+
+        /// <summary>
+        /// Returns all supplier's offers from the system filtered by given status.
+        /// </summary>
+        /// <response code="200">Returns list of supplier's offers.</response>
+        [HttpGet("{supplierId}/offers/filter")]
+        public IActionResult GetSuppliersOffersFilteredByStatus(Guid supplierId, OfferStatus? status)
+        {
+            return Ok(_supplierOfferService.ReadByStatusFor(supplierId, status));
+        }
+
+        /// <summary>
         /// Creates a new supplier's offer for pharmacy order in the system.
         /// </summary>
         /// <response code="200">Returns created supplier's offer.</response>
