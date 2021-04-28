@@ -47,7 +47,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created complaint.</response>
         /// <response code="400">Given patient didn't have an appointment with given dermatologist in the past.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
-        [HttpPost("complaints/about-dermatologist")]
+        [HttpPost("about-dermatologist")]
         public IActionResult CreateComplaintAboutDermatologist(CreateComplaintAboutDermatologistRequest request)
         {
             var complaint = _mapper.Map<ComplaintAboutDermatologist>(request);
@@ -73,7 +73,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created complaint.</response>
         /// <response code="400">Given patient didn't have an appointment with given pharmacist in the past.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
-        [HttpPost("complaints/about-pharmacists")]
+        [HttpPost("about-pharmacists")]
         public IActionResult CreateComplaintAboutPharmacists(CreateComplaintAboutPharmacistRequest request)
         {
             var complaint = _mapper.Map<ComplaintAboutPharmacist>(request);
@@ -99,7 +99,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created pharmacy.</response>
         /// <response code="400">Given patient didn't consume services of with given pharmacy in the past.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
-        [HttpPost("complaints/about-pharmacies")]
+        [HttpPost("about-pharmacies")]
         public IActionResult CreateComplaintAboutPharmacy(CreateComplaintAboutPharmacyRequest request)
         {
             var complaint = _mapper.Map<ComplaintAboutPharmacy>(request);
