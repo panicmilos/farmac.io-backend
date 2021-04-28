@@ -170,10 +170,16 @@ namespace Farmacio_API.Controllers
         /// Accepts an existing supplier offer for a pharmacy order.
         /// </summary>
         /// <response code="200">Accepted supplier offer.</response>
+        /// <response code="404">Offer, order, medicine or user missing.</response>
+        /// <response code="400">
+        ///     Order offers deadline not yer expired or
+        ///     The offer or order has already been handled or
+        ///     The pharmacy admin is not the creator of the order.
+        /// </response>
         [HttpPost("offers/{offerId}")]
         public IActionResult AcceptSupplierOffer(Guid offerId)
         {
-            return Ok(_supplierOfferService.AcceptOffer(offerId));
+            return Ok(_supplierOfferService.AcceptOffer(offerId, new Guid("08d906fa-8314-4183-818c-66f029870c3a")));
         }
         
          /// <summary>

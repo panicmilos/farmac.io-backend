@@ -10,6 +10,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<SupplierOffer> ReadForPharmacyOrder(Guid pharmacyOrderId);
 
         SupplierOffer ReadOfferFor(Guid supplierId, Guid offerId);
-        SupplierOffer AcceptOffer(Guid offerId);
+        SupplierOffer AcceptOffer(Guid offerId, Guid pharmacyAdminId);
     }
 }

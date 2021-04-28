@@ -53,14 +53,20 @@ namespace Farmacio_Services.Implementation
             return Read().FirstOrDefault(offer => offer.PharmacyOrderId == offerId && offer.SupplierId == supplierId);
         }
 
-        public SupplierOffer AcceptOffer(Guid offerId)
+        public SupplierOffer AcceptOffer(Guid offerId, Guid pharmacyAdminId)
         {
             var offer = TryToRead(offerId);
             var order = _pharmacyOrderService.TryToRead(offer.PharmacyOrderId);
-            if(order.OffersDeadline > DateTime.Now)
-                throw new BadLogicException("The offer deadline has not expired.");
+
+            if (order.PharmacyAdminId != pharmacyAdminId)
+                throw new BadLogicException(
+                    "Only the pharmacy admin who has created the offer can accept an offer for it.");
+            if(order.IsProcessed)
+                throw new BadLogicException("The order has already been processed.");
             if(offer.Status != OfferStatus.WaitingForAnswer)
                 throw new BadLogicException("The offer has already been handled.");
+            if(order.OffersDeadline > DateTime.Now)
+                throw new BadLogicException("The offer deadline has not expired.");
 
             ReadForPharmacyOrder(offer.PharmacyOrderId)
                 .Where(readOffer => readOffer.Id != offerId)
