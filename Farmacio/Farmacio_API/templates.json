@@ -49,7 +49,7 @@
       "type": "Email",
       "name": "Appointment",
       "template": {
-        "Subject": "Successfull reserving appointment with dermatologist on Farmac.io",
+        "Subject": "Successful reserving appointment with dermatologist on Farmac.io",
         "From": "panic.milos99@gmail.com",
         "Recipients": [ "panic.milos99@gmail.com" ],
         "Body": "<p>Dear {{name}},</p><p>Your appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
@@ -59,10 +59,20 @@
       "type": "Email",
       "name": "Consultation",
       "template": {
-        "Subject": "Successfull reserving consultation with pharmacist on Farmac.io",
+        "Subject": "Successful reserving consultation with pharmacist on Farmac.io",
         "From": "panic.milos99@gmail.com",
         "Recipients": [ "panic.milos99@gmail.com" ],
         "Body": "<p>Dear {{name}},</p><p>Your appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
+      }
+    },
+    {
+      "type": "Email",
+      "name": "OfferAccepted",
+      "template": {
+        "Subject": "Offer accepted on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "<p>Dear {{name}},</p><p>Your offer has been accepted.</p>"
       }
     }
   ]
