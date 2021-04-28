@@ -3,6 +3,7 @@ using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Farmacio_Services.Implementation
@@ -37,6 +38,11 @@ namespace Farmacio_Services.Implementation
             }
 
             return base.Create(answer);
+        }
+
+        public IEnumerable<ComplaintAnswer> ReadBy(Guid writerId)
+        {
+            return Read().Where(answer => answer.WriterId == writerId).ToList();
         }
 
         private bool HasSystemAdminAnsweredComplaint(Guid systemAdminId, Guid complaintId)

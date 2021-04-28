@@ -145,6 +145,16 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns all existing answers from the system writen by given writerId.
+        /// </summary>
+        /// <response code="200">Returns list of answers.</response>
+        [HttpGet("answered-by/{writerId}")]
+        public IActionResult ReadAnswersBy(Guid writerId)
+        {
+            return Ok(_complaintAnswerService.ReadBy(writerId));
+        }
+
+        /// <summary>
         /// Creates a new answer for complaint in the system.
         /// </summary>
         /// <response code="200">Returns created answer.</response>
