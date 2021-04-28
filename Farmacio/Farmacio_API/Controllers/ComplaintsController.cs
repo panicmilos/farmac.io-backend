@@ -12,22 +12,38 @@ namespace Farmacio_API.Controllers
     [Produces("application/json")]
     public class ComplaintsController : ControllerBase
     {
+        private readonly IComplaintService<Complaint> _complaintService;
         private readonly IComplaintAboutDermatologistService _complaintAboutDermatologistService;
         private readonly IComplaintAboutPharmacistService _complaintAboutPharmacistService;
         private readonly IComplaintAboutPharmacyService _complaintAboutPharmacyService;
+        private readonly IComplaintAnswerService _complaintAnswerService;
         private readonly IMapper _mapper;
 
         public ComplaintsController(
+            IComplaintService<Complaint> complaintService,
             IComplaintAboutDermatologistService complaintAboutDermatologistService,
             IComplaintAboutPharmacistService complaintAboutPharmacistService,
             IComplaintAboutPharmacyService complaintAboutPharmacyService,
+            IComplaintAnswerService complaintAnswerService,
             IMapper mapper
             )
         {
+            _complaintService = complaintService;
             _complaintAboutDermatologistService = complaintAboutDermatologistService;
             _complaintAboutPharmacistService = complaintAboutPharmacistService;
             _complaintAboutPharmacyService = complaintAboutPharmacyService;
+            _complaintAnswerService = complaintAnswerService;
             _mapper = mapper;
+        }
+
+        /// <summary>
+        /// Returns all existing complaints from the system.
+        /// </summary>
+        /// <response code="200">Returns list of complaints.</response>
+        [HttpGet]
+        public IActionResult ReadComplaints()
+        {
+            return Ok(_complaintService.Read());
         }
 
         /// <summary>
@@ -106,6 +122,21 @@ namespace Farmacio_API.Controllers
             var createdComplaint = _complaintAboutPharmacyService.Create(complaint);
 
             return Ok(createdComplaint);
+        }
+
+        /// <summary>
+        /// Creates a new answer for complaint in the system.
+        /// </summary>
+        /// <response code="200">Returns created answer.</response>
+        /// <response code="400">Given system admin has already answered to given complaint.</response>
+        /// <response code="404">Given system admin or complaint doesn't exist in the system.</response>
+        [HttpPost("{complaintId}/answers")]
+        public IActionResult CreateAnswerToCompaint(CreateComplaintAnswerRequest request)
+        {
+            var answer = _mapper.Map<ComplaintAnswer>(request);
+            var createdAnswer = _complaintAnswerService.Create(answer);
+
+            return Ok(createdAnswer);
         }
     }
 }
