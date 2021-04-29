@@ -98,6 +98,11 @@ namespace Farmacio_Services.Implementation
             return createdReservation;
         }
 
+        public IEnumerable<Reservation> ReadFor(Guid patientId)
+        {
+            return Read().Where(reservation => reservation.PatientId == patientId).ToList();
+        }
+
         public IEnumerable<SmallReservedMedicineDTO> ReadMedicinesForReservation(Guid reservationId)
         {
             var reservation = TryToRead(reservationId);
