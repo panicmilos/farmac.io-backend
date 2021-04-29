@@ -53,14 +53,16 @@ namespace Farmacio_Services.Implementation
             return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
         }
 
+        public IEnumerable<Appointment> ReadForPharmacy(Guid pharmacyId)
+        {
+            return Read().Where(appointment => appointment.PharmacyId == pharmacyId).ToList();
+        }
+
         public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
         {
-            return Read()
-                .ToList()
-                .Where(a => a.PharmacyId == pharmacyId &&
-                            _accountService.Read().ToList()
-                                .FirstOrDefault(acc => acc.UserId == a.MedicalStaffId)?.Role == Role.Dermatologist)
-                .ToList();
+            return ReadForPharmacy(pharmacyId)
+                .Where(appointment =>
+                    _accountService.ReadByUserId(appointment.MedicalStaffId)?.Role == Role.Dermatologist);
         }
 
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO)
