@@ -33,7 +33,6 @@ namespace Farmacio_API.Controllers
         [HttpGet("/pharmacy/{pharmacyId}/promotions")]
         public IActionResult ReadPharmacyPromotions(Guid pharmacyId)
         {
-            _pharmacyService.TryToRead(pharmacyId);
             return Ok(_promotionService.ReadFor(pharmacyId));
         }
         
@@ -45,7 +44,6 @@ namespace Farmacio_API.Controllers
         [HttpGet("/pharmacy/{pharmacyId}/promotions/active")]
         public IActionResult ReadActivePharmacyPromotions(Guid pharmacyId)
         {
-            _pharmacyService.TryToRead(pharmacyId);
             return Ok(_promotionService.ReadActiveFor(pharmacyId));
         }
         
