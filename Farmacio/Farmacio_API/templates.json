@@ -74,6 +74,16 @@
         "Recipients": [ "{{to}}" ],
         "Body": "<p>Dear {{name}},</p><p>Your offer has been accepted.</p>"
       }
+    },
+    {
+      "type": "Email",
+      "name": "PromotionCreated",
+      "template": {
+        "Subject": "Promotion has been created on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "<p>Dear {{name}},</p><p>Promotion has been created in the pharmacy that you're subscribed to.</p>"
+      }
     }
   ]
 }

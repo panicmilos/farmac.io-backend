@@ -24,6 +24,12 @@ namespace Farmacio_Services.Implementation
             _pharmacyService = pharmacyService;
         }
 
+        public IEnumerable<Account> ReadFollowersFor(Guid pharmacyId)
+        {
+            return _followingsService.Read().Where(follow => follow.PharmacyId == pharmacyId)
+                .Select(follow => _patientService.ReadByUserId(follow.PatientId)).ToList();
+        }
+
         public PatientPharmacyFollow Follow(Guid patientAccountId, Guid pharmacyId)
         {
             var patient = _patientService.TryToRead(patientAccountId);
