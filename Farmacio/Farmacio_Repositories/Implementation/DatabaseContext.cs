@@ -22,6 +22,9 @@ namespace Farmacio_Repositories.Implementation
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<ERecipe> ERecipes { get; set; }
         public DbSet<Complaint> Complaints { get; set; }
+        public DbSet<ComplaintAboutDermatologist> ComplaintAboutDermatologists { get; set; }
+        public DbSet<ComplaintAboutPharmacist> ComplaintAboutPharmacists { get; set; }
+        public DbSet<ComplaintAboutPharmacy> ComplaintAboutPharmacies { get; set; }
         public DbSet<LoyaltyPoints> LoyaltyPoints { get; set; }
 
         public DbSet<AbsenceRequest> AbsenceRequests { get; set; }
@@ -37,6 +40,7 @@ namespace Farmacio_Repositories.Implementation
         public DbSet<PharmacyPriceList> PharmacyPriceLists { get; set; }
         public DbSet<PharmacyOrder> PharmacyOrders { get; set; }
         public DbSet<SupplierOffer> SupplierOffers { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {

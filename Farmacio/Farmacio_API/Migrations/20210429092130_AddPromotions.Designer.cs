@@ -3,14 +3,16 @@ using System;
 using Farmacio_Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Farmacio_API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210429092130_AddPromotions")]
+    partial class AddPromotions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,9 +200,8 @@ namespace Farmacio_API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                    b.Property<bool>("IsAboutPharmacy")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Text")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
@@ -213,8 +214,6 @@ namespace Farmacio_API.Migrations
                     b.HasIndex("WriterId");
 
                     b.ToTable("Complaints");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Complaint");
                 });
 
             modelBuilder.Entity("Farmacio_Models.Domain.ComplaintAnswer", b =>
@@ -1056,42 +1055,6 @@ namespace Farmacio_API.Migrations
                     b.ToTable("WorkTime");
                 });
 
-            modelBuilder.Entity("Farmacio_Models.Domain.ComplaintAboutDermatologist", b =>
-                {
-                    b.HasBaseType("Farmacio_Models.Domain.Complaint");
-
-                    b.Property<Guid>("DermatologistId")
-                        .HasColumnType("char(36)");
-
-                    b.HasIndex("DermatologistId");
-
-                    b.HasDiscriminator().HasValue("ComplaintAboutDermatologist");
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.ComplaintAboutPharmacist", b =>
-                {
-                    b.HasBaseType("Farmacio_Models.Domain.Complaint");
-
-                    b.Property<Guid>("PharmacistId")
-                        .HasColumnType("char(36)");
-
-                    b.HasIndex("PharmacistId");
-
-                    b.HasDiscriminator().HasValue("ComplaintAboutPharmacist");
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.ComplaintAboutPharmacy", b =>
-                {
-                    b.HasBaseType("Farmacio_Models.Domain.Complaint");
-
-                    b.Property<Guid>("PharmacyId")
-                        .HasColumnType("char(36)");
-
-                    b.HasIndex("PharmacyId");
-
-                    b.HasDiscriminator().HasValue("ComplaintAboutPharmacy");
-                });
-
             modelBuilder.Entity("Farmacio_Models.Domain.MedicalStaffGrade", b =>
                 {
                     b.HasBaseType("Farmacio_Models.Domain.Grade");
@@ -1491,33 +1454,6 @@ namespace Farmacio_API.Migrations
                     b.HasOne("Farmacio_Models.Domain.Address", "Address")
                         .WithMany()
                         .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.ComplaintAboutDermatologist", b =>
-                {
-                    b.HasOne("Farmacio_Models.Domain.Dermatologist", "Dermatologist")
-                        .WithMany()
-                        .HasForeignKey("DermatologistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.ComplaintAboutPharmacist", b =>
-                {
-                    b.HasOne("Farmacio_Models.Domain.Pharmacist", "Pharmacist")
-                        .WithMany()
-                        .HasForeignKey("PharmacistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.ComplaintAboutPharmacy", b =>
-                {
-                    b.HasOne("Farmacio_Models.Domain.Pharmacy", "Pharmacy")
-                        .WithMany()
-                        .HasForeignKey("PharmacyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -54,6 +54,7 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IDermatologistWorkPlaceService), typeof(DermatologistWorkPlaceService));
             _services.AddScoped(typeof(IPharmacyPriceListService), typeof(PharmacyPriceListService));
             _services.AddScoped(typeof(IPharmacyStockService), typeof(PharmacyStockService));
+            _services.AddScoped(typeof(IPharmacyReportsService), typeof(PharmacyReportsService));
             _services.AddScoped(typeof(IMedicalStaffService), typeof(MedicalStaffService));
             _services.AddScoped(typeof(IReportService), typeof(ReportService));
             _services.AddScoped(typeof(IPatientAllergyService), typeof(PatientAllergyService));
@@ -61,6 +62,11 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IGradeService), typeof(GradeService));
             _services.AddScoped(typeof(IMedicalStaffGradeService), typeof(MedicalStaffGradeService));
             _services.AddScoped(typeof(IERecipeService), typeof(ERecipeService));
+            _services.AddScoped(typeof(IPromotionService), typeof(PromotionService));
+            _services.AddScoped(typeof(IComplaintService<>), typeof(ComplaintService<>));
+            _services.AddScoped(typeof(IComplaintAboutDermatologistService), typeof(ComplaintAboutDermatologistService));
+            _services.AddScoped(typeof(IComplaintAboutPharmacistService), typeof(ComplaintAboutPharmacistService));
+            _services.AddScoped(typeof(IComplaintAboutPharmacyService), typeof(ComplaintAboutPharmacyService));
         }
     }
 }

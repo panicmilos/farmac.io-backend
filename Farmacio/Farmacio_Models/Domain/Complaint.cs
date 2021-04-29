@@ -8,7 +8,6 @@ namespace Farmacio_Models.Domain
         public Guid WriterId { get; set; }
         public virtual Patient Writer { get; set; }
         public string Text { get; set; }
-        public bool IsAboutPharmacy { get; set; }
         public virtual List<ComplaintAnswer> Answers { get; set; }
     }
 
@@ -25,11 +24,16 @@ namespace Farmacio_Models.Domain
         public Guid PharmacyId { get; set; }
         public virtual Pharmacy Pharmacy { get; set; }
     }
-    
-    public class ComplaintAboutStaff : Complaint
+
+    public class ComplaintAboutDermatologist : Complaint
     {
-        public Guid StaffId { get; set; }
-        public virtual MedicalStaff Staff { get; set; }
+        public Guid DermatologistId { get; set; }
+        public virtual Dermatologist Dermatologist { get; set; }
+    }
+
+    public class ComplaintAboutPharmacist : Complaint
+    {
+        public Guid PharmacistId { get; set; }
+        public virtual Pharmacist Pharmacist { get; set; }
     }
 }
-
