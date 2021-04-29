@@ -89,7 +89,7 @@ namespace Farmacio_Services.Implementation
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
             var appointmentsForPharmacyInTimePeriod = 
                 (dermatologistsOnly ? _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId)
-                    : _appointmentService.Read().Where(appointment => appointment.PharmacyId == pharmacyId))
+                    : _appointmentService.ReadForPharmacy(pharmacyId))
                 .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To)
                 .ToList();
 
@@ -143,8 +143,8 @@ namespace Farmacio_Services.Implementation
         
         private static IEnumerable<DateTime> EachMonth(TimePeriodDTO timePeriod)
         {
-            for(var day = timePeriod.From.Date; day.Date <= timePeriod.To.Date; day = day.AddMonths(1))
-                yield return day;
+            for(var month = timePeriod.From.Date; month.Date <= timePeriod.To.Date; month = month.AddMonths(1))
+                yield return month;
         }
     }
 }
