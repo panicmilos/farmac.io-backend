@@ -7,7 +7,8 @@ namespace Farmacio_Services.Contracts
 {
     public interface IReservationService : ICrudService<Reservation>
     {
-        IEnumerable<Reservation> ReadFor(Guid pharmacyId);
+        IEnumerable<Reservation> ReadFrom(Guid pharmacyId);
+
         Reservation CancelMedicineReservation(Guid reservationId);
 
         IEnumerable<Reservation> ReadFor(Guid patientId);

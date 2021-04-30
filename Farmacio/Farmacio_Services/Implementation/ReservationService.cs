@@ -1,7 +1,7 @@
-﻿using Farmacio_Models.Domain;
-using Farmacio_Models.DTO;
-using EmailService.Constracts;
+﻿using EmailService.Constracts;
 using EmailService.Models;
+using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
@@ -29,7 +29,7 @@ namespace Farmacio_Services.Implementation
             _templatesProvider = templatesProvider;
         }
 
-        public IEnumerable<Reservation> ReadFor(Guid pharmacyId)
+        public IEnumerable<Reservation> ReadFrom(Guid pharmacyId)
         {
             return Read().Where(reservation => reservation.PharmacyId == pharmacyId).ToList();
         }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Farmacio_Models.Domain;
+﻿using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Farmacio_Services.Implementation
 {
@@ -17,7 +17,7 @@ namespace Farmacio_Services.Implementation
             _appointmentService = appointmentService;
             _reservationService = reservationService;
         }
-        
+
         public IEnumerable<PharmacyReportRecordDTO> GenerateExaminationsReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
         {
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
@@ -43,7 +43,7 @@ namespace Farmacio_Services.Implementation
                 .Select(group => new PharmacyReportRecordDTO
                 {
                     Group = group.Key.ToString(),
-                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ? 
+                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ?
                         reservation.Medicines.Sum(orderedMedicine => orderedMedicine.Quantity) : 0)
                 })
                 .ToList();
@@ -54,7 +54,7 @@ namespace Farmacio_Services.Implementation
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
             var appointmentsForPharmacyInTimePeriod = AppointmentsForPharmacyInTimePeriod(pharmacyId, timePeriod, false);
             var doneReservationsForPharmacyInTimePeriod = DoneReservationsForPharmacyInTimePeriod(pharmacyId, timePeriod);
-            
+
             var groupedAppointmentsByDate = appointmentsForPharmacyInTimePeriod.OrderBy(appointment => appointment.DateTime)
                 .GroupBy(appointment => isPeriodLongerThanAMonth ? appointment.DateTime.Month : appointment.DateTime.Day)
                 .Select(group => new PharmacyReportRecordDTO
@@ -63,13 +63,13 @@ namespace Farmacio_Services.Implementation
                     Value = group.Sum(appointment => appointment.Price)
                 })
                 .ToList();
-            
+
             var groupedReservationsByDate = doneReservationsForPharmacyInTimePeriod.OrderBy(reservation => reservation.CreatedAt)
                 .GroupBy(reservation => isPeriodLongerThanAMonth ? reservation.CreatedAt.Month : reservation.CreatedAt.Day)
                 .Select(group => new PharmacyReportRecordDTO
                 {
                     Group = group.Key.ToString(),
-                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ? 
+                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ?
                         reservation.Medicines.Sum(orderedMedicine => orderedMedicine.Price) : 0)
                 })
                 .ToList();
@@ -87,7 +87,7 @@ namespace Farmacio_Services.Implementation
             , bool dermatologistsOnly)
         {
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
-            var appointmentsForPharmacyInTimePeriod = 
+            var appointmentsForPharmacyInTimePeriod =
                 (dermatologistsOnly ? _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId)
                     : _appointmentService.ReadForPharmacy(pharmacyId))
                 .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To)
@@ -113,7 +113,7 @@ namespace Farmacio_Services.Implementation
         private IEnumerable<Reservation> DoneReservationsForPharmacyInTimePeriod(Guid pharmacyId, TimePeriodDTO timePeriod)
         {
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
-            var doneReservationsForPharmacyInTimePeriod = _reservationService.ReadFor(pharmacyId)
+            var doneReservationsForPharmacyInTimePeriod = _reservationService.ReadFrom(pharmacyId)
                 .Where(reservation =>
                     reservation.CreatedAt >= timePeriod.From && reservation.CreatedAt <= timePeriod.To)
                 .ToList();
@@ -137,13 +137,13 @@ namespace Farmacio_Services.Implementation
 
         private static IEnumerable<DateTime> EachDay(TimePeriodDTO timePeriod)
         {
-            for(var day = timePeriod.From.Date; day.Date <= timePeriod.To.Date; day = day.AddDays(1))
+            for (var day = timePeriod.From.Date; day.Date <= timePeriod.To.Date; day = day.AddDays(1))
                 yield return day;
         }
-        
+
         private static IEnumerable<DateTime> EachMonth(TimePeriodDTO timePeriod)
         {
-            for(var month = timePeriod.From.Date; month.Date <= timePeriod.To.Date; month = month.AddMonths(1))
+            for (var month = timePeriod.From.Date; month.Date <= timePeriod.To.Date; month = month.AddMonths(1))
                 yield return month;
         }
     }
