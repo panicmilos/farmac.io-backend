@@ -8,6 +8,11 @@ namespace Farmacio_Models.Domain
         public int ConsultationPoints { get; set; }
         public int ExaminationPoints { get; set; }
         public virtual List<MedicinePoints> MedicinePointsList { get; set; }
+
+        public LoyaltyPoints()
+        {
+            MedicinePointsList = new List<MedicinePoints>();
+        }
     }
 
     public class MedicinePoints : BaseEntity
