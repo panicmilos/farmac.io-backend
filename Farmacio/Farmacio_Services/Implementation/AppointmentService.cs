@@ -18,7 +18,6 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyService _pharmacyService;
         private readonly IAccountService _accountService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
-        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IPatientService _patientService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
@@ -28,7 +27,6 @@ namespace Farmacio_Services.Implementation
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
-            , IPharmacyPriceListService pharmacyPriceListService
             , IPatientService patientService
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
@@ -39,12 +37,10 @@ namespace Farmacio_Services.Implementation
             _pharmacyService = pharmacyService;
             _accountService = accountService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
-            _pharmacyPriceListService = pharmacyPriceListService;
             _patientService = patientService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
-            //_medicalStaffService = medicalStaffService;
             _eRecipeService = eRecipeService;
         }
 
@@ -392,6 +388,19 @@ namespace Farmacio_Services.Implementation
                     dateTime.AddMinutes(duration)))
                     throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
             }
+        }
+
+        public IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId)
+        {
+            return ReadForMedicalStaff(medicalStaffId).Select(appointment => new AppointmentAsEvent
+            {
+                Id = appointment.Id,
+                Start = appointment.DateTime,
+                End = appointment.DateTime.AddMinutes(appointment.Duration),
+                Title = $"{appointment.Patient?.FirstName} {appointment.Patient?.LastName}",
+                PharmacyName = appointment.Pharmacy.Name,
+                IsReported = appointment.ReportId != null
+            });
         }
 
         public IEnumerable<Appointment> ReadFor(Guid patientId)

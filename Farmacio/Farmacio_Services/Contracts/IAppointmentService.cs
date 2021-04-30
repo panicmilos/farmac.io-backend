@@ -41,7 +41,9 @@ namespace Farmacio_Services.Contracts
         bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistUserId);
 
         Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment);
-
+        
+        IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId);
+        
         IEnumerable<Appointment> ReadFor(Guid patientId);
     }
 }
