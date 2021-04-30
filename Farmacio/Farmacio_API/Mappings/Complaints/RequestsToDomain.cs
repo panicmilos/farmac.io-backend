@@ -11,6 +11,7 @@ namespace Farmacio_API.Mappings.Complaints
             CreateMap<CreateComplaintAboutDermatologistRequest, ComplaintAboutDermatologist>();
             CreateMap<CreateComplaintAboutPharmacistRequest, ComplaintAboutPharmacist>();
             CreateMap<CreateComplaintAboutPharmacyRequest, ComplaintAboutPharmacy>();
+            CreateMap<CreateComplaintAnswerRequest, ComplaintAnswer>();
         }
     }
 }

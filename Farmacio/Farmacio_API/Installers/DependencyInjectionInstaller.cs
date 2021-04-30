@@ -67,6 +67,7 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IComplaintAboutDermatologistService), typeof(ComplaintAboutDermatologistService));
             _services.AddScoped(typeof(IComplaintAboutPharmacistService), typeof(ComplaintAboutPharmacistService));
             _services.AddScoped(typeof(IComplaintAboutPharmacyService), typeof(ComplaintAboutPharmacyService));
+            _services.AddScoped(typeof(IComplaintAnswerService), typeof(ComplaintAnswerService));
         }
     }
 }

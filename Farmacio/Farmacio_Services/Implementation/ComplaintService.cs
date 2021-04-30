@@ -1,6 +1,9 @@
 ﻿using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Farmacio_Services.Implementation
 {
@@ -9,6 +12,11 @@ namespace Farmacio_Services.Implementation
         public ComplaintService(IRepository<T> repository) :
             base(repository)
         {
+        }
+
+        public IEnumerable<T> ReadBy(Guid writerId)
+        {
+            return Read().Where(complaint => complaint.WriterId == writerId).ToList();
         }
     }
 }
