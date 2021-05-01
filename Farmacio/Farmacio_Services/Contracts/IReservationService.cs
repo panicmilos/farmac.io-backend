@@ -10,5 +10,6 @@ namespace Farmacio_Services.Contracts
         Reservation CancelMedicineReservation(Guid reservationId);
         IEnumerable<SmallReservationDTO> ReadPatientReservations(Guid patientId);
         IEnumerable<SmallReservedMedicineDTO> ReadMedicinesForReservation(Guid reservationId);
+        bool DidPatientReserveMedicine(Guid medicineId, Guid patientId);
     }
 }

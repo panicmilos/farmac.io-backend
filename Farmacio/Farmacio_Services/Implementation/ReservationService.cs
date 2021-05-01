@@ -98,6 +98,18 @@ namespace Farmacio_Services.Implementation
             return createdReservation;
         }
 
+        public bool DidPatientReserveMedicine(Guid medicineId, Guid patientId)
+        {
+            var reservations = Read().ToList().Where(reservation => reservation.PatientId == patientId && reservation.State == ReservationState.Done 
+                                            && reservation.PickupDeadline < DateTime.Now).ToList();
+            reservations = reservations.Where(reservation =>
+            {
+                var medicines = reservation.Medicines;
+                return medicines.Where(medicine => medicine.MedicineId == medicineId).FirstOrDefault() != null;
+            }).ToList();
+            return reservations.Count() > 0;
+        }
+
         public IEnumerable<SmallReservedMedicineDTO> ReadMedicinesForReservation(Guid reservationId)
         {
             var reservation = TryToRead(reservationId);

@@ -22,5 +22,9 @@ namespace Farmacio_Services.Contracts
         IEnumerable<SmallMedicineDTO> ReadBy(MedicineSearchParams searchParams);
 
         IEnumerable<string> ReadMedicineTypes();
+
+        Medicine UpdateGrade(Medicine medicine);
+
+        IEnumerable<Medicine> ReadThatPatientCanRate(Guid patientId);
     }
 }

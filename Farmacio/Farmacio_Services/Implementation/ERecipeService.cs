@@ -2,6 +2,7 @@
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
+using System;
 using System.Linq;
 
 namespace Farmacio_Services.Implementation
@@ -17,6 +18,17 @@ namespace Farmacio_Services.Implementation
         {
             eRecipe.UniqueId = GetUniqueId();
             return base.Create(eRecipe);
+        }
+
+        public bool DidPatientHasBeenPrescribedMedicine(Guid patienttId, Guid medicineId)
+        {
+            var eRecipes = Read().Where(eRecipe => eRecipe.PatientId == patienttId).ToList();
+            eRecipes = eRecipes.Where(eRecipe =>
+            {
+                var medicines = eRecipe.Medicines;
+                return medicines.Where(medicine => medicine.MedicineId == medicineId).FirstOrDefault() != null;
+            }).ToList();
+            return eRecipes.Count() > 0;
         }
 
         private string GetUniqueId()

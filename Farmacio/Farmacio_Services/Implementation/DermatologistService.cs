@@ -152,6 +152,11 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("The patient has already been rate a dermatologist.");
             }
 
+            if (grade.Value < 1 || grade.Value > 5)
+            {
+                throw new BadLogicException("The score can have a value between 1 and 5");
+            }
+
             grade = _medicalStaffGradeService.Create(grade) as MedicalStaffGrade;
             var medicalStaff = dermatologist.User as MedicalStaff;
             medicalStaff.AverageGrade = (medicalStaff.NumberOfGrades * medicalStaff.AverageGrade + grade.Value) / ++medicalStaff.NumberOfGrades;
