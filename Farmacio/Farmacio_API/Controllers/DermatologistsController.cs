@@ -8,6 +8,7 @@ using System.Linq;
 using Farmacio_API.Contracts.Responses.Dermatologists;
 using Farmacio_Models.DTO;
 using Farmacio_API.Contracts.Requests.Grades;
+using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_API.Controllers
 {
@@ -19,16 +20,19 @@ namespace Farmacio_API.Controllers
         private readonly IDermatologistService _dermatologistService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IMedicalStaffGradeService _medicalStaffGradeService;
+        private readonly IMedicalStaffService _medicalStaffService;
         private readonly IMapper _mapper;
 
         public DermatologistsController(IDermatologistService dermatologistService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IMedicalStaffGradeService medicalStaffGradeService
+            , IMedicalStaffService medicalStaffService
             , IMapper mapper)
         {
             _dermatologistService = dermatologistService;
             _medicalStaffGradeService = medicalStaffGradeService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
+            _medicalStaffService = medicalStaffService;
             _mapper = mapper;
         }
 
@@ -163,10 +167,10 @@ namespace Farmacio_API.Controllers
         /// <response code="400">Patient cannot rate the dermatologist or already has rated.</response>
         /// <response code="404">Given patient or dermatologist does not exist in the system.</response>
         [HttpPost("rate")]
-        public IActionResult RateTheDermatologist(CreateDermatologistGradeRequest request)
+        public IActionResult RateTheDermatologist(CreateMedicalStaffGradeRequest request)
         {
             var dermatologistGrade = _mapper.Map<MedicalStaffGrade>(request);
-            return Ok(_dermatologistService.GradeDermatologist(dermatologistGrade));
+            return Ok(_medicalStaffService.GradeMedicalStaff(dermatologistGrade));
         }
 
 
@@ -197,6 +201,12 @@ namespace Farmacio_API.Controllers
         [HttpGet("{dermatologistId}/grade/{patientId}")]
         public IActionResult GetDermatologistGrade(Guid dermatologistId, Guid patientId)
         {
+            var medicalStaff = _medicalStaffService.ReadByUserId(dermatologistId);
+            if (medicalStaff == null)
+            {
+                throw new MissingEntityException("The given dermatologist does not exist in the system.");
+            }
+
             return Ok(_medicalStaffGradeService.Read(patientId, dermatologistId));
         }
 

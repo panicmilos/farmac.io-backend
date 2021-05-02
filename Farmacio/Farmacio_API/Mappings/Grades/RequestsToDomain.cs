@@ -8,9 +8,9 @@ namespace Farmacio_API.Mappings.Grades
     {
         public RequestsToDomain()
         {
-            CreateMap<CreateDermatologistGradeRequest, MedicalStaffGrade>()
+            CreateMap<CreateMedicalStaffGradeRequest, MedicalStaffGrade>()
                 .ForMember(dst => dst.Value, src => src.MapFrom(src => src.Grade))
-                .ForMember(dst => dst.MedicalStaffId, src => src.MapFrom(src => src.DermatologistId));
+                .ForMember(dst => dst.MedicalStaffId, src => src.MapFrom(src => src.MedicalStaffId));
         }
     }
 }

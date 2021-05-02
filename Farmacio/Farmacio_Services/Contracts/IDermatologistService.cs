@@ -16,8 +16,6 @@ namespace Farmacio_Services.Contracts
 
         Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistId);
 
-        Grade GradeDermatologist(MedicalStaffGrade grade);
-
         IEnumerable<Account> ReadThatPatientCanRate(Guid patientId);
 
         IEnumerable<Account> ReadThatPatientRated(Guid patientId);

@@ -23,7 +23,7 @@ namespace Farmacio_Services.Implementation
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IAppointmentService appointmentService
             , IMedicalStaffGradeService medicalStaffGradeService
             , IRepository<Account> repository)
-            : base(emailVerificationService, appointmentService, repository)
+            : base(emailVerificationService, appointmentService, medicalStaffGradeService, repository)
         {
             _pharmacyService = pharmacyService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
@@ -132,33 +132,6 @@ namespace Farmacio_Services.Implementation
                 .FirstOrDefault(wp => TimeIntervalUtils
                     .TimeIntervalTimesOverlap(wp.WorkTime.From, wp.WorkTime.To, workTime.From, workTime.To));
             return overlap == null;
-        }
-
-        public Grade GradeDermatologist(MedicalStaffGrade grade)
-        {
-            var dermatologist = ReadByUserId(grade.MedicalStaffId);
-            if(dermatologist == null)
-            {
-                throw new MissingEntityException("The given dermatologist does not exist.");
-            }
-
-            if (!_appointmentService.DidPatientHaveAppointmentWithDermatologist(grade.PatientId, grade.MedicalStaffId))
-            {
-                throw new BadLogicException("The patient cannot rate the dermatologist because he did not have an appointment with him.");
-            }
-
-            if (_medicalStaffGradeService.DidPatientGradeMedicalStaff(grade.PatientId, grade.MedicalStaffId))
-            {
-                throw new BadLogicException("The patient has already been rate a dermatologist.");
-            }
-
-            grade = _medicalStaffGradeService.Create(grade) as MedicalStaffGrade;
-            var medicalStaff = dermatologist.User as MedicalStaff;
-            medicalStaff.AverageGrade = (medicalStaff.NumberOfGrades * medicalStaff.AverageGrade + grade.Value) / ++medicalStaff.NumberOfGrades;
-            dermatologist.User = medicalStaff;
-            base.UpdateGrade(medicalStaff);
-
-            return grade;
         }
 
         public IEnumerable<Account> ReadThatPatientCanRate(Guid patientId)

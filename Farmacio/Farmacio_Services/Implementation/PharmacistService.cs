@@ -13,12 +13,16 @@ namespace Farmacio_Services.Implementation
     public class PharmacistService : MedicalStaffService, IPharmacistService
     {
         private readonly IPharmacyService _pharmacyService;
+        private readonly IAppointmentService _appointmentService;
+        private readonly IMedicalStaffGradeService _medicalStaffGradeService;
 
-        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService, 
+        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService, IMedicalStaffGradeService medicalStaffGradeService,
             IAppointmentService appointmentService, IRepository<Account> repository) :
-            base(emailVerificationService, appointmentService, repository)
+            base(emailVerificationService, appointmentService, medicalStaffGradeService,repository)
         {
             _pharmacyService = pharmacyService;
+            _appointmentService = appointmentService;
+            _medicalStaffGradeService = medicalStaffGradeService;
         }
 
         public override IEnumerable<Account> Read()
@@ -114,6 +118,12 @@ namespace Farmacio_Services.Implementation
                 pharmacists = searchSortParams.IsAsc ? pharmacists.OrderBy(p => p.AverageGrade).ToList() : pharmacists.OrderByDescending(p => p.AverageGrade).ToList();
             }
             return pharmacists;
+        }
+
+        public IEnumerable<Account> ReadThatPatientCanRate(Guid patientId)
+        {
+            return Read().Where(pharmacists => _appointmentService.DidPatientHaveAppointmentWithDermatologist(patientId, pharmacists.UserId) &&
+            !_medicalStaffGradeService.DidPatientGradeMedicalStaff(patientId, pharmacists.UserId)).ToList();
         }
     }
 }

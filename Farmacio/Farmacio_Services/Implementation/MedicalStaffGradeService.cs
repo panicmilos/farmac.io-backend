@@ -11,12 +11,10 @@ namespace Farmacio_Services.Implementation
 {
     public class MedicalStaffGradeService : GradeService, IMedicalStaffGradeService
     {
-        private readonly IMedicalStaffService _medicalStaffService;
         private readonly IPatientService _patientService;
-        public MedicalStaffGradeService(IRepository<Grade> repository, IMedicalStaffService medicalStaffService, IPatientService patientService):
+        public MedicalStaffGradeService(IRepository<Grade> repository, IPatientService patientService):
             base(repository)
         {
-            _medicalStaffService = medicalStaffService;
             _patientService = patientService;
         }
 
@@ -24,7 +22,11 @@ namespace Farmacio_Services.Implementation
         {
             var grades = Read().Where(grade => {
                 var medicalStaffGrade = grade as MedicalStaffGrade;
-                return medicalStaffGrade.PatientId == patientId && medicalStaffGrade.MedicalStaffId == medicalStaffId;
+                if(medicalStaffGrade != null)
+                {
+                    return medicalStaffGrade.PatientId == patientId && medicalStaffGrade.MedicalStaffId == medicalStaffId;
+                }
+                return false;
             });
             return grades.FirstOrDefault() != null;
         }
@@ -32,12 +34,6 @@ namespace Farmacio_Services.Implementation
         public MedicalStaffGrade Read(Guid patientId, Guid medicalStaffId)
         {
             _patientService.TryToRead(patientId);
-
-            var medicalStaff = _medicalStaffService.ReadByUserId(medicalStaffId);
-            if(medicalStaff == null)
-            {
-                throw new MissingEntityException("The given dermatologist does not exist in the system.");
-            }
 
             return Read().Where(grade =>
             {

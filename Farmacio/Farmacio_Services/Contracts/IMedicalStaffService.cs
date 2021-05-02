@@ -12,5 +12,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<PatientDTO> SearchPatientsForMedicalStaff(Guid medicalId, string name);
         public IEnumerable<Account> ReadBy(MedicalStaffFilterParamsDTO filterParams);
         public Account UpdateGrade(MedicalStaff medicalStaff);
+        Grade GradeMedicalStaff(MedicalStaffGrade grade);
     }
 }
