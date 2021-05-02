@@ -3,6 +3,7 @@ using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Farmacio_Services.Implementation
@@ -20,9 +21,14 @@ namespace Farmacio_Services.Implementation
             return base.Create(eRecipe);
         }
 
-        public bool DidPatientHasBeenPrescribedMedicine(Guid patienttId, Guid medicineId)
+        public IEnumerable<ERecipe> ReadFor(Guid patientId)
         {
-            var eRecipes = Read().Where(eRecipe => eRecipe.PatientId == patienttId).ToList();
+            return Read().Where(eRecipe => eRecipe.PatientId == patientId).ToList();
+        }
+
+        public bool WasMedicinePrescribedToPatient(Guid patientId, Guid medicineId)
+        {
+            var eRecipes = ReadFor(patientId);
             eRecipes = eRecipes.Where(eRecipe =>
             {
                 var medicines = eRecipe.Medicines;

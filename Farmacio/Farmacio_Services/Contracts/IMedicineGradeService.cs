@@ -8,6 +8,6 @@ namespace Farmacio_Services.Contracts
 {
     public interface IMedicineGradeService: IGradeService
     {
-        IEnumerable<SmallMedicineDTO> ReadMedicinesThatPatientCanRate(IEnumerable<Medicine> medicines, Guid patientId);
+        IEnumerable<Medicine> ReadThatPatientCanRate(Guid patientId);
     }
 }

@@ -24,7 +24,5 @@ namespace Farmacio_Services.Contracts
         IEnumerable<string> ReadMedicineTypes();
 
         Medicine UpdateGrade(Medicine medicine);
-
-        IEnumerable<Medicine> ReadThatPatientCanRate(Guid patientId);
     }
 }

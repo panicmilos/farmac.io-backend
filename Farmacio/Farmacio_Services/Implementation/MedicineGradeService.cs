@@ -41,19 +41,19 @@ namespace Farmacio_Services.Implementation
             }
 
             if(!_reservationService.DidPatientReserveMedicine(medicineGrade.MedicineId, medicineGrade.PatientId) &&
-                !_eRecipeService.DidPatientHasBeenPrescribedMedicine(medicineGrade.PatientId, medicineGrade.MedicineId))
+                !_eRecipeService.WasMedicinePrescribedToPatient(medicineGrade.PatientId, medicineGrade.MedicineId))
             {
                 throw new BadLogicException("The patient can rate the medicine if he has reserved and taken the medicine or if it has been prescribed to him.");
             }
 
             if(grade.Value < 1 || grade.Value > 5)
             {
-                throw new BadLogicException("The grade can have a value between 1 and 5");
+                throw new BadLogicException("The grade can have a value between 1 and 5.");
             }
 
             if(DidPatientRateMedicine(medicineGrade.MedicineId, medicineGrade.PatientId))
             {
-                throw new BadLogicException("The patient has already rated the medicine");
+                throw new BadLogicException("The patient has already rated the medicine.");
             }
 
             medicine.AverageGrade = (medicine.AverageGrade * medicine.NumberOfGrades + medicineGrade.Value) / ++medicine.NumberOfGrades;
@@ -63,17 +63,17 @@ namespace Farmacio_Services.Implementation
             return medicineGrade;
         }
 
-        public IEnumerable<SmallMedicineDTO> ReadMedicinesThatPatientCanRate(IEnumerable<Medicine> medicines, Guid patientId)
+        public IEnumerable<Medicine> ReadThatPatientCanRate(Guid patientId)
         {
-            return medicines.Where(medicine => !DidPatientRateMedicine(medicine.Id, patientId))
-                            .Select(medicine => new SmallMedicineDTO
-                            {
-                                AverageGrade = medicine.AverageGrade,
-                                Name = medicine.Name,
-                                Id = medicine.Id,
-                                Manufacturer = medicine.Manufacturer,
-                                Type = medicine.Type
-                            });
+            var medicines = _medicineService.Read().ToList().Where(medicine => _reservationService.DidPatientReserveMedicine(medicine.Id, patientId)).ToList();
+            foreach (var medicine in _medicineService.Read().ToList())
+            {
+                if (medicines.Where(reservedMedicine => reservedMedicine.Id == medicine.Id).Count() == 0 && _eRecipeService.WasMedicinePrescribedToPatient(medicine.Id, patientId))
+                {
+                    medicines.Add(medicine);
+                }
+            }
+            return medicines.Where(medicine => !DidPatientRateMedicine(medicine.Id, patientId));
         }
 
         private bool DidPatientRateMedicine(Guid medicineId, Guid patientId)

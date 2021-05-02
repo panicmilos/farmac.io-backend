@@ -206,11 +206,7 @@ namespace Farmacio_Services.Implementation
 
         public Medicine UpdateGrade(Medicine medicine)
         {
-            var existingMedicine = Read(medicine.Id);
-            if (existingMedicine == null)
-            {
-                throw new MissingEntityException("Medicine does not exist in the system.");
-            }
+            var existingMedicine = TryToRead(medicine.Id);
 
             existingMedicine.AverageGrade = medicine.AverageGrade;
             existingMedicine.NumberOfGrades = medicine.NumberOfGrades;
@@ -223,7 +219,7 @@ namespace Farmacio_Services.Implementation
             var medicines = Read().ToList().Where(medicine => _reservationService.DidPatientReserveMedicine(medicine.Id, patientId)).ToList();
             foreach(var medicine in Read().ToList())
             {
-                if(medicines.Where(reservedMedicine => reservedMedicine.Id == medicine.Id).Count() == 0 && _eRecipeService.DidPatientHasBeenPrescribedMedicine(medicine.Id, patientId))
+                if(medicines.Where(reservedMedicine => reservedMedicine.Id == medicine.Id).Count() == 0 && _eRecipeService.WasMedicinePrescribedToPatient(medicine.Id, patientId))
                 {
                     medicines.Add(medicine);
                 }

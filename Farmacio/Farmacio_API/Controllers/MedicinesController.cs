@@ -195,7 +195,7 @@ namespace Farmacio_API.Controllers
         /// Rate medicine.
         /// </summary>
         /// <response code="200">Returns medicine grade.</response>
-        /// <response code="400">Patient cannot rate the medicine or already has rated.</response>
+        /// <response code="400">Patient cannot rate the medicine or already has rated it.</response>
         /// <response code="404">Given patient or medicine does not exist in the system.</response>
         [HttpPost("rate")]
         public IActionResult RateMedicine(CreateMedicineGradeRequest request)
@@ -212,9 +212,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("{patientId}/can-rate")]
         public IActionResult GetPatientCanRate(Guid patientId)
         {
-            var medicines = _medicineService.ReadThatPatientCanRate(patientId);
-
-            return Ok(_medicineGradeService.ReadMedicinesThatPatientCanRate(medicines, patientId));
+            return Ok(_medicineGradeService.ReadThatPatientCanRate(patientId));
         }
     }
 }
