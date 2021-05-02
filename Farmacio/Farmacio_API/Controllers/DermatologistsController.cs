@@ -199,5 +199,15 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_medicalStaffGradeService.Read(patientId, dermatologistId));
         }
+
+        /// <summary>
+        /// Reads pharmacy names where dermatologist works.
+        /// </summary>
+        /// <response code="200">Pharmacy names.</response>
+        [HttpGet("{dermatologistId}/work-place-names")]
+        public IActionResult GetDermatologistsWorkPlaceNames(Guid dermatologistId)
+        {
+            return Ok(_dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistId).Select(dwp => dwp.Pharmacy.Name));
+        }
     }
 }

@@ -5,6 +5,9 @@ using Farmacio_Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EmailService.Constracts;
+using EmailService.Models;
+using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
@@ -12,18 +15,27 @@ namespace Farmacio_Services.Implementation
     {
         private readonly ISupplierService _supplierService;
         private readonly ISupplierStockService _supplierStockService;
+        private readonly IPharmacyStockService _pharmacyStockService;
+        private readonly IEmailDispatcher _emailDispatcher;
+        private readonly ITemplatesProvider _templatesProvider;
         private readonly ICrudService<PharmacyOrder> _pharmacyOrderService;
 
         public SupplierOfferService(
             ISupplierService supplierService,
             ICrudService<PharmacyOrder> pharmacyOrderService,
             ISupplierStockService supplierStockService,
+            IPharmacyStockService pharmacyStockService,
+            ITemplatesProvider templatesProvider,
+            IEmailDispatcher emailDispatcher,
             IRepository<SupplierOffer> repository) :
             base(repository)
         {
             _supplierService = supplierService;
             _supplierStockService = supplierStockService;
             _pharmacyOrderService = pharmacyOrderService;
+            _pharmacyStockService = pharmacyStockService;
+            _emailDispatcher = emailDispatcher;
+            _templatesProvider = templatesProvider;
         }
 
         public IEnumerable<SupplierOffer> ReadFor(Guid supplierId)
@@ -31,9 +43,69 @@ namespace Farmacio_Services.Implementation
             return Read().Where(offer => offer.SupplierId == supplierId).ToList();
         }
 
+        public IEnumerable<SupplierOffer> ReadForPharmacyOrder(Guid pharmacyOrderId)
+        {
+            return Read().Where(offer => offer.PharmacyOrderId == pharmacyOrderId).ToList();
+        }
+
         public SupplierOffer ReadOfferFor(Guid supplierId, Guid offerId)
         {
             return Read().FirstOrDefault(offer => offer.PharmacyOrderId == offerId && offer.SupplierId == supplierId);
+        }
+
+        public SupplierOffer AcceptOffer(Guid offerId, Guid pharmacyAdminId)
+        {
+            var offer = TryToRead(offerId);
+            var order = _pharmacyOrderService.TryToRead(offer.PharmacyOrderId);
+
+            if (order.PharmacyAdminId != pharmacyAdminId)
+                throw new BadLogicException(
+                    "Only the pharmacy admin who has created the offer can accept an offer for it.");
+            if(order.IsProcessed)
+                throw new BadLogicException("The order has already been processed.");
+            if(offer.Status != OfferStatus.WaitingForAnswer)
+                throw new BadLogicException("The offer has already been handled.");
+            if(order.OffersDeadline > DateTime.Now)
+                throw new BadLogicException("The offer deadline has not expired.");
+
+            ReadForPharmacyOrder(offer.PharmacyOrderId)
+                .Where(readOffer => readOffer.Id != offerId)
+                .ToList()
+                .ForEach(RefuseOffer);
+            
+            order.OrderedMedicines.ForEach(orderedMedicine =>
+            {
+                var pharmacyMedicine =
+                    _pharmacyStockService.ReadForPharmacy(order.PharmacyId, orderedMedicine.MedicineId);
+                if (pharmacyMedicine == null) return;
+                pharmacyMedicine.Quantity += orderedMedicine.Quantity;
+                _pharmacyStockService.Update(pharmacyMedicine);
+            });
+
+            offer.Status = OfferStatus.Accepted;
+            var updatedOffer = Update(offer);
+            order.IsProcessed = true;
+            _pharmacyOrderService.Update(order);
+
+            var supplier = _supplierService.TryToRead(offer.SupplierId);
+            var offerAcceptedEmail = _templatesProvider.FromTemplate<Email>("OfferAccepted",
+                new {To = supplier.Email, Name = supplier.User.FirstName});
+            _emailDispatcher.Dispatch(offerAcceptedEmail);
+            
+            return updatedOffer;
+        }
+
+        private void RefuseOffer(SupplierOffer otherOffer)
+        {
+            otherOffer.PharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
+            {
+                var supplierMedicine =
+                    _supplierStockService.ReadMedicineFor(otherOffer.SupplierId, orderedMedicine.MedicineId);
+                supplierMedicine.Quantity += orderedMedicine.Quantity;
+                _supplierStockService.Update(supplierMedicine);
+            });
+            otherOffer.Status = OfferStatus.Refused;
+            Update(otherOffer);
         }
 
         public override SupplierOffer Create(SupplierOffer offer)

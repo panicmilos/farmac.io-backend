@@ -1,7 +1,7 @@
-﻿using Farmacio_Models.Domain;
-using Farmacio_Models.DTO;
-using EmailService.Constracts;
+﻿using EmailService.Constracts;
 using EmailService.Models;
+using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
@@ -27,6 +27,11 @@ namespace Farmacio_Services.Implementation
             _patientService = patientService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
+        }
+
+        public IEnumerable<Reservation> ReadFrom(Guid pharmacyId)
+        {
+            return Read().Where(reservation => reservation.PharmacyId == pharmacyId).ToList();
         }
 
         public Reservation CancelMedicineReservation(Guid reservationId)
@@ -98,6 +103,7 @@ namespace Farmacio_Services.Implementation
             return createdReservation;
         }
 
+
         public bool DidPatientReserveMedicine(Guid medicineId, Guid patientId)
         {
             var reservations = Read().ToList().Where(reservation => reservation.PatientId == patientId && reservation.State == ReservationState.Done 
@@ -108,6 +114,11 @@ namespace Farmacio_Services.Implementation
                 return medicines.Where(medicine => medicine.MedicineId == medicineId).FirstOrDefault() != null;
             }).ToList();
             return reservations.Count() > 0;
+        }
+        
+        public IEnumerable<Reservation> ReadFor(Guid patientId)
+        {
+            return Read().Where(reservation => reservation.PatientId == patientId).ToList();
         }
 
         public IEnumerable<SmallReservedMedicineDTO> ReadMedicinesForReservation(Guid reservationId)

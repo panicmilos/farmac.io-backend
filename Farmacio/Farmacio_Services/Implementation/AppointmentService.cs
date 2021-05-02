@@ -18,18 +18,15 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyService _pharmacyService;
         private readonly IAccountService _accountService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
-        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IPatientService _patientService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
         private readonly IERecipeService _eRecipeService;
 
-
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
-            , IPharmacyPriceListService pharmacyPriceListService
             , IPatientService patientService
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
@@ -40,12 +37,10 @@ namespace Farmacio_Services.Implementation
             _pharmacyService = pharmacyService;
             _accountService = accountService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
-            _pharmacyPriceListService = pharmacyPriceListService;
             _patientService = patientService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
-            //_medicalStaffService = medicalStaffService;
             _eRecipeService = eRecipeService;
         }
 
@@ -54,14 +49,16 @@ namespace Farmacio_Services.Implementation
             return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
         }
 
+        public IEnumerable<Appointment> ReadForPharmacy(Guid pharmacyId)
+        {
+            return Read().Where(appointment => appointment.PharmacyId == pharmacyId).ToList();
+        }
+
         public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
         {
-            return Read()
-                .ToList()
-                .Where(a => a.PharmacyId == pharmacyId &&
-                            _accountService.Read().ToList()
-                                .FirstOrDefault(acc => acc.UserId == a.MedicalStaffId)?.Role == Role.Dermatologist)
-                .ToList();
+            return ReadForPharmacy(pharmacyId)
+                .Where(appointment =>
+                    _accountService.ReadByUserId(appointment.MedicalStaffId)?.Role == Role.Dermatologist);
         }
 
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO)
@@ -75,7 +72,7 @@ namespace Farmacio_Services.Implementation
                 .GetWorkPlaceInPharmacyFor(appointmentDTO.MedicalStaffId, pharmacy.Id);
             if (workPlace == null)
                 throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
-            
+
             ValidateAppointmentDateTime(appointmentDTO, workPlace.WorkTime, "The given date-time and duration do not overlap with dermatologist's work time.",
                 "Dermatologist already has an appointment defined on the given date-time.");
 
@@ -83,9 +80,9 @@ namespace Farmacio_Services.Implementation
 
             if (withPatient)
                 ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
-            
+
             var price = appointmentDTO.Price ?? _pharmacyService.GetPriceOfDermatologistExamination(pharmacy.Id);
-            if(price <= 0 || price > 999999)
+            if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
             var newAppointment = Create(new Appointment
@@ -134,10 +131,10 @@ namespace Farmacio_Services.Implementation
         public Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointmentRequest)
         {
             var appointmentWithDermatologist = base.Read(appointmentRequest.AppointmentId);
-            if(appointmentWithDermatologist == null)
+            if (appointmentWithDermatologist == null)
                 throw new MissingEntityException("The given appointment does not exist in the system.");
 
-            if(_patientService.Read().Where(account => account.UserId == appointmentRequest.PatientId) == null)
+            if (_patientService.Read().Where(account => account.UserId == appointmentRequest.PatientId) == null)
                 throw new MissingEntityException("The given patient does not exixst in the system.");
 
             if (appointmentWithDermatologist.IsReserved)
@@ -146,7 +143,7 @@ namespace Farmacio_Services.Implementation
             if (_patientService.HasExceededLimitOfNegativePoints(appointmentRequest.PatientId))
                 throw new BadLogicException("The given patient has 3 or more negative points.");
 
-            if(appointmentWithDermatologist.DateTime < DateTime.Now)
+            if (appointmentWithDermatologist.DateTime < DateTime.Now)
                 throw new BadLogicException("The given appointment is in the past.");
 
             ValidateTimeForPatient(appointmentWithDermatologist.PatientId.Value, appointmentWithDermatologist.DateTime, appointmentWithDermatologist.Duration);
@@ -175,7 +172,6 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadForPatients(Guid patientId)
         {
-
             if (_patientService.Read().Where(account => account.UserId == patientId) == null)
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
@@ -187,11 +183,11 @@ namespace Farmacio_Services.Implementation
         public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
         {
             var appointment = base.TryToRead(appointmentId);
-            if(!appointment.IsReserved)
+            if (!appointment.IsReserved)
                 throw new BadLogicException("Given appointment is not reserved.");
-            if(DateTime.Now.AddHours(24) > appointment.DateTime)
+            if (DateTime.Now.AddHours(24) > appointment.DateTime)
                 throw new BadLogicException("It is not possible to cancel an appointment if there are less than 24 hours left before the start.");
-            if(appointment.DateTime < DateTime.Now)
+            if (appointment.DateTime < DateTime.Now)
                 throw new BadLogicException("It is not possible to cancel an appointment which date and time in the past.");
             appointment.IsReserved = false;
             appointment.PatientId = null;
@@ -206,7 +202,7 @@ namespace Farmacio_Services.Implementation
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment => 
+            return Read().ToList().Where(appointment =>
                 appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Dermatologist);
         }
 
@@ -278,7 +274,7 @@ namespace Farmacio_Services.Implementation
 
         public Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointmentDTO)
         {
-            if(appointmentDTO.DateTime < DateTime.Now)
+            if (appointmentDTO.DateTime < DateTime.Now)
                 throw new BadLogicException("The given date and time are in the past.");
 
             var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
@@ -287,7 +283,7 @@ namespace Farmacio_Services.Implementation
 
             if (pharmacist.PharmacyId != appointmentDTO.PharmacyId)
                 throw new BadLogicException("Pharmacist must work in that pharmacy.");
-                
+
             ValidateAppointmentDateTime(appointmentDTO, pharmacist.WorkTime, "The given date-time and duration do not overlap with pharmacist's work time.",
                 "Pharmacist already has an appointment defined on the given date-time.");
 
@@ -333,8 +329,8 @@ namespace Farmacio_Services.Implementation
                 var overlapingAppointments = ReadForMedicalStaff(pharmacist.Id)
                 .Where(appointment =>
                     appointment.MedicalStaffId == pharmacist.Id &&
-                    appointment.DateTime.Date == searchParams.ConsultationDateTime.Date && 
-                    TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration), 
+                    appointment.DateTime.Date == searchParams.ConsultationDateTime.Date &&
+                    TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration),
                     appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
                 return overlapingAppointments.Count() == 0;
             });
@@ -370,7 +366,8 @@ namespace Farmacio_Services.Implementation
             var patient = _patientService.TryToRead(patientId);
             return ReadForMedicalStaff(dermatologistUserId).Where(appointment => appointment.IsReserved
                              && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now).Count() != 0;
-       }
+        }
+
         public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment)
         {
             var medicalAccount = _accountService.ReadByUserId(appointment.MedicalStaffId);
@@ -391,6 +388,29 @@ namespace Farmacio_Services.Implementation
                     dateTime.AddMinutes(duration)))
                     throw new BadLogicException("The given appointment overlaps with the already reserved appointment of the patient.");
             }
+        }
+
+        public IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId)
+        {
+            return ReadForMedicalStaff(medicalStaffId).Select(appointment => new AppointmentAsEvent
+            {
+                Id = appointment.Id,
+                Start = appointment.DateTime,
+                End = appointment.DateTime.AddMinutes(appointment.Duration),
+                Title = $"{appointment.Patient?.FirstName} {appointment.Patient?.LastName}",
+                PharmacyName = appointment.Pharmacy.Name,
+                IsReported = appointment.ReportId != null
+            });
+        }
+
+        public IEnumerable<Appointment> ReadFor(Guid patientId)
+        {
+            if (_patientService.ReadByUserId(patientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+
+            return Read().Where(appointment => appointment.PatientId == patientId).ToList();
         }
     }
 }

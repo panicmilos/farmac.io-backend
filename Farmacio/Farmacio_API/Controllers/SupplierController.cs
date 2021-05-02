@@ -157,6 +157,32 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns all supplier's offers for a pharmacy order.
+        /// </summary>
+        /// <response code="200">Returns list of supplier's offers for a pharmacy order.</response>
+        [HttpGet("offers/pharmacy-order/{pharmacyOrderId}")]
+        public IActionResult GetSuppliersOffersForPharmacyOrder(Guid pharmacyOrderId)
+        {
+            return Ok(_supplierOfferService.ReadForPharmacyOrder(pharmacyOrderId));
+        }
+        
+        /// <summary>
+        /// Accepts an existing supplier offer for a pharmacy order.
+        /// </summary>
+        /// <response code="200">Accepted supplier offer.</response>
+        /// <response code="404">Offer, order, medicine or user missing.</response>
+        /// <response code="400">
+        ///     Order offers deadline not yer expired or
+        ///     The offer or order has already been handled or
+        ///     The pharmacy admin is not the creator of the order.
+        /// </response>
+        [HttpPost("offers/{offerId}")]
+        public IActionResult AcceptSupplierOffer(Guid offerId)
+        {
+            return Ok(_supplierOfferService.AcceptOffer(offerId, new Guid("08d906fa-8314-4183-818c-66f029870c3a")));
+        }
+        
+        /// <summary>
         /// Returns all supplier's offers from the system filtered by given status.
         /// </summary>
         /// <response code="200">Returns list of supplier's offers.</response>

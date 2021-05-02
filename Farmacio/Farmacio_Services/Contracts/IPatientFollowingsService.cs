@@ -6,6 +6,7 @@ namespace Farmacio_Services.Contracts
 {
     public interface IPatientFollowingsService
     {
+        IEnumerable<Account> ReadFollowersFor(Guid pharmacyId);
         PatientPharmacyFollow Follow(Guid patientAccountId, Guid pharmacyId);
 
         IEnumerable<PatientPharmacyFollow> ReadFollowingsOf(Guid patientAccountId);

@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
+using Farmacio_API.Contracts.Requests.PharmacyPriceLists;
+using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Farmacio_API.Contracts.Requests.PharmacyPriceLists;
-using Farmacio_API.Contracts.Requests.PharmacyPriceLists;
-using Farmacio_Models.Domain;
-using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_API.Controllers
 {
@@ -27,7 +25,7 @@ namespace Farmacio_API.Controllers
             _medicineService = medicineService;
             _mapper = mapper;
         }
-        
+
         /// <summary>
         /// Read an existing pharmacy price list by id.
         /// </summary>
@@ -39,7 +37,7 @@ namespace Farmacio_API.Controllers
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyPriceListService.TryToReadWithMostRecentPricesFor(pharmacyPriceListId));
         }
-        
+
         /// <summary>
         /// Read an existing pharmacy price list by pharmacy id.
         /// </summary>
@@ -51,7 +49,7 @@ namespace Farmacio_API.Controllers
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyPriceListService.TryToReadWithMostRecentPricesFor(pharmacyId));
         }
-        
+
         /// <summary>
         /// Create a pharmacy price list.
         /// </summary>
@@ -69,7 +67,7 @@ namespace Farmacio_API.Controllers
 
             return Ok(_pharmacyPriceListService.Create(pharmacyPriceList));
         }
-        
+
         /// <summary>
         /// Update an existing pharmacy price list.
         /// </summary>

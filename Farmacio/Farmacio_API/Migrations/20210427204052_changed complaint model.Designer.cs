@@ -3,14 +3,16 @@ using System;
 using Farmacio_Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Farmacio_API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210427204052_changed complaint model")]
+    partial class changedcomplaintmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,7 +246,7 @@ namespace Farmacio_API.Migrations
 
                     b.HasIndex("WriterId");
 
-                    b.ToTable("ComplaintAnswers");
+                    b.ToTable("ComplaintAnswer");
                 });
 
             modelBuilder.Entity("Farmacio_Models.Domain.DermatologistWorkPlace", b =>
@@ -798,37 +800,6 @@ namespace Farmacio_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PharmacyPriceLists");
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.Promotion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Discount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("From")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("PharmacyId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("To")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PharmacyId");
-
-                    b.ToTable("Promotions");
                 });
 
             modelBuilder.Entity("Farmacio_Models.Domain.Report", b =>
@@ -1417,15 +1388,6 @@ namespace Farmacio_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Farmacio_Models.Domain.Pharmacy", "Pharmacy")
-                        .WithMany()
-                        .HasForeignKey("PharmacyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Farmacio_Models.Domain.Promotion", b =>
-                {
                     b.HasOne("Farmacio_Models.Domain.Pharmacy", "Pharmacy")
                         .WithMany()
                         .HasForeignKey("PharmacyId")
