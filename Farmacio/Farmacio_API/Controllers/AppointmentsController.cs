@@ -240,7 +240,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns patients history of visits to a dermatologist.
+        /// Returns patients history of visits to a pharmacists.
         /// </summary>
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
@@ -251,7 +251,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Sort History of dermatology visits.
+        /// Sort history of pharmacists visits.
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
         [HttpGet("history-visit-pharmacists/{patientId}/sort")]
