@@ -81,7 +81,11 @@ namespace Farmacio_Services.Implementation
             return Read().Where(grade =>
             {
                 var medicineGrade = grade as MedicineGrade;
-                return medicineGrade.MedicineId == medicineId && medicineGrade.PatientId == patientId;
+                if(medicineGrade != null)
+                {
+                    return medicineGrade.MedicineId == medicineId && medicineGrade.PatientId == patientId;
+                }
+                return false;
             }).FirstOrDefault() != null;
         }
     }

@@ -213,7 +213,6 @@ namespace Farmacio_API.Controllers
         public IActionResult GetPatientCanRate(Guid patientId)
         {
             var medicines = _medicineService.ReadThatPatientCanRate(patientId);
-            Console.WriteLine(medicines.Count());
 
             return Ok(_medicineGradeService.ReadMedicinesThatPatientCanRate(medicines, patientId));
         }
