@@ -238,5 +238,27 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_appointmentService.ReadAppointmentsForCalendar(medicalStaffId));
         }
+
+        /// <summary>
+        /// Returns patients history of visits to a dermatologist.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
+        [HttpGet("history-visit-pharmacists/{patientId}")]
+        public IActionResult ReadPatientsHistoryOfVisingPharmacists(Guid patientId)
+        {
+            return Ok(_appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId));
+        }
+
+        /// <summary>
+        /// Sort History of dermatology visits.
+        /// </summary>
+        /// <response code="200">Sorted appointments.</response>
+        [HttpGet("history-visit-pharmacists/{patientId}/sort")]
+        public IActionResult SortHistoryOfVisitingPharmacists(Guid patientId, string criteria, bool isAsc)
+        {
+            var appointments = _appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId);
+            return Ok(_appointmentService.SortAppointments(appointments, criteria, isAsc));
+        }
     }
 }
