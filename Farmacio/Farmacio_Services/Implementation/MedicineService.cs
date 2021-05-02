@@ -16,9 +16,12 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IPharmacyService _pharmacyService;
+        private readonly IERecipeService _eRecipeService;
+        private readonly IReservationService _reservationService;
 
         public MedicineService(IMedicineReplacementService replacementService, IMedicineIngredientService ingredientService,
             IPharmacyPriceListService pharmacyPriceListService, IPharmacyService pharmacyService, IPharmacyStockService pharmacyStockService,
+            IERecipeService eRecipeService, IReservationService reservationService,
             IRepository<Medicine> repository) :
             base(repository)
         {
@@ -27,6 +30,8 @@ namespace Farmacio_Services.Implementation
             _pharmacyPriceListService = pharmacyPriceListService;
             _pharmacyStockService = pharmacyStockService;
             _pharmacyService = pharmacyService;
+            _eRecipeService = eRecipeService;
+            _reservationService = reservationService;
         }
 
         public FullMedicineDTO ReadFullMedicine(Guid id)
@@ -78,6 +83,8 @@ namespace Farmacio_Services.Implementation
             existingMedicine.Contraindications = medicine.Contraindications;
             existingMedicine.AdditionalInfo = medicine.AdditionalInfo;
             existingMedicine.RecommendedDose = medicine.RecommendedDose;
+            existingMedicine.NumberOfGrades = medicine.NumberOfGrades;
+            existingMedicine.AverageGrade = medicine.AverageGrade;
 
             return base.Update(existingMedicine);
         }
@@ -195,6 +202,29 @@ namespace Farmacio_Services.Implementation
                 Name = m.Name,
                 Price = m.Price
             }));
+        }
+
+        public Medicine UpdateGrade(Medicine medicine)
+        {
+            var existingMedicine = TryToRead(medicine.Id);
+
+            existingMedicine.AverageGrade = medicine.AverageGrade;
+            existingMedicine.NumberOfGrades = medicine.NumberOfGrades;
+
+            return base.Update(existingMedicine);
+        }
+
+        public IEnumerable<Medicine> ReadThatPatientCanRate(Guid patientId)
+        {
+            var medicines = Read().ToList().Where(medicine => _reservationService.DidPatientReserveMedicine(medicine.Id, patientId)).ToList();
+            foreach(var medicine in Read().ToList())
+            {
+                if(medicines.Where(reservedMedicine => reservedMedicine.Id == medicine.Id).Count() == 0 && _eRecipeService.WasMedicinePrescribedToPatient(medicine.Id, patientId))
+                {
+                    medicines.Add(medicine);
+                }
+            }
+            return medicines;
         }
     }
 }

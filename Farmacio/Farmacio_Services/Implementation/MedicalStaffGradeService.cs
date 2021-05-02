@@ -24,7 +24,7 @@ namespace Farmacio_Services.Implementation
         {
             var grades = Read().Where(grade => {
                 var medicalStaffGrade = grade as MedicalStaffGrade;
-                return medicalStaffGrade.PatientId == patientId && medicalStaffGrade.MedicalStaffId == medicalStaffId;
+                return medicalStaffGrade?.PatientId == patientId && medicalStaffGrade.MedicalStaffId == medicalStaffId;
             });
             return grades.FirstOrDefault() != null;
         }

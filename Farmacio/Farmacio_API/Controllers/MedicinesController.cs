@@ -1,4 +1,5 @@
 using AutoMapper;
+using Farmacio_API.Contracts.Requests.Grades;
 using Farmacio_API.Contracts.Requests.Medicines;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
@@ -7,6 +8,7 @@ using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Farmacio_API.Controllers
 {
@@ -19,18 +21,21 @@ namespace Farmacio_API.Controllers
         private readonly IPharmacyService _pharmacyService;
         private readonly IMedicinePdfService _medicinePdfService;
         private readonly IPatientAllergyService _patientAllergyService;
+        private readonly IMedicineGradeService _medicineGradeService;
         private readonly IMapper _mapper;
 
         public MedicinesController(IMedicineService medicineService,
             IPharmacyService pharmacyService,
             IMedicinePdfService medicinePdfService,
             IPatientAllergyService patientAllergyService,
+            IMedicineGradeService medicineGradeService,
             IMapper mapper)
         {
             _medicineService = medicineService;
             _pharmacyService = pharmacyService;
             _medicinePdfService = medicinePdfService;
             _patientAllergyService = patientAllergyService;
+            _medicineGradeService = medicineGradeService;
             _mapper = mapper;
         }
 
@@ -184,6 +189,30 @@ namespace Farmacio_API.Controllers
             var medicineDTOs = _medicineService.ReadMedicinesOrReplacementsByName(pharmacyId, name);
             medicineDTOs = _patientAllergyService.ForEachMedicineInListCheckIfPatientHasAnAllergyToIt(medicineDTOs, patientId);
             return Ok(medicineDTOs);
+        }
+
+        /// <summary>
+        /// Rate medicine.
+        /// </summary>
+        /// <response code="200">Returns medicine grade.</response>
+        /// <response code="400">Patient cannot rate the medicine or already has rated it.</response>
+        /// <response code="404">Given patient or medicine does not exist in the system.</response>
+        [HttpPost("rate")]
+        public IActionResult RateMedicine(CreateMedicineGradeRequest request)
+        {
+            var medicineGrade = _mapper.Map<MedicineGrade>(request);
+            return Ok(_medicineGradeService.Create(medicineGrade));
+        }
+
+
+        /// <summary>
+        /// Reads medicines that patient can rate.
+        /// </summary>
+        /// <response code="200">Returns medicines.</response>
+        [HttpGet("{patientId}/can-rate")]
+        public IActionResult GetPatientCanRate(Guid patientId)
+        {
+            return Ok(_medicineGradeService.ReadThatPatientCanRate(patientId));
         }
     }
 }
