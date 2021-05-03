@@ -2,10 +2,10 @@
 
 namespace Farmacio_API.Contracts.Requests.Grades
 {
-    public class CreateDermatologistGradeRequest
+    public class CreateMedicalStaffGradeRequest
     {
         public int Grade { get; set; }
         public Guid PatientId { get; set; }
-        public Guid DermatologistId { get; set; }
+        public Guid MedicalStaffId { get; set; }
     }
 }

@@ -38,7 +38,7 @@ namespace Farmacio_Services.Contracts
 
         Appointment CancelAppointmentWithPharmacist(Guid appointmentId);
 
-        bool DidPatientHaveAppointmentWithDermatologist(Guid patientId, Guid dermatologistUserId);
+        bool DidPatientHaveAppointmentWithMedicalStaff(Guid patientId, Guid medicalStaffId);
 
         Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment);
         
