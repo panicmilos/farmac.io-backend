@@ -161,7 +161,8 @@ namespace Farmacio_Services.Implementation
             {
                 { "grade", a => a.MedicalStaff.AverageGrade },
                 { "price", a => a.Price },
-                { "duration", a => a.Duration }
+                { "duration", a => a.Duration },
+                { "date", a => a.DateTime}
             };
 
             if (sortingCriteria.TryGetValue(criteria ?? "", out var sortingCriterion))
@@ -411,6 +412,16 @@ namespace Farmacio_Services.Implementation
             }
 
             return Read().Where(appointment => appointment.PatientId == patientId).ToList();
+        }
+
+        public IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId)
+        {
+            if (_patientService.ReadByUserId(patientId) == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+            return ReadFor(patientId).Where(appointment =>
+                appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Pharmacist);
         }
     }
 }

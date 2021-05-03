@@ -45,5 +45,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId);
         
         IEnumerable<Appointment> ReadFor(Guid patientId);
+        IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId);
     }
 }
