@@ -11,6 +11,8 @@ namespace Farmacio_API.Mappings.Grades
             CreateMap<CreateMedicalStaffGradeRequest, MedicalStaffGrade>()
                 .ForMember(dst => dst.Value, src => src.MapFrom(src => src.Grade))
                 .ForMember(dst => dst.MedicalStaffId, src => src.MapFrom(src => src.MedicalStaffId));
+
+            CreateMap<CreateMedicineGradeRequest, MedicineGrade>();
         }
     }
 }
