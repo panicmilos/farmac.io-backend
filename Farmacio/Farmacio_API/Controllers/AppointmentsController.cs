@@ -245,7 +245,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
         [HttpGet("history-visit-pharmacists/{patientId}")]
-        public IActionResult ReadPatientsHistoryOfVisingPharmacists(Guid patientId)
+        public IActionResult ReadPatientsHistoryOfVisitngPharmacists(Guid patientId)
         {
             return Ok(_appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId));
         }

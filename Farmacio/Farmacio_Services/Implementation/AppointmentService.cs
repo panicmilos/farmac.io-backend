@@ -416,12 +416,12 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId)
         {
-            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
+            if (_patientService.ReadByUserId(patientId) == null)
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment =>
-                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Pharmacist);
+            return ReadFor(patientId).Where(appointment =>
+                appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Pharmacist);
         }
     }
 }
