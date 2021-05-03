@@ -57,7 +57,6 @@ namespace Farmacio_Services.Implementation
 
         public override LoyaltyPoints Update(LoyaltyPoints loyaltyPoints)
         {
-            loyaltyPoints.MedicinePointsList.ForEach(medicine => Console.WriteLine(medicine.MedicineId));
             loyaltyPoints.MedicinePointsList.ForEach(medicinePoints => _medicineService.TryToRead(medicinePoints.MedicineId));
 
             var existingLoyaltyPoints = ReadOrCreate();
