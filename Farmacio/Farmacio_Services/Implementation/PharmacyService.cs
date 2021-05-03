@@ -220,5 +220,15 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Price list not found for the given pharmacy.");
             return priceList.ExaminationPrice;
         }
+
+        public Pharmacy UpdateGrade(Pharmacy pharmacy)
+        {
+            var existingPharmacy = TryToRead(pharmacy.Id);
+
+            existingPharmacy.AverageGrade = pharmacy.AverageGrade;
+            existingPharmacy.NumberOfGrades = pharmacy.NumberOfGrades;
+
+            return base.Update(existingPharmacy);
+        }
     }
 }
