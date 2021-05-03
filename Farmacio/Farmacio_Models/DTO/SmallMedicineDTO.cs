@@ -8,7 +8,7 @@ namespace Farmacio_Models.DTO
         public Guid Id { get; set; }
         public string Name { get; set; }
         public MedicineType Type { get; set; }
-        public int AverageGrade { get; set; }
+        public float AverageGrade { get; set; }
         public string Manufacturer { get; set; }
     }
 }

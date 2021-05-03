@@ -15,7 +15,7 @@ namespace Farmacio_Models.Domain
         public string Contraindications { get; set; }
         public string AdditionalInfo { get; set; }
         public string RecommendedDose { get; set; }
-        public int AverageGrade { get; set; }
+        public float AverageGrade { get; set; }
         public int NumberOfGrades { get; set; }
     }
 
