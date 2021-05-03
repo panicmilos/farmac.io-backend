@@ -336,20 +336,23 @@ public static class SeedDb
 
         var loyaltyProgram1 = new LoyaltyProgram
         {
-            Discount = 30,
-            MinPoints = 5
+            Discount = 2,
+            MinPoints = 50,
+            Name = "Regular"
         };
 
         var loyaltyProgram2 = new LoyaltyProgram
         {
-            Discount = 20,
-            MinPoints = 3
+            Discount = 5,
+            MinPoints = 150,
+            Name = "Silver"
         };
 
         var loyaltyProgram3 = new LoyaltyProgram
         {
-            Discount = 50,
-            MinPoints = 15
+            Discount = 10,
+            MinPoints = 500,
+            Name = "Gold"
         };
 
         AddIFNotDuplicate(context, loyaltyProgram1);
