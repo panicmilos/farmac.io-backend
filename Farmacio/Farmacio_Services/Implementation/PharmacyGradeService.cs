@@ -50,7 +50,7 @@ namespace Farmacio_Services.Implementation
 
             if (DidPatientRatePharmacy(grade.PatientId, pharmacyGrade.PharmacyId))
             {
-                throw new BadLogicException("The patient has already rated the medicine.");
+                throw new BadLogicException("The patient has already rated the pharmacy.");
             }
 
             if (grade.Value < 1 || grade.Value > 5)

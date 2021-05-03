@@ -345,7 +345,7 @@ namespace Farmacio_API.Controllers
         /// <response code="400">Patient cannot rate the pharmacy or already has rated it.</response>
         /// <response code="404">Given patient or pharmacy does not exist in the system.</response>
         [HttpPost("rate")]
-        public IActionResult RateMedicine(CreatePharmacyGradeRequest request)
+        public IActionResult RatePharmacy(CreatePharmacyGradeRequest request)
         {
             var pharmacyGrade = _mapper.Map<PharmacyGrade>(request);
             return Ok(_pharmacyGradeService.Create(pharmacyGrade));
