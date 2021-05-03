@@ -94,14 +94,14 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("The given medical staff does not exist.");
             }
 
-            if (!_appointmentService.DidPatientHaveAppointmentWithDermatologist(grade.PatientId, grade.MedicalStaffId))
+            if (!_appointmentService.DidPatientHaveAppointmentWithMedicalStaff(grade.PatientId, grade.MedicalStaffId))
             {
                 throw new BadLogicException("The patient cannot rate the medical staff because he did not have an appointment with him.");
             }
 
             if (_medicalStaffGradeService.DidPatientGradeMedicalStaff(grade.PatientId, grade.MedicalStaffId))
             {
-                throw new BadLogicException("The patient has already been rate a medical staff.");
+                throw new BadLogicException("The patient has already rated a medical staff.");
             }
 
             grade = _medicalStaffGradeService.Create(grade) as MedicalStaffGrade;

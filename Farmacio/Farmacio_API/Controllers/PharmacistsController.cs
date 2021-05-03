@@ -111,8 +111,8 @@ namespace Farmacio_API.Controllers
         [HttpPost("rate")]
         public IActionResult RateThePharmacist(CreateMedicalStaffGradeRequest request)
         {
-            var dermatologistGrade = _mapper.Map<MedicalStaffGrade>(request);
-            return Ok(_medicalStaffService.GradeMedicalStaff(dermatologistGrade));
+            var pharmacistsGrade = _mapper.Map<MedicalStaffGrade>(request);
+            return Ok(_medicalStaffService.GradeMedicalStaff(pharmacistsGrade));
         }
 
 

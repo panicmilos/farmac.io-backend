@@ -136,7 +136,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Account> ReadThatPatientCanRate(Guid patientId)
         {
-            return Read().Where(dermatologist => _appointmentService.DidPatientHaveAppointmentWithDermatologist(patientId, dermatologist.UserId) &&
+            return Read().Where(dermatologist => _appointmentService.DidPatientHaveAppointmentWithMedicalStaff(patientId, dermatologist.UserId) &&
             !_medicalStaffGradeService.DidPatientGradeMedicalStaff(patientId, dermatologist.UserId)).ToList();
         }
 

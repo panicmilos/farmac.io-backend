@@ -22,11 +22,7 @@ namespace Farmacio_Services.Implementation
         {
             var grades = Read().Where(grade => {
                 var medicalStaffGrade = grade as MedicalStaffGrade;
-                if(medicalStaffGrade != null)
-                {
-                    return medicalStaffGrade.PatientId == patientId && medicalStaffGrade.MedicalStaffId == medicalStaffId;
-                }
-                return false;
+                return medicalStaffGrade?.PatientId == patientId && medicalStaffGrade?.MedicalStaffId == medicalStaffId;
             });
             return grades.FirstOrDefault() != null;
         }
@@ -38,7 +34,7 @@ namespace Farmacio_Services.Implementation
             return Read().Where(grade =>
             {
                 var medicalStafGrade = grade as MedicalStaffGrade;
-                return medicalStafGrade.PatientId == patientId && medicalStafGrade.MedicalStaffId == medicalStaffId;
+                return medicalStafGrade?.PatientId == patientId && medicalStafGrade?.MedicalStaffId == medicalStaffId;
             }).FirstOrDefault() as MedicalStaffGrade;
         }
     }

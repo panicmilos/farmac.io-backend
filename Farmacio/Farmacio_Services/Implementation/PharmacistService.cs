@@ -18,7 +18,7 @@ namespace Farmacio_Services.Implementation
 
         public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService, IMedicalStaffGradeService medicalStaffGradeService,
             IAppointmentService appointmentService, IRepository<Account> repository) :
-            base(emailVerificationService, appointmentService, medicalStaffGradeService,repository)
+            base(emailVerificationService, appointmentService, medicalStaffGradeService, repository)
         {
             _pharmacyService = pharmacyService;
             _appointmentService = appointmentService;
@@ -122,7 +122,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Account> ReadThatPatientCanRate(Guid patientId)
         {
-            return Read().Where(pharmacists => _appointmentService.DidPatientHaveAppointmentWithDermatologist(patientId, pharmacists.UserId) &&
+            return Read().Where(pharmacists => _appointmentService.DidPatientHaveAppointmentWithMedicalStaff(patientId, pharmacists.UserId) &&
             !_medicalStaffGradeService.DidPatientGradeMedicalStaff(patientId, pharmacists.UserId)).ToList();
         }
     }
