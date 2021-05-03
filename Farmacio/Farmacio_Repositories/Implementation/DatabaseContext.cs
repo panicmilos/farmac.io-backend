@@ -27,6 +27,7 @@ namespace Farmacio_Repositories.Implementation
         public DbSet<ComplaintAboutPharmacy> ComplaintAboutPharmacies { get; set; }
         public DbSet<ComplaintAnswer> ComplaintAnswers { get; set; }
         public DbSet<LoyaltyPoints> LoyaltyPoints { get; set; }
+        public DbSet<MedicinePoints> MedicinePoints { get; set; }
 
         public DbSet<AbsenceRequest> AbsenceRequests { get; set; }
         public DbSet<DermatologistWorkPlace> DermatologistWorkPlaces { get; set; }
