@@ -13,6 +13,7 @@ namespace Farmacio_API.Mappings.Grades
                 .ForMember(dst => dst.MedicalStaffId, src => src.MapFrom(src => src.MedicalStaffId));
 
             CreateMap<CreateMedicineGradeRequest, MedicineGrade>();
+            CreateMap<CreatePharmacyGradeRequest, PharmacyGrade>();
         }
     }
 }

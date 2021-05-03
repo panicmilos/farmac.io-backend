@@ -11,6 +11,7 @@ using System.Linq;
 using Farmacio_API.Contracts.Requests.PharmacyMedicines;
 using Farmacio_API.Contracts.Requests.WorkTimes;
 using Farmacio_API.Contracts.Responses.Dermatologists;
+using Farmacio_API.Contracts.Requests.Grades;
 
 namespace Farmacio_API.Controllers
 {
@@ -27,6 +28,7 @@ namespace Farmacio_API.Controllers
         private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IMedicineService _medicineService;
         private readonly IPharmacyPriceListService _pharmacyPriceListService;
+        private readonly IPharmacyGradeService _pharmacyGradeService;
         private readonly IMapper _mapper;
 
         public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
@@ -34,6 +36,7 @@ namespace Farmacio_API.Controllers
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IPharmacyStockService pharmacyStockService
             , IPharmacyPriceListService pharmacyPriceListService
+            , IPharmacyGradeService pharmacyGradeService
             , IMedicineService medicineService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
@@ -45,6 +48,7 @@ namespace Farmacio_API.Controllers
             _pharmacyStockService = pharmacyStockService;
             _medicineService = medicineService;
             _pharmacyPriceListService = pharmacyPriceListService;
+            _pharmacyGradeService = pharmacyGradeService;
         }
 
         /// <summary>
@@ -331,6 +335,30 @@ namespace Farmacio_API.Controllers
             }).Select(pharmacistAccount => (Pharmacist)pharmacistAccount.User);
 
             return Ok(_pharmacistService.SortByGrade(pharmacists.ToList(), searchParams));
+        }
+
+
+        /// <summary>
+        /// Rate pharmacy.
+        /// </summary>
+        /// <response code="200">Returns pharmacy grade.</response>
+        /// <response code="400">Patient cannot rate the pharmacy or already has rated it.</response>
+        /// <response code="404">Given patient or pharmacy does not exist in the system.</response>
+        [HttpPost("rate")]
+        public IActionResult RatePharmacy(CreatePharmacyGradeRequest request)
+        {
+            var pharmacyGrade = _mapper.Map<PharmacyGrade>(request);
+            return Ok(_pharmacyGradeService.Create(pharmacyGrade));
+        }
+
+        /// <summary>
+        /// Reads pharmacies that patient can rate.
+        /// </summary>
+        /// <response code="200">Returns pharmacies.</response>
+        [HttpGet("{patientId}/can-rate")]
+        public IActionResult GetPatientCanRate(Guid patientId)
+        {
+            return Ok(_pharmacyGradeService.ReadThatPatientCanRate(patientId));
         }
     }
 }

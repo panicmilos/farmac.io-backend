@@ -9,6 +9,6 @@ namespace Farmacio_Models.DTO
         public string Name { get; set; }
         public string Description { get; set; }
         public Address Address { get; set; }
-        public int AverageGrade { get; set; }
+        public float AverageGrade { get; set; }
     }
 }

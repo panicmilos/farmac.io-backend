@@ -8,7 +8,7 @@ namespace Farmacio_Models.Domain
         public Guid AddressId { get; set; }
         public virtual Address Address { get; set; }
         public string Description { get; set; }
-        public int AverageGrade { get; set; }
+        public float AverageGrade { get; set; }
         public int NumberOfGrades { get; set; }
     }
 

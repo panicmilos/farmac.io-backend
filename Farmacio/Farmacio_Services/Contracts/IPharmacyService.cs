@@ -18,5 +18,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacists(IList<Account> pharmacists, SearhSortParamsForAppointments searchParams);
         float GetPriceOfPharmacistConsultation(Guid pharmacyId);
         float GetPriceOfDermatologistExamination(Guid pharmacyId);
+        Pharmacy UpdateGrade(Pharmacy pharmacy);
     }
 }
