@@ -1,4 +1,5 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
@@ -10,15 +11,50 @@ namespace Farmacio_Services.Implementation
 {
     public class ERecipeService : CrudService<ERecipe>, IERecipeService
     {
-        public ERecipeService(IRepository<ERecipe> repository) : base(repository)
-        {
+        private readonly IPharmacyService _pharmacyService;
 
+        public ERecipeService(IPharmacyService pharmacyService, IRepository<ERecipe> repository) : base(repository)
+        {
+            _pharmacyService = pharmacyService;
         }
 
         public override ERecipe Create(ERecipe eRecipe)
         {
             eRecipe.UniqueId = GetUniqueId();
             return base.Create(eRecipe);
+        }
+
+        public IEnumerable<PharmacyForERecipeDTO> FindPharmaciesWithMedicinesFrom(Guid eRecipeId)
+        {
+            var existingERecipe = TryToRead(eRecipeId);
+
+            return _pharmacyService.Read().ToList()
+                .Where(pharmacy =>
+                {
+                    return existingERecipe.Medicines.All(medicine =>
+                    {
+                        try
+                        {
+                            var medicineInPharmacy = _pharmacyService.ReadMedicine(pharmacy.Id, medicine.MedicineId);
+                            if (medicineInPharmacy.InStock < medicine.Quantity)
+                            {
+                                return false;
+                            }
+                            return true;
+                        }
+                        catch (Exception)
+                        {
+                            return false;
+                        }
+                    });
+                })
+                .Select(pharmacy => new PharmacyForERecipeDTO
+                {
+                    Name = pharmacy.Name,
+                    Address = pharmacy.Address,
+                    AverageGrade = pharmacy.AverageGrade,
+                    TotalPriceOfMedicines = existingERecipe.Medicines.Sum(medicine => _pharmacyService.ReadMedicine(pharmacy.Id, medicine.MedicineId).Price * medicine.Quantity)
+                });
         }
 
         public IEnumerable<ERecipe> ReadFor(Guid patientId)
