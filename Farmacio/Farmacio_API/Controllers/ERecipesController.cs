@@ -26,5 +26,15 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_eRecipeService.FindPharmaciesWithMedicinesFrom(eRecipeId));
         }
+
+        /// <summary>
+        /// Sorts pharmacies with medicines for eRecipe.
+        /// </summary>
+        /// <response code="200">Sorted pharmacies.</response>
+        [HttpGet("{eRecipeId}/pharmacies/sort")]
+        public IActionResult SortPharmaciesWithMedicines(Guid eRecipeId, string criteria, bool isAsc)
+        {
+            return Ok(_eRecipeService.SortPharmaciesWithMedicinesFrom(eRecipeId, criteria, isAsc));
+        }
     }
 }

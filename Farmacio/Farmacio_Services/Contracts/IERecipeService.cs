@@ -12,5 +12,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<ERecipe> ReadFor(Guid patientId);
 
         IEnumerable<PharmacyForERecipeDTO> FindPharmaciesWithMedicinesFrom(Guid eRecipeId);
+
+        IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending);
     }
 }

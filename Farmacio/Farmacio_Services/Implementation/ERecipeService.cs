@@ -62,6 +62,24 @@ namespace Farmacio_Services.Implementation
             return Read().Where(eRecipe => eRecipe.PatientId == patientId).ToList();
         }
 
+        public IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending)
+        {
+            var pharmacies = FindPharmaciesWithMedicinesFrom(eRecipeId);
+            var sortingCriteria = new Dictionary<string, Func<PharmacyForERecipeDTO, object>>()
+            {
+                { "name", p => p.Name },
+                { "grade", p => p.AverageGrade },
+                { "price", p => p.TotalPriceOfMedicines }
+            };
+
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
+            {
+                pharmacies = isAscending ? pharmacies.OrderBy(sortingCriterion) : pharmacies.OrderByDescending(sortingCriterion);
+            }
+
+            return pharmacies;
+        }
+
         public bool WasMedicinePrescribedToPatient(Guid patientId, Guid medicineId)
         {
             var eRecipes = ReadFor(patientId);
