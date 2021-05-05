@@ -81,10 +81,7 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("The given allergy does not exist in the system.");
             }
 
-            allergy.Active = false;
-            base.Update(allergy);
-
-            return allergy;
+            return base.Delete(allergy.Id);
         }
     }
 }
