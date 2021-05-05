@@ -61,14 +61,24 @@ namespace Farmacio_Services.Implementation
             return ReadFor(pharmacyId)
                 .Where(promotion => DateTime.Now >= promotion.From && DateTime.Now <= promotion.To).ToList();
         }
-        
+
+        public float ApplyPromotionDiscountForPriceFor(Guid pharmacyId, float price)
+        {
+            ReadActiveFor(pharmacyId).ToList()
+                .ForEach(promotion =>
+                {
+                    price -= (promotion.Discount / 100f) * price;
+                });
+            return price >= 0f ? price : 0f;
+        }
+
         private void ValidatePromotion(Promotion promotion, bool isCreate = true)
         {
             if (isCreate)
                 _pharmacyService.TryToRead(promotion.PharmacyId);
             if (promotion.To <= promotion.From)
                 throw new BadLogicException("Please provide valid time period.");
-            if (DateTime.Now <= promotion.From)
+            if (DateTime.Now > promotion.From)
                 throw new BadLogicException("Promotion must be in the future.");
             if (promotion.Discount <= 0 || promotion.Discount > 100)
                 throw new BadLogicException("Discount is not valid.");

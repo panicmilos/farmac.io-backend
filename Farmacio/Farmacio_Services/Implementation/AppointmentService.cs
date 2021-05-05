@@ -24,6 +24,7 @@ namespace Farmacio_Services.Implementation
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
         private readonly IERecipeService _eRecipeService;
+        private readonly IPromotionService _promotionService;
 
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
@@ -33,7 +34,8 @@ namespace Farmacio_Services.Implementation
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
             , IReportService reportService
-            , IERecipeService eRecipeService) : base(repository)
+            , IERecipeService eRecipeService
+            , IPromotionService promotionService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -45,6 +47,7 @@ namespace Farmacio_Services.Implementation
             _templatesProvider = templateProvider;
             _reportService = reportService;
             _eRecipeService = eRecipeService;
+            _promotionService = promotionService;
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
@@ -93,6 +96,8 @@ namespace Farmacio_Services.Implementation
             var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentDTO.PatientId.Value)) : originalPrice;
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
+
+            price = _promotionService.ApplyPromotionDiscountForPriceFor(pharmacy.Id, price);
 
             var newAppointment = Create(new Appointment
             {
@@ -310,6 +315,8 @@ namespace Farmacio_Services.Implementation
             var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentDTO.PatientId.Value)) : originalPrice;
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
+            
+            price = _promotionService.ApplyPromotionDiscountForPriceFor(pharmacy.Id, price);
 
             var appointmentWithPharmacist = Create(new Appointment
             {
