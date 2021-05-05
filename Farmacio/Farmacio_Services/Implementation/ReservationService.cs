@@ -19,6 +19,7 @@ namespace Farmacio_Services.Implementation
         private readonly ILoyaltyProgramService _loyaltyProgramService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
+        private readonly IPromotionService _promotionService;
 
         public ReservationService(
             IPharmacyService pharmacyService,
@@ -34,6 +35,7 @@ namespace Farmacio_Services.Implementation
             _loyaltyProgramService = loyaltyProgramService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
+            _promotionService = promotionService;
         }
 
         public IEnumerable<Reservation> ReadFrom(Guid pharmacyId)
