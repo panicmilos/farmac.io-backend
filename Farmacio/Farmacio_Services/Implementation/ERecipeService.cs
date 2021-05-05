@@ -38,9 +38,14 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
 
-            (string sortCriteria, bool isAsc, bool isUsed) = sortFilterParams;
+            (string sortCriteria, bool isAsc, bool? isUsed) = sortFilterParams;
 
-            var eRecipes = Read().ToList().Where(eRecipe => eRecipe.PatientId == patientUserId && eRecipe.IsUsed == isUsed);
+            var eRecipes = Read().ToList().Where(eRecipe => eRecipe.PatientId == patientUserId);
+
+            if(isUsed.HasValue)
+            {
+                eRecipes = eRecipes.Where(eRecipe => eRecipe.IsUsed == isUsed);
+            }
 
             var sortingCriteria = new Dictionary<string, Func<ERecipe, object>>()
             {
