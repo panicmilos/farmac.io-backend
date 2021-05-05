@@ -20,6 +20,7 @@ namespace Farmacio_API.Controllers
         private readonly IMedicalStaffService _medicalStaffService;
         private readonly IPatientAllergyService _patientAllergyService;
         private readonly IPatientFollowingsService _patientFollowingsService;
+        private readonly IERecipeService _eRecipeService;
         private readonly IMapper _mapper;
 
         public PatientsController(
@@ -27,12 +28,14 @@ namespace Farmacio_API.Controllers
             IMedicalStaffService medicalStaffService,
             IPatientAllergyService patientAllergyService,
             IPatientFollowingsService patientFollowingsService,
+            IERecipeService eRecipeService,
             IMapper mapper)
         {
             _patientService = patientService;
             _medicalStaffService = medicalStaffService;
             _patientAllergyService = patientAllergyService;
             _patientFollowingsService = patientFollowingsService;
+            _eRecipeService = eRecipeService;
             _mapper = mapper;
         }
 
@@ -178,6 +181,18 @@ namespace Farmacio_API.Controllers
         public IActionResult DeleteAllergy(Guid patientId, Guid medicineId)
         {
             return Ok(_patientAllergyService.Delete(patientId, medicineId));
+        }
+
+
+        /// <summary>
+        /// Returns patient's eRecipes.
+        /// </summary>
+        /// <response code="200">Returns patient's eRecipes.</response>
+        /// <response code="404">Given patient does not exist in the system.</response>
+        [HttpGet("{patientUserId}/eRecipes/sort")]
+        public IActionResult SortERecipes(Guid patientUserId, [FromQuery] ERecipesSortFilterParams sortFilterParams)
+        {
+            return Ok(_eRecipeService.SortFor(patientUserId, sortFilterParams));
         }
     }
 }

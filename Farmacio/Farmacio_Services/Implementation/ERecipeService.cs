@@ -1,7 +1,9 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
+using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,10 @@ namespace Farmacio_Services.Implementation
 {
     public class ERecipeService : CrudService<ERecipe>, IERecipeService
     {
-        public ERecipeService(IRepository<ERecipe> repository) : base(repository)
+        private readonly IPatientService _patientService;
+        public ERecipeService(IRepository<ERecipe> repository, IPatientService patientService) : base(repository)
         {
-
+            _patientService = patientService;
         }
 
         public override ERecipe Create(ERecipe eRecipe)
@@ -24,6 +27,43 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<ERecipe> ReadFor(Guid patientId)
         {
             return Read().Where(eRecipe => eRecipe.PatientId == patientId).ToList();
+        }
+
+        public IEnumerable<ERecipeDTO> SortFor(Guid patientUserId, ERecipesSortFilterParams sortFilterParams)
+        {
+            var patient = _patientService.ReadByUserId(patientUserId);
+
+            if (patient == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+
+            (string sortCriteria, bool isAsc, bool? isUsed) = sortFilterParams;
+
+            var eRecipes = Read().ToList().Where(eRecipe => eRecipe.PatientId == patientUserId);
+
+            if(isUsed.HasValue)
+            {
+                eRecipes = eRecipes.Where(eRecipe => eRecipe.IsUsed == isUsed);
+            }
+
+            var sortingCriteria = new Dictionary<string, Func<ERecipe, object>>()
+            {
+                { "issuingDate", e => e.IssuingDate }
+            };
+
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
+            {
+                eRecipes = isAsc ? eRecipes.OrderBy(sortingCriterion) : eRecipes.OrderByDescending(sortingCriterion);
+            }
+
+            return eRecipes.Select(eRecipe => new ERecipeDTO
+            {
+                Id = eRecipe.Id,
+                IssuingDate = eRecipe.IssuingDate,
+                IsUsed = eRecipe.IsUsed,
+                UniqueId = eRecipe.UniqueId
+            });
         }
 
         public bool WasMedicinePrescribedToPatient(Guid patientId, Guid medicineId)
