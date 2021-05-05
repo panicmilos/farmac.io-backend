@@ -10,6 +10,7 @@ namespace Farmacio_Models.Domain
         public Guid PatientId { get; set; }
         public virtual Patient Patient { get; set; }
         public virtual List<ERecipeMedicine> Medicines { get; set; }
+        public bool IsUsed { get; set; }
     }
 
     public class ERecipeMedicine : BaseEntity

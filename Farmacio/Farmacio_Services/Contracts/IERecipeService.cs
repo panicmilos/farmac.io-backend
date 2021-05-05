@@ -14,5 +14,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<PharmacyForERecipeDTO> FindPharmaciesWithMedicinesFrom(Guid eRecipeId);
 
         IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending);
+
+        Reservation CreateReservationFromERecipe(CreateReservationFromERecipeDTO createERecipeDTO);
     }
 }

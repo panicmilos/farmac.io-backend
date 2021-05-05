@@ -1,4 +1,7 @@
-﻿using Farmacio_Services.Contracts;
+﻿using AutoMapper;
+using Farmacio_API.Contracts.Requests.ERecipes;
+using Farmacio_Models.DTO;
+using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -10,10 +13,12 @@ namespace Farmacio_API.Controllers
     public class ERecipesController : ControllerBase
     {
         private readonly IERecipeService _eRecipeService;
+        private readonly IMapper _mapper;
 
-        public ERecipesController(IERecipeService eRecipeService)
+        public ERecipesController(IERecipeService eRecipeService, IMapper mapper)
         {
             _eRecipeService = eRecipeService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -35,6 +40,21 @@ namespace Farmacio_API.Controllers
         public IActionResult SortPharmaciesWithMedicines(Guid eRecipeId, string criteria, bool isAsc)
         {
             return Ok(_eRecipeService.SortPharmaciesWithMedicinesFrom(eRecipeId, criteria, isAsc));
+        }
+
+        /// <summary>
+        /// Creates reservation from eRecipe.
+        /// </summary>
+        /// <response code="200">Created reservation.</response>
+        /// <response code="400">ERecipe is already used or there is not enough medicines for reservation.</response>
+        /// <response code="404">Given eRecipe or pharmacy or patient is not found.</response>
+        [HttpPost("to-reservation")]
+        public IActionResult CreateReservationFromERecipe(CreateReservationFromERecipeRequest request)
+        {
+            var createReservationDTO = _mapper.Map<CreateReservationFromERecipeDTO>(request);
+            var createdReservation = _eRecipeService.CreateReservationFromERecipe(createReservationDTO);
+
+            return Ok(createdReservation);
         }
     }
 }

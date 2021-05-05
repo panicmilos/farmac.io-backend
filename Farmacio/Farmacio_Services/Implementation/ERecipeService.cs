@@ -3,6 +3,7 @@ using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
+using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,62 @@ namespace Farmacio_Services.Implementation
     public class ERecipeService : CrudService<ERecipe>, IERecipeService
     {
         private readonly IPharmacyService _pharmacyService;
+        private readonly IReservationService _reservationService;
+        private readonly IPatientService _patientService;
 
-        public ERecipeService(IPharmacyService pharmacyService, IRepository<ERecipe> repository) : base(repository)
+        public ERecipeService(
+            IPharmacyService pharmacyService,
+            IReservationService reservationService,
+            IPatientService patientService,
+            IRepository<ERecipe> repository
+         ) : base(repository)
         {
             _pharmacyService = pharmacyService;
+            _reservationService = reservationService;
+            _patientService = patientService;
         }
 
         public override ERecipe Create(ERecipe eRecipe)
         {
             eRecipe.UniqueId = GetUniqueId();
             return base.Create(eRecipe);
+        }
+
+        public override ERecipe Update(ERecipe eRecipe)
+        {
+            var existingERecipe = TryToRead(eRecipe.Id);
+            existingERecipe.IsUsed = eRecipe.IsUsed;
+
+            return _repository.Update(existingERecipe);
+        }
+
+        public Reservation CreateReservationFromERecipe(CreateReservationFromERecipeDTO createERecipeDTO)
+        {
+            var existingERecipe = TryToRead(createERecipeDTO.ERecipeId);
+            _pharmacyService.TryToRead(createERecipeDTO.PharmacyId);
+
+            if (existingERecipe.IsUsed)
+            {
+                throw new BadLogicException("ERecipe is already used.");
+            }
+
+            var reservation = new Reservation
+            {
+                PatientId = _patientService.ReadByUserId(existingERecipe.PatientId).Id,
+                PharmacyId = createERecipeDTO.PharmacyId,
+                PickupDeadline = createERecipeDTO.PickupDeadline,
+                Medicines = existingERecipe.Medicines.Select(prescribedMedicine => new ReservedMedicine
+                {
+                    MedicineId = prescribedMedicine.MedicineId,
+                    Quantity = prescribedMedicine.Quantity
+                }).ToList()
+            };
+
+            var createdReservation = _reservationService.Create(reservation);
+            existingERecipe.IsUsed = true;
+            Update(existingERecipe);
+
+            return createdReservation;
         }
 
         public IEnumerable<PharmacyForERecipeDTO> FindPharmaciesWithMedicinesFrom(Guid eRecipeId)
