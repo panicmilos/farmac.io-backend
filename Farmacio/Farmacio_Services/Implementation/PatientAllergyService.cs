@@ -69,5 +69,22 @@ namespace Farmacio_Services.Implementation
                     Id = allergy.Medicine.Id
                 });
         }
+
+        public PatientAllergy Delete(Guid patientId, Guid medicineId)
+        {
+            _patientService.TryToRead(patientId);
+            _medicineService.TryToRead(medicineId);
+
+            var allergy = Read().FirstOrDefault(allergy => allergy.MedicineId == medicineId && allergy.PatientId == patientId);
+            if(allergy == null)
+            {
+                throw new BadLogicException("The given allergy does not exist in the system.");
+            }
+
+            allergy.Active = false;
+            base.Update(allergy);
+
+            return allergy;
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<PatientAllergy> CreateAllergies(PatientAllergyDTO request);
         IEnumerable<SmallMedicineDTO> GetPatientsAllergies(Guid patientId);
         IEnumerable<CheckMedicineDTO> ForEachMedicineInListCheckIfPatientHasAnAllergyToIt(IEnumerable<CheckMedicineDTO> medicineDTOs, Guid patientId);
+        PatientAllergy Delete(Guid patientId, Guid medicineId);
     }
 }
