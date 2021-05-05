@@ -168,5 +168,16 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_patientFollowingsService.Unfollow(followId));
         }
+
+        /// <summary>
+        /// Deletes an existing patient allergy from the system.
+        /// </summary>
+        /// <response code="200">Returns deleted patient allergy object.</response>
+        /// <response code="404">Given allergy does not exist in the system.</response>
+        [HttpDelete("{patientId}/allergy/{medicineId}")]
+        public IActionResult DeleteAllergy(Guid patientId, Guid medicineId)
+        {
+            return Ok(_patientAllergyService.Delete(patientId, medicineId));
+        }
     }
 }
