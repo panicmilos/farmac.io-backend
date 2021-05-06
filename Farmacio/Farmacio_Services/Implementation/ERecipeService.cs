@@ -97,6 +97,7 @@ namespace Farmacio_Services.Implementation
                 })
                 .Select(pharmacy => new PharmacyForERecipeDTO
                 {
+                    Id = pharmacy.Id,
                     Name = pharmacy.Name,
                     Address = pharmacy.Address,
                     AverageGrade = pharmacy.AverageGrade,
