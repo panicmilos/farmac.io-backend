@@ -1,13 +1,13 @@
-﻿using Farmacio_Models.Domain;
+﻿using EmailService.Constracts;
+using EmailService.Models;
+using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
+using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EmailService.Constracts;
-using EmailService.Models;
-using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
@@ -61,18 +61,18 @@ namespace Farmacio_Services.Implementation
             if (order.PharmacyAdminId != pharmacyAdminId)
                 throw new BadLogicException(
                     "Only the pharmacy admin who has created the offer can accept an offer for it.");
-            if(order.IsProcessed)
+            if (order.IsProcessed)
                 throw new BadLogicException("The order has already been processed.");
-            if(offer.Status != OfferStatus.WaitingForAnswer)
+            if (offer.Status != OfferStatus.WaitingForAnswer)
                 throw new BadLogicException("The offer has already been handled.");
-            if(order.OffersDeadline > DateTime.Now)
+            if (order.OffersDeadline > DateTime.Now)
                 throw new BadLogicException("The offer deadline has not expired.");
 
             ReadForPharmacyOrder(offer.PharmacyOrderId)
                 .Where(readOffer => readOffer.Id != offerId)
                 .ToList()
                 .ForEach(RefuseOffer);
-            
+
             order.OrderedMedicines.ForEach(orderedMedicine =>
             {
                 var pharmacyMedicine =
@@ -89,23 +89,47 @@ namespace Farmacio_Services.Implementation
 
             var supplier = _supplierService.TryToRead(offer.SupplierId);
             var offerAcceptedEmail = _templatesProvider.FromTemplate<Email>("OfferAccepted",
-                new {To = supplier.Email, Name = supplier.User.FirstName});
+                new { To = supplier.Email, Name = supplier.User.FirstName });
             _emailDispatcher.Dispatch(offerAcceptedEmail);
-            
+
             return updatedOffer;
         }
 
         private void RefuseOffer(SupplierOffer otherOffer)
         {
-            otherOffer.PharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
+            ReturnMedicinesToStock(otherOffer);
+            otherOffer.Status = OfferStatus.Refused;
+            Update(otherOffer);
+        }
+
+        public SupplierOffer CancelOffer(Guid offerId)
+        {
+            var existingOffer = TryToRead(offerId);
+            if (existingOffer.PharmacyOrder.IsProcessed)
+            {
+                throw new OrderIsAlreadyProcessedException("You cannot delete offer for the order that has already been processed.");
+            }
+
+            if (DateTime.Now > existingOffer.PharmacyOrder.OffersDeadline)
+            {
+                throw new BadLogicException("You cannot delete offer after offers deadline.");
+            }
+
+            ReturnMedicinesToStock(existingOffer);
+            base.Delete(offerId);
+
+            return existingOffer;
+        }
+
+        private void ReturnMedicinesToStock(SupplierOffer offer)
+        {
+            offer.PharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
             {
                 var supplierMedicine =
-                    _supplierStockService.ReadMedicineFor(otherOffer.SupplierId, orderedMedicine.MedicineId);
+                    _supplierStockService.ReadMedicineFor(offer.SupplierId, orderedMedicine.MedicineId);
                 supplierMedicine.Quantity += orderedMedicine.Quantity;
                 _supplierStockService.Update(supplierMedicine);
             });
-            otherOffer.Status = OfferStatus.Refused;
-            Update(otherOffer);
         }
 
         public override SupplierOffer Create(SupplierOffer offer)

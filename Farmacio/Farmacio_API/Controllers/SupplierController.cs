@@ -165,7 +165,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_supplierOfferService.ReadForPharmacyOrder(pharmacyOrderId));
         }
-        
+
         /// <summary>
         /// Accepts an existing supplier offer for a pharmacy order.
         /// </summary>
@@ -181,7 +181,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_supplierOfferService.AcceptOffer(offerId, new Guid("08d906fa-8314-4183-818c-66f029870c3a")));
         }
-        
+
         /// <summary>
         /// Returns all supplier's offers from the system filtered by given status.
         /// </summary>
@@ -227,6 +227,23 @@ namespace Farmacio_API.Controllers
             var updatedOffer = _supplierOfferService.Update(offer);
 
             return Ok(updatedOffer);
+        }
+
+        /// <summary>
+        /// Cancels an existing supplier's offer for pharmacy order from the system.
+        /// </summary>
+        /// <response code="200">Returns canceled supplier's offer.</response>
+        /// <response code="400">
+        /// Unable to cancel supplier's offer because datetime is after offers deadline or
+        /// order is already processed.
+        /// </response>
+        /// <response code="404">Given offer doesn't exist.</response>
+        [HttpDelete("{supplierId}/offers/{offerId}")]
+        public IActionResult CancelSupplierOffer(Guid offerId)
+        {
+            var canceledOffer = _supplierOfferService.CancelOffer(offerId);
+
+            return Ok(canceledOffer);
         }
     }
 }
