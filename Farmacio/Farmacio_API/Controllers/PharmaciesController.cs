@@ -336,29 +336,5 @@ namespace Farmacio_API.Controllers
 
             return Ok(_pharmacistService.SortByGrade(pharmacists.ToList(), searchParams));
         }
-
-
-        /// <summary>
-        /// Rate pharmacy.
-        /// </summary>
-        /// <response code="200">Returns pharmacy grade.</response>
-        /// <response code="400">Patient cannot rate the pharmacy or already has rated it.</response>
-        /// <response code="404">Given patient or pharmacy does not exist in the system.</response>
-        [HttpPost("rate")]
-        public IActionResult RatePharmacy(CreatePharmacyGradeRequest request)
-        {
-            var pharmacyGrade = _mapper.Map<PharmacyGrade>(request);
-            return Ok(_pharmacyGradeService.Create(pharmacyGrade));
-        }
-
-        /// <summary>
-        /// Reads pharmacies that patient can rate.
-        /// </summary>
-        /// <response code="200">Returns pharmacies.</response>
-        [HttpGet("{patientId}/can-rate")]
-        public IActionResult GetPatientCanRate(Guid patientId)
-        {
-            return Ok(_pharmacyGradeService.ReadThatPatientCanRate(patientId));
-        }
     }
 }

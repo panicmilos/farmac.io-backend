@@ -15,9 +15,5 @@ namespace Farmacio_Services.Contracts
         Account AddToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime);
 
         Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistId);
-
-        IEnumerable<Account> ReadThatPatientCanRate(Guid patientId);
-
-        IEnumerable<Account> ReadThatPatientRated(Guid patientId);
     }
 }
