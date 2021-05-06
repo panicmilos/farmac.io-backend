@@ -13,5 +13,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Account> ReadDermatologistThatPatientCanRate(Guid patientId);
         IEnumerable<Account> ReadDermatologistThatPatientRated(Guid patientId);
         IEnumerable<Account> ReadPharmacistsThatPatientCanRate(Guid patientId);
+        MedicalStaffGrade ChangeGrade(Guid gradeId, int value);
+        IEnumerable<Account> ReadPharmacistsThatPatientRated(Guid patientId);
     }
 }

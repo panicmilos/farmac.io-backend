@@ -91,11 +91,12 @@ namespace Farmacio_Services.Implementation
 
         private bool DidPatientRatePharmacy(Guid patientId, Guid pharmacyId)
         {
-            return Read().Where(grade =>
+            var grades = Read().ToList().Where(grade =>
             {
                 var pharmacyGrade = grade as PharmacyGrade;
                 return pharmacyGrade?.PharmacyId == pharmacyId && pharmacyGrade?.PatientId == patientId;
-            }).FirstOrDefault() != null;
+            });
+            return grades?.FirstOrDefault() != null;
         }
 
         public IEnumerable<Pharmacy> ReadThatPatientCanRate(Guid patientId)
@@ -115,6 +116,44 @@ namespace Farmacio_Services.Implementation
 
 
             return pharmaciesThatPatientCanRate.ToHashSet().Where(pharmacy => !DidPatientRatePharmacy(patientId, pharmacy.Id));
+        }
+
+        public PharmacyGrade ChangeGrade(Guid pharmacyGradeId, int value)
+        {
+            var pharmacyGrade = TryToRead(pharmacyGradeId) as PharmacyGrade;
+
+            var pharmacy = _pharmacyService.TryToRead(pharmacyGrade.PharmacyId);
+
+            if(value < 1 || value > 5)
+            {
+                throw new BadLogicException("The grade can be between 0 and 5.");
+            }
+
+            if(pharmacyGrade.Value == value)
+            {
+                throw new BadLogicException("The given grade is same as previous.");
+            }
+
+            pharmacy.AverageGrade = (pharmacy.AverageGrade * pharmacy.NumberOfGrades - pharmacyGrade.Value + value) / pharmacy.NumberOfGrades;
+            _pharmacyService.UpdateGrade(pharmacy);
+
+            pharmacyGrade.Value = value;
+
+            return base.Update(pharmacyGrade) as PharmacyGrade;
+        }
+
+        public IEnumerable<Pharmacy> ReadPharmaciesThatPatientRated(Guid patientId)
+        {
+            return _pharmacyService.Read().ToList().Where(pharmacy => DidPatientRatePharmacy(patientId, pharmacy.Id)).ToList();
+        }
+
+        public PharmacyGrade Read(Guid patientId, Guid pharmacyId)
+        {
+            return Read().Where(grade =>
+            {
+                var pharmacyGrade = grade as PharmacyGrade;
+                return pharmacyGrade?.PatientId == patientId && pharmacyGrade?.PharmacyId == pharmacyId;
+            }).FirstOrDefault() as PharmacyGrade;
         }
     }
 }

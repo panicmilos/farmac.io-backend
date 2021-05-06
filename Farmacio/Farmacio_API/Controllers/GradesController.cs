@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.Grades;
+using Farmacio_API.Contracts.Responses.Grades;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 
 namespace Farmacio_API.Controllers
 {
@@ -65,7 +67,11 @@ namespace Farmacio_API.Controllers
         [HttpGet("{patientId}/rated-dermatologists")]
         public IActionResult GetRatedDermatologist(Guid patientId)
         {
-            return Ok(_medicalStaffGradeService.ReadDermatologistThatPatientRated(patientId));
+            return Ok(_medicalStaffGradeService.ReadDermatologistThatPatientRated(patientId).Select(dermatologist => new MedicalStafftWithGradeResponse
+            {
+                MedicalStaff = dermatologist,
+                Grade = _medicalStaffGradeService.Read(patientId, dermatologist.UserId).Value
+            }));
         }
 
         /// <summary>
@@ -139,6 +145,85 @@ namespace Farmacio_API.Controllers
         public IActionResult GetPharmaciesThatPatientCanRate(Guid patientId)
         {
             return Ok(_pharmacyGradeService.ReadThatPatientCanRate(patientId));
+        }
+
+
+        /// <summary>
+        /// Change medical staff's grade.
+        /// </summary>
+        /// <response code="200">Returns changed grade.</response>
+        /// <response code="400">Given value is same as previous.</response>
+        /// <response code="404">Given grade does not exist in the system.</response>
+        [HttpPost("change-medicalStaff-grade/{medicalStaffGradeId}")]
+        public IActionResult ChangeMedicalStaffGrade(Guid medicalStaffGradeId, [FromBody] int value)
+        {
+            return Ok(_medicalStaffGradeService.ChangeGrade(medicalStaffGradeId, value));
+        }
+
+        /// <summary>
+        /// Change medicine's grade.
+        /// </summary>
+        /// <response code="200">Returns changed grade.</response>
+        /// <response code="400">Given value is same as previous.</response>
+        /// <response code="404">Given grade does not exist in the system.</response>
+        [HttpPost("change-medicine-grade/{medicineGradeId}")]
+        public IActionResult ChangeMedicineGrade(Guid medicineGradeId, [FromBody] int value)
+        {
+            return Ok(_medicineGradeService.ChangeGrade(medicineGradeId, value));
+        }
+
+        /// <summary>
+        /// Change grade of pharmacy.
+        /// </summary>
+        /// <response code="200">Returns changed grade.</response>
+        /// <response code="400">Given value is same as previous.</response>
+        /// <response code="404">Given grade does not exist in the system.</response>
+        [HttpPost("change-pharmacy-grade/{pharmacyGradeId}")]
+        public IActionResult ChangePharmacyGrade(Guid pharmacyGradeId, [FromBody] int value)
+        {
+            return Ok(_pharmacyGradeService.ChangeGrade(pharmacyGradeId, value));
+        }
+
+        /// <summary>
+        /// Reads an existing medicines in the system that patient rated.
+        /// </summary>
+        /// <response code="200">Read medicines.</response>
+        [HttpGet("{patientId}/rated-medicines")]
+        public IActionResult GetRatedMedicines(Guid patientId)
+        {
+            return Ok(_medicineGradeService.ReadMedicinesThatPatientRated(patientId).Select(medicine => new MedicineWithGradeResponse
+            {
+                Medicine = medicine,
+                Grade = _medicineGradeService.Read(patientId, medicine.Id).Value
+            }));
+        }
+
+        /// <summary>
+        /// Reads an existing pharmacies in the system that patient rated.
+        /// </summary>
+        /// <response code="200">Read pharmacies.</response>
+        [HttpGet("{patientId}/rated-pharmacies")]
+        public IActionResult GetRatedPharmacies(Guid patientId)
+        {
+            return Ok(_pharmacyGradeService.ReadPharmaciesThatPatientRated(patientId).Select(pharmacy => new PharmacyWithGradeResponse
+            {
+                Pharmacy = pharmacy,
+                Grade = _pharmacyGradeService.Read(patientId, pharmacy.Id).Value
+            }));
+        }
+
+        /// <summary>
+        /// Reads an existing pharmacists in the system that patient rated.
+        /// </summary>
+        /// <response code="200">Read pharmacists.</response>
+        [HttpGet("{patientId}/rated-pharmacists")]
+        public IActionResult GetRatedPharmacists(Guid patientId)
+        {
+            return Ok(_medicalStaffGradeService.ReadPharmacistsThatPatientRated(patientId).Select(pharmacist => new MedicalStafftWithGradeResponse
+            {
+                MedicalStaff = pharmacist,
+                Grade = _medicalStaffGradeService.Read(patientId, pharmacist.UserId).Value
+            }));
         }
     }
 }

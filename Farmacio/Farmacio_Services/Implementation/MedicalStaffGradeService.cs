@@ -37,7 +37,7 @@ namespace Farmacio_Services.Implementation
                 var medicalStaffGrade = grade as MedicalStaffGrade;
                 return medicalStaffGrade?.PatientId == patientId && medicalStaffGrade?.MedicalStaffId == medicalStaffId;
             });
-            return grades.FirstOrDefault() != null;
+            return grades?.FirstOrDefault() != null;
         }
 
         public MedicalStaffGrade Read(Guid patientId, Guid medicalStaffId)
@@ -92,6 +92,43 @@ namespace Farmacio_Services.Implementation
         {
             return _pharmacistService.Read().Where(pharmacists => _appointmentService.DidPatientHaveAppointmentWithMedicalStaff(patientId, pharmacists.UserId) &&
             !DidPatientGradeMedicalStaff(patientId, pharmacists.UserId)).ToList();
+        }
+
+        public MedicalStaffGrade ChangeGrade(Guid gradeId, int value)
+        {
+            var grade = TryToRead(gradeId);
+
+            var medicalStaffGrade = grade as MedicalStaffGrade;
+
+            var medicalStaff = _medicalStaffService.ReadByUserId(medicalStaffGrade.MedicalStaffId);
+            if (medicalStaff == null)
+            {
+                throw new MissingEntityException("The given medical staff does not exist.");
+            }
+
+            if (value < 1 || value > 5)
+            {
+                throw new BadLogicException("The grade can be between 0 and 5.");
+            }
+
+            if (grade.Value == value)
+            {
+                throw new BadLogicException("The given grade is same as previous.");
+            }
+
+            var medicalStaffUser = medicalStaff.User as MedicalStaff;
+
+            medicalStaffUser.AverageGrade = (medicalStaffUser.AverageGrade * medicalStaffUser.NumberOfGrades - grade.Value + value) / medicalStaffUser.NumberOfGrades;
+            _medicalStaffService.UpdateGrade(medicalStaffUser);
+
+            medicalStaffGrade.Value = value;
+
+            return base.Update(medicalStaffGrade) as MedicalStaffGrade;
+        }
+
+        public IEnumerable<Account> ReadPharmacistsThatPatientRated(Guid patientId)
+        {
+            return _pharmacistService.Read().Where(pharmacist => DidPatientGradeMedicalStaff(patientId, pharmacist.UserId)).ToList();
         }
     }
 }
