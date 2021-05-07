@@ -223,8 +223,8 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns medicnes from eRecipes.</response>
         /// <response code="404">Given eRecipe does not exist in the system.</response>
-        [HttpGet("{eRecipeId}/medicines")]
-        public IActionResult GetMedicinesFromEecipe(Guid eRecipeId)
+        [HttpGet("in-eRecipe/{eRecipeId}")]
+        public IActionResult GetMedicinesFromERecipe(Guid eRecipeId)
         {
             return Ok(_eRecipeService.ReadMedicinesFromERecipe(eRecipeId));
         }
