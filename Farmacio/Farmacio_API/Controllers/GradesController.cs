@@ -67,10 +67,15 @@ namespace Farmacio_API.Controllers
         [HttpGet("{patientId}/rated-dermatologists")]
         public IActionResult GetRatedDermatologist(Guid patientId)
         {
-            return Ok(_medicalStaffGradeService.ReadDermatologistThatPatientRated(patientId).Select(dermatologist => new MedicalStafftWithGradeResponse
+            return Ok(_medicalStaffGradeService.ReadDermatologistThatPatientRated(patientId).Select(dermatologist =>
             {
-                MedicalStaff = dermatologist,
-                Grade = _medicalStaffGradeService.Read(patientId, dermatologist.UserId).Value
+                var grade = _medicalStaffGradeService.Read(patientId, dermatologist.UserId);
+                return new MedicalStafftWithGradeResponse
+                {
+                    MedicalStaff = dermatologist,
+                    Grade = grade.Value,
+                    GradeId = grade.Id
+                };
             }));
         }
 
@@ -154,10 +159,10 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns changed grade.</response>
         /// <response code="400">Given value is same as previous.</response>
         /// <response code="404">Given grade does not exist in the system.</response>
-        [HttpPost("change-medicalStaff-grade/{medicalStaffGradeId}")]
-        public IActionResult ChangeMedicalStaffGrade(Guid medicalStaffGradeId, [FromBody] int value)
+        [HttpPost("change-medicalStaff-grade")]
+        public IActionResult ChangeMedicalStaffGrade(ChangeGradeRequest changeGradeRequest)
         {
-            return Ok(_medicalStaffGradeService.ChangeGrade(medicalStaffGradeId, value));
+            return Ok(_medicalStaffGradeService.ChangeGrade(changeGradeRequest.GradeId, changeGradeRequest.Value));
         }
 
         /// <summary>
@@ -166,10 +171,10 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns changed grade.</response>
         /// <response code="400">Given value is same as previous.</response>
         /// <response code="404">Given grade does not exist in the system.</response>
-        [HttpPost("change-medicine-grade/{medicineGradeId}")]
-        public IActionResult ChangeMedicineGrade(Guid medicineGradeId, [FromBody] int value)
+        [HttpPost("change-medicine-grade")]
+        public IActionResult ChangeMedicineGrade(ChangeGradeRequest changeGradeRequest)
         {
-            return Ok(_medicineGradeService.ChangeGrade(medicineGradeId, value));
+            return Ok(_medicineGradeService.ChangeGrade(changeGradeRequest.GradeId, changeGradeRequest.Value));
         }
 
         /// <summary>
@@ -178,10 +183,10 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns changed grade.</response>
         /// <response code="400">Given value is same as previous.</response>
         /// <response code="404">Given grade does not exist in the system.</response>
-        [HttpPost("change-pharmacy-grade/{pharmacyGradeId}")]
-        public IActionResult ChangePharmacyGrade(Guid pharmacyGradeId, [FromBody] int value)
+        [HttpPost("change-pharmacy-grade")]
+        public IActionResult ChangePharmacyGrade(ChangeGradeRequest changeGradeRequest)
         {
-            return Ok(_pharmacyGradeService.ChangeGrade(pharmacyGradeId, value));
+            return Ok(_pharmacyGradeService.ChangeGrade(changeGradeRequest.GradeId, changeGradeRequest.Value));
         }
 
         /// <summary>
@@ -191,10 +196,15 @@ namespace Farmacio_API.Controllers
         [HttpGet("{patientId}/rated-medicines")]
         public IActionResult GetRatedMedicines(Guid patientId)
         {
-            return Ok(_medicineGradeService.ReadMedicinesThatPatientRated(patientId).Select(medicine => new MedicineWithGradeResponse
+            return Ok(_medicineGradeService.ReadMedicinesThatPatientRated(patientId).Select(medicine =>
             {
-                Medicine = medicine,
-                Grade = _medicineGradeService.Read(patientId, medicine.Id).Value
+                var grade = _medicineGradeService.Read(patientId, medicine.Id);
+                return new MedicineWithGradeResponse
+                {
+                    Medicine = medicine,
+                    Grade = grade.Value,
+                    GradeId = grade.Id
+                };
             }));
         }
 
@@ -205,10 +215,15 @@ namespace Farmacio_API.Controllers
         [HttpGet("{patientId}/rated-pharmacies")]
         public IActionResult GetRatedPharmacies(Guid patientId)
         {
-            return Ok(_pharmacyGradeService.ReadPharmaciesThatPatientRated(patientId).Select(pharmacy => new PharmacyWithGradeResponse
+            return Ok(_pharmacyGradeService.ReadPharmaciesThatPatientRated(patientId).Select(pharmacy =>
             {
-                Pharmacy = pharmacy,
-                Grade = _pharmacyGradeService.Read(patientId, pharmacy.Id).Value
+                var grade = _pharmacyGradeService.Read(patientId, pharmacy.Id);
+                return new PharmacyWithGradeResponse
+                {
+                    Pharmacy = pharmacy,
+                    Grade = grade.Value,
+                    GradeId = grade.Id
+                };
             }));
         }
 
@@ -219,10 +234,14 @@ namespace Farmacio_API.Controllers
         [HttpGet("{patientId}/rated-pharmacists")]
         public IActionResult GetRatedPharmacists(Guid patientId)
         {
-            return Ok(_medicalStaffGradeService.ReadPharmacistsThatPatientRated(patientId).Select(pharmacist => new MedicalStafftWithGradeResponse
-            {
-                MedicalStaff = pharmacist,
-                Grade = _medicalStaffGradeService.Read(patientId, pharmacist.UserId).Value
+            return Ok(_medicalStaffGradeService.ReadPharmacistsThatPatientRated(patientId).Select(pharmacist => {
+                var grade = _medicalStaffGradeService.Read(patientId, pharmacist.UserId);
+                return new MedicalStafftWithGradeResponse
+                {
+                    MedicalStaff = pharmacist,
+                    Grade = grade.Value,
+                    GradeId = grade.Id
+                };
             }));
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Farmacio_Models.Domain;
 
 namespace Farmacio_API.Contracts.Responses.Grades
@@ -7,5 +8,6 @@ namespace Farmacio_API.Contracts.Responses.Grades
     {
         public Pharmacy Pharmacy { get; set; }
         public int Grade { get; set; }
+        public Guid GradeId { get; set; }
     }
 }
