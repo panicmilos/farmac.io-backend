@@ -110,7 +110,7 @@ namespace Farmacio_Services.Implementation
             return Read().Where(eRecipe => eRecipe.PatientId == patientId).ToList();
         }
 
-        public IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending)
+       public IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending)
         {
             var pharmacies = FindPharmaciesWithMedicinesFrom(eRecipeId);
             var sortingCriteria = new Dictionary<string, Func<PharmacyForERecipeDTO, object>>()
@@ -126,6 +126,43 @@ namespace Farmacio_Services.Implementation
             }
 
             return pharmacies;
+        }
+        
+        public IEnumerable<ERecipeDTO> SortFor(Guid patientUserId, ERecipesSortFilterParams sortFilterParams)
+        {
+            var patient = _patientService.ReadByUserId(patientUserId);
+
+            if (patient == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+
+            (string sortCriteria, bool isAsc, bool? isUsed) = sortFilterParams;
+
+            var eRecipes = Read().ToList().Where(eRecipe => eRecipe.PatientId == patientUserId);
+
+            if(isUsed.HasValue)
+            {
+                eRecipes = eRecipes.Where(eRecipe => eRecipe.IsUsed == isUsed);
+            }
+
+            var sortingCriteria = new Dictionary<string, Func<ERecipe, object>>()
+            {
+                { "issuingDate", e => e.IssuingDate }
+            };
+
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
+            {
+                eRecipes = isAsc ? eRecipes.OrderBy(sortingCriterion) : eRecipes.OrderByDescending(sortingCriterion);
+            }
+
+            return eRecipes.Select(eRecipe => new ERecipeDTO
+            {
+                Id = eRecipe.Id,
+                IssuingDate = eRecipe.IssuingDate,
+                IsUsed = eRecipe.IsUsed,
+                UniqueId = eRecipe.UniqueId
+            });
         }
 
         public bool WasMedicinePrescribedToPatient(Guid patientId, Guid medicineId)
