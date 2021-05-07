@@ -45,5 +45,15 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Patient account not found.");
             return existingAccount;
         }
+
+        public Account UpdateLoyaltyProgram(Guid patientAccountId, Guid? loyaltyProgramId)
+        {
+            var patientAccount = TryToRead(patientAccountId);
+            var patient = patientAccount.User as Patient;
+
+            patient.LoyaltyProgramId = loyaltyProgramId;
+
+            return base.Update(patientAccount);
+        }
     }
 }
