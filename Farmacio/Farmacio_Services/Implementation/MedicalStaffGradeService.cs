@@ -113,7 +113,7 @@ namespace Farmacio_Services.Implementation
 
             if (grade.Value == value)
             {
-                throw new BadLogicException("The given grade is same as previous.");
+                return medicalStaffGrade;
             }
 
             var medicalStaffUser = medicalStaff.User as MedicalStaff;

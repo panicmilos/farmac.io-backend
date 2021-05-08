@@ -72,7 +72,7 @@ namespace Farmacio_API.Controllers
                 var grade = _medicalStaffGradeService.Read(patientId, dermatologist.UserId);
                 return new MedicalStafftWithGradeResponse
                 {
-                    MedicalStaff = dermatologist,
+                    MedicalStaff = dermatologist.User as MedicalStaff,
                     Grade = grade.Value,
                     GradeId = grade.Id
                 };
@@ -157,7 +157,7 @@ namespace Farmacio_API.Controllers
         /// Change medical staff's grade.
         /// </summary>
         /// <response code="200">Returns changed grade.</response>
-        /// <response code="400">Given value is same as previous.</response>
+        /// <response code="400">The grade is not in the interval between 1 and 5.</response>
         /// <response code="404">Given grade does not exist in the system.</response>
         [HttpPost("change-medicalStaff-grade")]
         public IActionResult ChangeMedicalStaffGrade(ChangeGradeRequest changeGradeRequest)
@@ -169,7 +169,7 @@ namespace Farmacio_API.Controllers
         /// Change medicine's grade.
         /// </summary>
         /// <response code="200">Returns changed grade.</response>
-        /// <response code="400">Given value is same as previous.</response>
+        /// <response code="400">The grade is not in the interval between 1 and 5.</response>
         /// <response code="404">Given grade does not exist in the system.</response>
         [HttpPost("change-medicine-grade")]
         public IActionResult ChangeMedicineGrade(ChangeGradeRequest changeGradeRequest)
@@ -181,7 +181,7 @@ namespace Farmacio_API.Controllers
         /// Change grade of pharmacy.
         /// </summary>
         /// <response code="200">Returns changed grade.</response>
-        /// <response code="400">Given value is same as previous.</response>
+        /// <response code="400">The grade is not in the interval between 1 and 5.</response>
         /// <response code="404">Given grade does not exist in the system.</response>
         [HttpPost("change-pharmacy-grade")]
         public IActionResult ChangePharmacyGrade(ChangeGradeRequest changeGradeRequest)
@@ -238,7 +238,7 @@ namespace Farmacio_API.Controllers
                 var grade = _medicalStaffGradeService.Read(patientId, pharmacist.UserId);
                 return new MedicalStafftWithGradeResponse
                 {
-                    MedicalStaff = pharmacist,
+                    MedicalStaff = pharmacist.User as MedicalStaff,
                     Grade = grade.Value,
                     GradeId = grade.Id
                 };

@@ -6,7 +6,7 @@ namespace Farmacio_API.Contracts.Responses.Grades
 {
     public class MedicalStafftWithGradeResponse
     {
-        public Account MedicalStaff { get; set; }
+        public MedicalStaff MedicalStaff { get; set; }
         public int Grade { get; set; }
         public Guid GradeId { get; set; }
     }

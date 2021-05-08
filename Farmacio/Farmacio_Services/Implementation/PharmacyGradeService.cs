@@ -131,7 +131,7 @@ namespace Farmacio_Services.Implementation
 
             if(pharmacyGrade.Value == value)
             {
-                throw new BadLogicException("The given grade is same as previous.");
+                return pharmacyGrade;
             }
 
             pharmacy.AverageGrade = (pharmacy.AverageGrade * pharmacy.NumberOfGrades - pharmacyGrade.Value + value) / pharmacy.NumberOfGrades;
