@@ -10,5 +10,6 @@ namespace Farmacio_Services.Contracts
         bool WasMedicinePrescribedToPatient(Guid patienrtId, Guid medicineId);
         IEnumerable<ERecipe> ReadFor(Guid patientId);
         IEnumerable<ERecipeDTO> SortFor(Guid patientId, ERecipesSortFilterParams sortFilterParams);
+        IEnumerable<ERecipeMedicine> ReadMedicinesFromERecipe(Guid eRecipeId);
     }
 }

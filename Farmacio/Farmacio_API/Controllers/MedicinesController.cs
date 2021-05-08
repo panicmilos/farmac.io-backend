@@ -22,6 +22,7 @@ namespace Farmacio_API.Controllers
         private readonly IMedicinePdfService _medicinePdfService;
         private readonly IPatientAllergyService _patientAllergyService;
         private readonly IMedicineGradeService _medicineGradeService;
+        private readonly IERecipeService _eRecipeService;
         private readonly IMapper _mapper;
 
         public MedicinesController(IMedicineService medicineService,
@@ -29,6 +30,7 @@ namespace Farmacio_API.Controllers
             IMedicinePdfService medicinePdfService,
             IPatientAllergyService patientAllergyService,
             IMedicineGradeService medicineGradeService,
+            IERecipeService eRecipeService,
             IMapper mapper)
         {
             _medicineService = medicineService;
@@ -36,6 +38,7 @@ namespace Farmacio_API.Controllers
             _medicinePdfService = medicinePdfService;
             _patientAllergyService = patientAllergyService;
             _medicineGradeService = medicineGradeService;
+            _eRecipeService = eRecipeService;
             _mapper = mapper;
         }
 
@@ -213,6 +216,17 @@ namespace Farmacio_API.Controllers
         public IActionResult GetPatientCanRate(Guid patientId)
         {
             return Ok(_medicineGradeService.ReadThatPatientCanRate(patientId));
+        }
+
+        /// <summary>
+        /// Returns medicines from eRecipe
+        /// </summary>
+        /// <response code="200">Returns medicnes from eRecipes.</response>
+        /// <response code="404">Given eRecipe does not exist in the system.</response>
+        [HttpGet("in-eRecipe/{eRecipeId}")]
+        public IActionResult GetMedicinesFromERecipe(Guid eRecipeId)
+        {
+            return Ok(_eRecipeService.ReadMedicinesFromERecipe(eRecipeId));
         }
     }
 }
