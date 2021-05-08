@@ -145,6 +145,7 @@ namespace Farmacio_Services.Implementation
                     patientReservations.Add(new SmallReservationDTO
                     {
                         ReservationId = reservation.Id,
+                        UniqueId = reservation.UniqueId,
                         PickupDeadline = reservation.PickupDeadline,
                         Price = price,
                         PharmacyId = reservation.PharmacyId
