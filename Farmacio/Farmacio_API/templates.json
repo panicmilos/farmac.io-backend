@@ -77,6 +77,36 @@
     },
     {
       "type": "Email",
+      "name": "AbsenceRequestAccepted",
+      "template": {
+        "Subject": "Absence request accepted on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "<p>Dear {{name}},</p><p>Your absence request in pharmacy {{pharmacyName}} from {{fromDate}} to {{toDate}} has been accepted.</p>"
+      }
+    },
+    {
+      "type": "Email",
+      "name": "AbsenceRequestDeclined",
+      "template": {
+        "Subject": "Absence request declined on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "<p>Dear {{name}},</p><p>Your absence request in pharmacy {{pharmacyName}} from {{fromDate}} to {{toDate}} has been declined for the following reason: \"{{reason}}\"</p>"
+      }
+    },
+    {
+      "type": "Email",
+      "name": "AppointmentCanceled",
+      "template": {
+        "Subject": "Appointment has been canceled on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "<p>Dear {{name}},</p><p>Your appointment on {{date}} has been canceled.</p>"
+      }
+    },
+    {
+      "type": "Email",
       "name": "PromotionCreated",
       "template": {
         "Subject": "Promotion has been created on Farmac.io",

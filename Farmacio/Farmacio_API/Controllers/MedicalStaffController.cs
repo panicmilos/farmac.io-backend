@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Farmacio_API.Contracts.Requests.AbsenceRequests;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
@@ -25,12 +26,32 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Accepts absence request.
+        /// </summary>
+        /// <response code="200">Accepted absence request.</response>
+        [HttpPost("absence-requests/{absenceRequestId}/accept")]
+        public IActionResult CreateAbsenceRequest(Guid absenceRequestId)
+        {
+            return Ok(_absenceRequestService.AcceptAbsenceRequest(absenceRequestId));
+        }
+        
+        /// <summary>
+        /// Declines absence request.
+        /// </summary>
+        /// <response code="200">Declined absence request.</response>
+        [HttpPost("absence-requests/{absenceRequestId}/decline")]
+        public IActionResult CreateAbsenceRequest(Guid absenceRequestId, DeclineAbsenceRequestRequest declineAbsenceRequest)
+        {
+            return Ok(_absenceRequestService.DeclineAbsenceRequest(absenceRequestId, declineAbsenceRequest.Reason));
+        }
+        
+        /// <summary>
         /// Creates absence request.
         /// </summary>
         /// <response code="200">Returns absence request(s).</response>
         /// <response code="400"></response>
         /// <response code="404">Requester not found.</response>
-        [HttpPost("absence-request")]
+        [HttpPost("absence-requests")]
         public IActionResult CreateAbsenceRequest(CreateAbsenceRequestRequest request)
         {
             var absenceRequest = _mapper.Map<AbsenceRequestDTO>(request);
