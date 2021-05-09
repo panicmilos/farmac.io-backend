@@ -16,12 +16,10 @@ namespace Farmacio_API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IPharmacistService _pharmacistService;
-        private readonly IMedicalStaffService _medicalStaffService;
 
-        public PharmacistsController(IPharmacistService pharmacistService, IMedicalStaffService medicalStaffService, IMapper mapper)
+        public PharmacistsController(IPharmacistService pharmacistService, IMapper mapper)
         {
             _pharmacistService = pharmacistService;
-            _medicalStaffService = medicalStaffService;
             _mapper = mapper;
         }
 
@@ -100,30 +98,6 @@ namespace Farmacio_API.Controllers
         public IActionResult DeletePharmacist(Guid id)
         {
             return Ok(_pharmacistService.Delete(id));
-        }
-
-        /// <summary>
-        /// Rate the pharmacist.
-        /// </summary>
-        /// <response code="200">Returns grade.</response>
-        /// <response code="400">Patient cannot rate the pharmacist or already has rated.</response>
-        /// <response code="404">Given patient or pharmacist does not exist in the system.</response>
-        [HttpPost("rate")]
-        public IActionResult RateThePharmacist(CreateMedicalStaffGradeRequest request)
-        {
-            var pharmacistsGrade = _mapper.Map<MedicalStaffGrade>(request);
-            return Ok(_medicalStaffService.GradeMedicalStaff(pharmacistsGrade));
-        }
-
-
-        /// <summary>
-        /// Reads an existing pharmacist in the system that patietn can rate.
-        /// </summary>
-        /// <response code="200">Read pharmacist.</response>
-        [HttpGet("{patientId}/can-rate")]
-        public IActionResult GetPharmacistToRate(Guid patientId)
-        {
-            return Ok(_pharmacistService.ReadThatPatientCanRate(patientId));
         }
     }
 }
