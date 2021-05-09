@@ -19,20 +19,14 @@ namespace Farmacio_API.Controllers
     {
         private readonly IDermatologistService _dermatologistService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
-        private readonly IMedicalStaffGradeService _medicalStaffGradeService;
-        private readonly IMedicalStaffService _medicalStaffService;
         private readonly IMapper _mapper;
 
         public DermatologistsController(IDermatologistService dermatologistService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
-            , IMedicalStaffGradeService medicalStaffGradeService
-            , IMedicalStaffService medicalStaffService
             , IMapper mapper)
         {
             _dermatologistService = dermatologistService;
-            _medicalStaffGradeService = medicalStaffGradeService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
-            _medicalStaffService = medicalStaffService;
             _mapper = mapper;
         }
 
@@ -157,57 +151,6 @@ namespace Farmacio_API.Controllers
             var deletedDermatologist = _dermatologistService.Delete(id);
 
             return Ok(deletedDermatologist);
-        }
-
-
-        /// <summary>
-        /// Rate the dermatologist.
-        /// </summary>
-        /// <response code="200">Returns grade.</response>
-        /// <response code="400">Patient cannot rate the dermatologist or already has rated.</response>
-        /// <response code="404">Given patient or dermatologist does not exist in the system.</response>
-        [HttpPost("rate")]
-        public IActionResult RateTheDermatologist(CreateMedicalStaffGradeRequest request)
-        {
-            var dermatologistGrade = _mapper.Map<MedicalStaffGrade>(request);
-            return Ok(_medicalStaffService.GradeMedicalStaff(dermatologistGrade));
-        }
-
-
-        /// <summary>
-        /// Reads an existing dermatologist in the system that patietn can rate.
-        /// </summary>
-        /// <response code="200">Read dermatologists.</response>
-        [HttpGet("{patientId}/can-rate")]
-        public IActionResult GetDermatologistToRate(Guid patientId)
-        {
-            return Ok(_dermatologistService.ReadThatPatientCanRate(patientId));
-        }
-
-        /// <summary>
-        /// Reads an existing dermatologists in the system that patient rated.
-        /// </summary>
-        /// <response code="200">Read dermatologist.</response>
-        [HttpGet("{patientId}/rated")]
-        public IActionResult GetRatedDermatologist(Guid patientId)
-        {
-            return Ok(_dermatologistService.ReadThatPatientRated(patientId));
-        }
-
-        /// <summary>
-        /// Return dermatologist's grade.
-        /// </summary>
-        /// <response code="200">Read grade.</response>
-        [HttpGet("{dermatologistId}/grade/{patientId}")]
-        public IActionResult GetDermatologistGrade(Guid dermatologistId, Guid patientId)
-        {
-            var medicalStaff = _medicalStaffService.ReadByUserId(dermatologistId);
-            if (medicalStaff == null)
-            {
-                throw new MissingEntityException("The given dermatologist does not exist in the system.");
-            }
-
-            return Ok(_medicalStaffGradeService.Read(patientId, dermatologistId));
         }
 
         /// <summary>

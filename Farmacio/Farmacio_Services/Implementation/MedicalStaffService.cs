@@ -12,14 +12,12 @@ namespace Farmacio_Services.Implementation
     public class MedicalStaffService : AccountService, IMedicalStaffService
     {
         private readonly IAppointmentService _appointmentService;
-        private readonly IMedicalStaffGradeService _medicalStaffGradeService;
 
-        public MedicalStaffService(IEmailVerificationService emailVerificationService, IAppointmentService appointmentService, IMedicalStaffGradeService medicalStaffGradeService,
+        public MedicalStaffService(IEmailVerificationService emailVerificationService, IAppointmentService appointmentService,
             IRepository<Account> repository)
             : base(emailVerificationService, repository)
         {
             _appointmentService = appointmentService;
-            _medicalStaffGradeService = medicalStaffGradeService;
         }
 
         public IEnumerable<PatientDTO> ReadPatientsForMedicalStaff(Guid medicalAccountId)
@@ -84,33 +82,6 @@ namespace Farmacio_Services.Implementation
             staffUser.AverageGrade = medicalStaff.AverageGrade;
             staffAccount.User = staffUser;
             return base.Update(staffAccount);
-        }
-
-        public Grade GradeMedicalStaff(MedicalStaffGrade grade)
-        {
-            var medicalStaff = ReadByUserId(grade.MedicalStaffId);
-            if (medicalStaff == null)
-            {
-                throw new MissingEntityException("The given medical staff does not exist.");
-            }
-
-            if (!_appointmentService.DidPatientHaveAppointmentWithMedicalStaff(grade.PatientId, grade.MedicalStaffId))
-            {
-                throw new BadLogicException("The patient cannot rate the medical staff because he did not have an appointment with him.");
-            }
-
-            if (_medicalStaffGradeService.DidPatientGradeMedicalStaff(grade.PatientId, grade.MedicalStaffId))
-            {
-                throw new BadLogicException("The patient has already rated a medical staff.");
-            }
-
-            grade = _medicalStaffGradeService.Create(grade) as MedicalStaffGrade;
-            var medicalStaffUser = medicalStaff.User as MedicalStaff;
-            medicalStaffUser.AverageGrade = (medicalStaffUser.NumberOfGrades * medicalStaffUser.AverageGrade + grade.Value) / ++medicalStaffUser.NumberOfGrades;
-            medicalStaff.User = medicalStaffUser;
-            UpdateGrade(medicalStaffUser);
-
-            return grade;
         }
     }
 }

@@ -128,6 +128,13 @@ namespace Farmacio_Services.Implementation
             return pharmacies;
         }
         
+        public IEnumerable<ERecipeMedicine> ReadMedicinesFromERecipe(Guid eRecipeId)
+        {
+            var eRecipe = base.TryToRead(eRecipeId);
+
+            return eRecipe.Medicines;
+        }
+
         public IEnumerable<ERecipeDTO> SortFor(Guid patientUserId, ERecipesSortFilterParams sortFilterParams)
         {
             var patient = _patientService.ReadByUserId(patientUserId);
