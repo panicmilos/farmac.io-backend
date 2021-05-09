@@ -21,7 +21,7 @@ namespace Farmacio_Services.Implementation
         {
             if (!IsMinimumPointsUnique(loyaltyProgram.MinPoints))
             {
-                throw new BadLogicException("Two loyalty points cannot have same number of minimum points.");
+                throw new BadLogicException("Two loyalty programs cannot have same number of minimum points.");
             }
 
             var createdLoyaltyPoints = base.Create(loyaltyProgram);
@@ -36,7 +36,7 @@ namespace Farmacio_Services.Implementation
 
             if (existingLoyaltyProgram.MinPoints != loyaltyProgram.MinPoints && !IsMinimumPointsUnique(loyaltyProgram.MinPoints))
             {
-                throw new BadLogicException("Two loyalty points cannot have same number of minimum points.");
+                throw new BadLogicException("Two loyalty programs cannot have same number of minimum points.");
             }
 
             existingLoyaltyProgram.Name = loyaltyProgram.Name;

@@ -22,7 +22,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns list of pharmacies that containt all medicines from eRecipe in stock with total price.
+        /// Returns list of pharmacies that containts all medicines from eRecipe in stock with total price.
         /// </summary>
         /// <response code="200">Returns list of pharmacies with total price.</response>
         /// <response code="404">Given eRecipe doesn't exist.</response>
