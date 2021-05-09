@@ -5,6 +5,7 @@ using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Farmacio_Services.Implementation
 {
@@ -21,41 +22,42 @@ namespace Farmacio_Services.Implementation
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
         }
 
-        public IEnumerable<AbsenceRequest> CreateAbsenceRequest(AbsenceRequestDTO absenceRequestDTO)
+        public IEnumerable<AbsenceRequest> ReadFor(Guid pharmacyId)
         {
-            var medicalAccount = _accountService.ReadByUserId(absenceRequestDTO.RequesterId);
+            return Read().Where(absenceRequest => absenceRequest.PharmacyId == pharmacyId).ToList();
+        }
+
+        public IEnumerable<AbsenceRequest> CreateAbsenceRequest(AbsenceRequestDTO absenceRequestDto)
+        {
+            var medicalAccount = _accountService.ReadByUserId(absenceRequestDto.RequesterId);
             if (medicalAccount == null)
                 throw new MissingEntityException("The given requester does not exist in the system.");
 
-            List<AbsenceRequest> absenceRequests = new List<AbsenceRequest>();
-            if (medicalAccount.Role == Role.Dermatologist)
-            {
-                var workPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(medicalAccount.UserId);
-                foreach (var wp in workPlaces)
-                    absenceRequests.Add(new AbsenceRequest
-                    {
-                        RequesterId = medicalAccount.UserId,
-                        FromDate = absenceRequestDTO.FromDate,
-                        ToDate = absenceRequestDTO.ToDate,
-                        Type = absenceRequestDTO.Type,
-                        PharmacyId = wp.PharmacyId,
-                        Status = AbsenceRequestStatus.WaitingForAnswer
-                    });
-            }
-            else if (medicalAccount.Role == Role.Pharmacist)
-            {
-                var pharmacist = (Pharmacist)medicalAccount.User;
-                absenceRequests.Add(new AbsenceRequest
+            var absenceRequests = medicalAccount.Role == Role.Dermatologist
+                ? _dermatologistWorkPlaceService
+                    .GetWorkPlacesFor(medicalAccount.UserId)
+                    .Select(workPlace =>
+                        CreateAbsenceRequestInstanceFor(workPlace.PharmacyId, medicalAccount, absenceRequestDto))
+                    .ToList()
+                : new List<AbsenceRequest>
                 {
-                    RequesterId = medicalAccount.UserId,
-                    FromDate = absenceRequestDTO.FromDate,
-                    ToDate = absenceRequestDTO.ToDate,
-                    Type = absenceRequestDTO.Type,
-                    PharmacyId = pharmacist.PharmacyId,
-                    Status = AbsenceRequestStatus.WaitingForAnswer
-                });
-            }
+                    CreateAbsenceRequestInstanceFor(((Pharmacist) medicalAccount.User).PharmacyId, medicalAccount,
+                        absenceRequestDto)
+                };
+            absenceRequests.ForEach(absenceRequest => Create(absenceRequest));
             return absenceRequests;
         }
+
+        private static AbsenceRequest CreateAbsenceRequestInstanceFor(Guid pharmacyId, Account medicalAccount,
+            AbsenceRequestDTO absenceRequestDto) =>
+            new AbsenceRequest
+            {
+                RequesterId = medicalAccount.UserId,
+                FromDate = absenceRequestDto.FromDate,
+                ToDate = absenceRequestDto.ToDate,
+                Type = absenceRequestDto.Type,
+                PharmacyId = pharmacyId,
+                Status = AbsenceRequestStatus.WaitingForAnswer
+            };
     }
 }

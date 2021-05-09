@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Farmacio_API.Contracts.Requests.AbsenceRequests;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Farmacio_API.Controllers
 {
     [ApiController]
-    [Route("medical-staff")]
     [Produces("application/json")]
     public class MedicalStaffController : ControllerBase
     {
@@ -23,6 +23,16 @@ namespace Farmacio_API.Controllers
             _absenceRequestService = absenceRequestService;
             _mapper = mapper;
         }
+        
+        /// <summary>
+        /// Reads an existing absence requests in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read absence requests.</response>
+        [HttpGet("pharmacies/{pharmacyId}/absence-requests")]
+        public IActionResult GetAbsenceRequestsForPharmacy(Guid pharmacyId)
+        {
+            return Ok(_absenceRequestService.ReadFor(pharmacyId));
+        }
 
         /// <summary>
         /// Creates absence request.
@@ -30,7 +40,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns absence request(s).</response>
         /// <response code="400"></response>
         /// <response code="404">Requester not found.</response>
-        [HttpPost("absence-request")]
+        [HttpPost("medical-staff/absence-request")]
         public IActionResult CreateAbsenceRequest(CreateAbsenceRequestRequest request)
         {
             var absenceRequest = _mapper.Map<AbsenceRequestDTO>(request);
