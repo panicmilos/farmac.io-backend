@@ -125,5 +125,13 @@ namespace Farmacio_Services.Implementation
             return Read().Where(pharmacists => _appointmentService.DidPatientHaveAppointmentWithMedicalStaff(patientId, pharmacists.UserId) &&
             !_medicalStaffGradeService.DidPatientGradeMedicalStaff(patientId, pharmacists.UserId)).ToList();
         }
+
+        public Pharmacy ReadWorkPlace(Guid pharmacistId)
+        {
+            var account = ReadByUserId(pharmacistId);
+            if (account == null)
+                throw new MissingEntityException("Pharmacist not found");
+            return ((Pharmacist)account.User).Pharmacy;
+        }
     }
 }

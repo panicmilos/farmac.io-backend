@@ -115,7 +115,6 @@ namespace Farmacio_API.Controllers
             return Ok(_medicalStaffService.GradeMedicalStaff(pharmacistsGrade));
         }
 
-
         /// <summary>
         /// Reads an existing pharmacist in the system that patietn can rate.
         /// </summary>
@@ -124,6 +123,17 @@ namespace Farmacio_API.Controllers
         public IActionResult GetPharmacistToRate(Guid patientId)
         {
             return Ok(_pharmacistService.ReadThatPatientCanRate(patientId));
+        }
+
+        /// <summary>
+        /// Reads the pharmacy where pharmacist works.
+        /// </summary>
+        /// <response code="200">Read pharmacy.</response>
+        /// /// <response code="404">Pharmacist not found.</response>
+        [HttpGet("{pharmacistId}/work-place")]
+        public IActionResult GetWorkPlace(Guid pharmacistId)
+        {
+            return Ok(_pharmacistService.ReadWorkPlace(pharmacistId));
         }
     }
 }

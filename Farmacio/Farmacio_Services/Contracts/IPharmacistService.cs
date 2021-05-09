@@ -12,5 +12,6 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name);
         IEnumerable<Pharmacist> SortByGrade(IList<Pharmacist> pharmacists, SearhSortParamsForAppointments searchSortParams);
         IEnumerable<Account> ReadThatPatientCanRate(Guid patientId);
+        Pharmacy ReadWorkPlace(Guid pharmacistId);
     }
 }
