@@ -43,6 +43,7 @@ namespace Farmacio_Repositories.Implementation
         public DbSet<PharmacyOrder> PharmacyOrders { get; set; }
         public DbSet<SupplierOffer> SupplierOffers { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<NotInStock> NotInStocks { get; set; }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {

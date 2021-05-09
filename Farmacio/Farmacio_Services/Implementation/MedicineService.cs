@@ -18,10 +18,12 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyService _pharmacyService;
         private readonly IERecipeService _eRecipeService;
         private readonly IReservationService _reservationService;
+        private readonly ICrudService<NotInStock> _notInStockService;
 
         public MedicineService(IMedicineReplacementService replacementService, IMedicineIngredientService ingredientService,
             IPharmacyPriceListService pharmacyPriceListService, IPharmacyService pharmacyService, IPharmacyStockService pharmacyStockService,
             IERecipeService eRecipeService, IReservationService reservationService,
+            ICrudService<NotInStock> notInStockService,
             IRepository<Medicine> repository) :
             base(repository)
         {
@@ -32,6 +34,7 @@ namespace Farmacio_Services.Implementation
             _pharmacyService = pharmacyService;
             _eRecipeService = eRecipeService;
             _reservationService = reservationService;
+            _notInStockService = notInStockService;
         }
 
         public FullMedicineDTO ReadFullMedicine(Guid id)
@@ -167,7 +170,12 @@ namespace Farmacio_Services.Implementation
         {
             var medicines = _pharmacyStockService.ReadForPharmacy(pharmacyId)?
                 .Select(mp => mp.Medicine).Where(m => m.Name == name)
-                .Select(m => _pharmacyService.ReadMedicine(pharmacyId, m.Id));
+                .Select(m => {
+                    var medicineInPharmacy = _pharmacyService.ReadMedicine(pharmacyId, m.Id);
+                    if (medicineInPharmacy.InStock == 0)
+                        _notInStockService.Create(new NotInStock { MedicineId = m.Id, PharmacyId = pharmacyId });
+                    return medicineInPharmacy;
+                });
 
             List<MedicineInPharmacyDTO> replacements = new List<MedicineInPharmacyDTO>();
             foreach (var medicine in medicines)
