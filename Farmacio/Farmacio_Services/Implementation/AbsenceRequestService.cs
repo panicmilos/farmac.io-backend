@@ -44,6 +44,8 @@ namespace Farmacio_Services.Implementation
         public AbsenceRequest AcceptAbsenceRequest(Guid absenceRequestId)
         {
             var absenceRequest = TryToRead(absenceRequestId);
+            if(absenceRequest.Status != AbsenceRequestStatus.WaitingForAnswer)
+                throw new BadLogicException("Absence request has already been handled.");
 
             _appointmentService.ReadForMedicalStaffInPharmacy(absenceRequest.RequesterId, absenceRequest.PharmacyId)
                 .ToList()
@@ -76,6 +78,30 @@ namespace Farmacio_Services.Implementation
             _emailDispatcher.Dispatch(absenceRequestAcceptedEmail);
 
             absenceRequest.Status = AbsenceRequestStatus.Accepted;
+            return base.Update(absenceRequest);
+        }
+
+        public AbsenceRequest DeclineAbsenceRequest(Guid absenceRequestId, string reason)
+        {
+            var absenceRequest = TryToRead(absenceRequestId);
+            if(absenceRequest.Status != AbsenceRequestStatus.WaitingForAnswer)
+                throw new BadLogicException("Absence request has already been handled.");
+            
+            var medicalStaffAccount = _medicalStaffService.ReadByUserId(absenceRequest.Requester.Id);
+            var absenceRequestDeclinedEmail = _templatesProvider.FromTemplate<Email>("AbsenceRequestDeclined",
+                new
+                {
+                    To = medicalStaffAccount.Email, 
+                    Name = medicalStaffAccount.User.FirstName,
+                    absenceRequest.FromDate,
+                    absenceRequest.ToDate,
+                    Reason = reason,
+                    PharmacyName = absenceRequest.Pharmacy.Name
+                });
+            _emailDispatcher.Dispatch(absenceRequestDeclinedEmail);
+            
+            absenceRequest.Status = AbsenceRequestStatus.Refused;
+            absenceRequest.Answer = reason;
             return base.Update(absenceRequest);
         }
 

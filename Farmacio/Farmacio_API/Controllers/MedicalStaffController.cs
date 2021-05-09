@@ -38,10 +38,20 @@ namespace Farmacio_API.Controllers
         /// Accepts absence request.
         /// </summary>
         /// <response code="200">Accepted absence request.</response>
-        [HttpPost("medical-staff/absence-request/accept/{absenceRequestId}")]
+        [HttpPost("medical-staff/absence-requests/{absenceRequestId}/accept")]
         public IActionResult CreateAbsenceRequest(Guid absenceRequestId)
         {
             return Ok(_absenceRequestService.AcceptAbsenceRequest(absenceRequestId));
+        }
+        
+        /// <summary>
+        /// Declines absence request.
+        /// </summary>
+        /// <response code="200">Declined absence request.</response>
+        [HttpPost("medical-staff/absence-requests/{absenceRequestId}/decline")]
+        public IActionResult CreateAbsenceRequest(Guid absenceRequestId, DeclineAbsenceRequestRequest declineAbsenceRequest)
+        {
+            return Ok(_absenceRequestService.DeclineAbsenceRequest(absenceRequestId, declineAbsenceRequest.Reason));
         }
         
         /// <summary>
@@ -50,7 +60,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns absence request(s).</response>
         /// <response code="400"></response>
         /// <response code="404">Requester not found.</response>
-        [HttpPost("medical-staff/absence-request")]
+        [HttpPost("medical-staff/absence-requests")]
         public IActionResult CreateAbsenceRequest(CreateAbsenceRequestRequest request)
         {
             var absenceRequest = _mapper.Map<AbsenceRequestDTO>(request);
