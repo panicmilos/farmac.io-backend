@@ -77,7 +77,16 @@ namespace Farmacio_Services.Implementation
             {
                 var pharmacyMedicine =
                     _pharmacyStockService.ReadForPharmacy(order.PharmacyId, orderedMedicine.MedicineId);
-                if (pharmacyMedicine == null) return;
+                if (pharmacyMedicine == null)
+                {
+                    _pharmacyStockService.Create(new PharmacyMedicine
+                    {
+                        MedicineId = orderedMedicine.MedicineId,
+                        PharmacyId = order.PharmacyId,
+                        Quantity = orderedMedicine.Quantity
+                    });
+                    return;
+                }
                 pharmacyMedicine.Quantity += orderedMedicine.Quantity;
                 _pharmacyStockService.Update(pharmacyMedicine);
             });
