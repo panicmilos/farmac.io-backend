@@ -192,6 +192,13 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("The reservation has already been picked up.");
             reservation.State = ReservationState.Done;
             base.Update(reservation);
+
+            var email = _templatesProvider.FromTemplate<Email>("ReservationIssued", new
+            {
+                Name = reservation.Patient.FirstName,
+                Id = reservation.UniqueId
+            });
+            _emailDispatcher.Dispatch(email);
         }
     }
 }
