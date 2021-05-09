@@ -8,6 +8,7 @@ namespace Farmacio_Services.Contracts
     public interface IAbsenceRequestService : ICrudService<AbsenceRequest>
     {
         IEnumerable<AbsenceRequest> ReadFor(Guid pharmacyId);
+        AbsenceRequest AcceptAbsenceRequest(Guid absenceRequestId);
         IEnumerable<AbsenceRequest> CreateAbsenceRequest(AbsenceRequestDTO absenceRequestDto); 
     }
 }
