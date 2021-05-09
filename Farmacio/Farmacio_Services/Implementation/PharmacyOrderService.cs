@@ -13,17 +13,15 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyService _pharmacyService;
         private readonly IPharmacyAdminService _pharmacyAdminService;
         private readonly IMedicineService _medicineService;
-        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly ICrudService<OrderedMedicine> _orderedMedicineService;
         public PharmacyOrderService(IPharmacyService pharmacyService, IPharmacyAdminService pharmacyAdminService
             , IMedicineService medicineService, ICrudService<OrderedMedicine> orderedMedicineService
-            , IPharmacyPriceListService pharmacyPriceListService, IRepository<PharmacyOrder> repository) : base(repository)
+            , IRepository<PharmacyOrder> repository) : base(repository)
         {
             _pharmacyService = pharmacyService;
             _pharmacyAdminService = pharmacyAdminService;
             _medicineService = medicineService;
             _orderedMedicineService = orderedMedicineService;
-            _pharmacyPriceListService = pharmacyPriceListService;
         }
 
         public override PharmacyOrder Create(PharmacyOrder pharmacyOrder)
@@ -69,9 +67,6 @@ namespace Farmacio_Services.Implementation
             pharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
             {
                 _medicineService.TryToRead(orderedMedicine.MedicineId);
-                if (_pharmacyPriceListService.ReadForPharmacy(pharmacyId).MedicinePriceList
-                    .FirstOrDefault(medicinePrice => medicinePrice.MedicineId == orderedMedicine.MedicineId) == null)
-                    throw new BadLogicException("Ordered medicine is not defined in pharmacy's price list.");
                 if (orderedMedicine.Quantity <= 0)
                     throw new BadLogicException("Invalid quantity for medicine order.");
             });
