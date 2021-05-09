@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Farmacio_Models.Domain;
+using System;
 
 namespace Farmacio_Services.Contracts
 {

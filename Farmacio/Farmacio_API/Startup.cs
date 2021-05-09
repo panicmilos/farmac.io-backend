@@ -1,12 +1,14 @@
 using Farmacio_API.Installers;
 using Farmacio_API.Settings;
 using GlobalExceptionHandler.Extensions;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System;
 
 namespace Farmacio_API
 {
@@ -31,13 +33,17 @@ namespace Farmacio_API
                 new AutoMapperInstaller(services),
                 new FluentValidationInstaller(services),
                 new EmailServiceInstaller(services, Configuration),
-                new JwtBearerInstaller(services)
+                new JwtBearerInstaller(services),
+                new HangfireInstaller(services)
             );
             installerCollection.Install();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, 
+            IBackgroundJobClient backgroundJobClient, 
+            IRecurringJobManager recurringJobManager,
+            IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -74,6 +80,11 @@ namespace Farmacio_API
                      SubmitMethod.Get, SubmitMethod.Post,
                      SubmitMethod.Put, SubmitMethod.Delete });
             });
+
+            app.UseHangfireDashboard();
+
+            backgroundJobClient.Enqueue(() => Console.WriteLine("Hello"));
+            recurringJobManager.AddOrUpdate("Run every minute", () => Console.WriteLine("Testing recuring job"), "* * * * *");
         }
     }
 }
