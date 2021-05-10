@@ -12,9 +12,19 @@ namespace Farmacio_Services.Implementation
 {
     public class ERecipeService : CrudService<ERecipe>, IERecipeService
     {
+        private readonly IPharmacyService _pharmacyService;
+        private readonly IReservationService _reservationService;
         private readonly IPatientService _patientService;
-        public ERecipeService(IRepository<ERecipe> repository, IPatientService patientService) : base(repository)
+
+        public ERecipeService(
+            IPharmacyService pharmacyService,
+            IReservationService reservationService,
+            IPatientService patientService,
+            IRepository<ERecipe> repository
+         ) : base(repository)
         {
+            _pharmacyService = pharmacyService;
+            _reservationService = reservationService;
             _patientService = patientService;
         }
 
@@ -24,9 +34,105 @@ namespace Farmacio_Services.Implementation
             return base.Create(eRecipe);
         }
 
+        public override ERecipe Update(ERecipe eRecipe)
+        {
+            var existingERecipe = TryToRead(eRecipe.Id);
+            existingERecipe.IsUsed = eRecipe.IsUsed;
+
+            return _repository.Update(existingERecipe);
+        }
+
+        public Reservation CreateReservationFromERecipe(CreateReservationFromERecipeDTO createERecipeDTO)
+        {
+            var existingERecipe = TryToRead(createERecipeDTO.ERecipeId);
+            _pharmacyService.TryToRead(createERecipeDTO.PharmacyId);
+
+            if (existingERecipe.IsUsed)
+            {
+                throw new BadLogicException("ERecipe is already used.");
+            }
+
+            var reservation = new Reservation
+            {
+                PatientId = _patientService.ReadByUserId(existingERecipe.PatientId).Id,
+                PharmacyId = createERecipeDTO.PharmacyId,
+                PickupDeadline = createERecipeDTO.PickupDeadline,
+                Medicines = existingERecipe.Medicines.Select(prescribedMedicine => new ReservedMedicine
+                {
+                    MedicineId = prescribedMedicine.MedicineId,
+                    Quantity = prescribedMedicine.Quantity
+                }).ToList()
+            };
+
+            var createdReservation = _reservationService.Create(reservation);
+            existingERecipe.IsUsed = true;
+            Update(existingERecipe);
+
+            return createdReservation;
+        }
+
+        public IEnumerable<PharmacyForERecipeDTO> FindPharmaciesWithMedicinesFrom(Guid eRecipeId)
+        {
+            var existingERecipe = TryToRead(eRecipeId);
+
+            return _pharmacyService.Read().ToList()
+                .Where(pharmacy =>
+                {
+                    return existingERecipe.Medicines.All(medicine =>
+                    {
+                        try
+                        {
+                            var medicineInPharmacy = _pharmacyService.ReadMedicine(pharmacy.Id, medicine.MedicineId);
+                            if (medicineInPharmacy.InStock < medicine.Quantity)
+                            {
+                                return false;
+                            }
+                            return true;
+                        }
+                        catch (Exception)
+                        {
+                            return false;
+                        }
+                    });
+                })
+                .Select(pharmacy => new PharmacyForERecipeDTO
+                {
+                    Id = pharmacy.Id,
+                    Name = pharmacy.Name,
+                    Address = pharmacy.Address,
+                    AverageGrade = pharmacy.AverageGrade,
+                    TotalPriceOfMedicines = existingERecipe.Medicines.Sum(medicine => _pharmacyService.ReadMedicine(pharmacy.Id, medicine.MedicineId).Price * medicine.Quantity)
+                });
+        }
+
         public IEnumerable<ERecipe> ReadFor(Guid patientId)
         {
             return Read().Where(eRecipe => eRecipe.PatientId == patientId).ToList();
+        }
+
+       public IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending)
+        {
+            var pharmacies = FindPharmaciesWithMedicinesFrom(eRecipeId);
+            var sortingCriteria = new Dictionary<string, Func<PharmacyForERecipeDTO, object>>()
+            {
+                { "name", p => p.Name },
+                { "grade", p => p.AverageGrade },
+                { "price", p => p.TotalPriceOfMedicines }
+            };
+
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
+            {
+                pharmacies = isAscending ? pharmacies.OrderBy(sortingCriterion) : pharmacies.OrderByDescending(sortingCriterion);
+            }
+
+            return pharmacies;
+        }
+        
+        public IEnumerable<ERecipeMedicine> ReadMedicinesFromERecipe(Guid eRecipeId)
+        {
+            var eRecipe = base.TryToRead(eRecipeId);
+
+            return eRecipe.Medicines;
         }
 
         public IEnumerable<ERecipeDTO> SortFor(Guid patientUserId, ERecipesSortFilterParams sortFilterParams)

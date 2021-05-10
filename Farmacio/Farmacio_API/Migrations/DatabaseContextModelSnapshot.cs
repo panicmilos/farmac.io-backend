@@ -600,6 +600,32 @@ namespace Farmacio_API.Migrations
                     b.ToTable("MedicineType");
                 });
 
+            modelBuilder.Entity("Farmacio_Models.Domain.NotInStock", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsSeen")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid>("MedicineId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("PharmacyId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NotInStocks");
+                });
+
             modelBuilder.Entity("Farmacio_Models.Domain.OrderedMedicine", b =>
                 {
                     b.Property<Guid>("Id")

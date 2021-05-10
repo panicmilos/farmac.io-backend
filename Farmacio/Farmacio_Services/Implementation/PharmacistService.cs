@@ -14,15 +14,13 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IAppointmentService _appointmentService;
-        private readonly IMedicalStaffGradeService _medicalStaffGradeService;
 
-        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService, IMedicalStaffGradeService medicalStaffGradeService,
+        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService,
             IAppointmentService appointmentService, IRepository<Account> repository) :
-            base(emailVerificationService, appointmentService, medicalStaffGradeService, repository)
+            base(emailVerificationService, appointmentService, repository)
         {
             _pharmacyService = pharmacyService;
             _appointmentService = appointmentService;
-            _medicalStaffGradeService = medicalStaffGradeService;
         }
 
         public override IEnumerable<Account> Read()

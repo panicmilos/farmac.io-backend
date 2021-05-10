@@ -16,12 +16,10 @@ namespace Farmacio_API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IPharmacistService _pharmacistService;
-        private readonly IMedicalStaffService _medicalStaffService;
 
-        public PharmacistsController(IPharmacistService pharmacistService, IMedicalStaffService medicalStaffService, IMapper mapper)
+        public PharmacistsController(IPharmacistService pharmacistService, IMapper mapper)
         {
             _pharmacistService = pharmacistService;
-            _medicalStaffService = medicalStaffService;
             _mapper = mapper;
         }
 

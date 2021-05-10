@@ -16,19 +16,14 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
-        private readonly IAppointmentService _appointmentService;
-        private readonly IMedicalStaffGradeService _medicalStaffGradeService;
 
         public DermatologistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IAppointmentService appointmentService
-            , IMedicalStaffGradeService medicalStaffGradeService
             , IRepository<Account> repository)
-            : base(emailVerificationService, appointmentService, medicalStaffGradeService, repository)
+            : base(emailVerificationService, appointmentService, repository)
         {
             _pharmacyService = pharmacyService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
-            _appointmentService = appointmentService;
-            _medicalStaffGradeService = medicalStaffGradeService;
         }
 
         public override IEnumerable<Account> Read()
@@ -132,17 +127,6 @@ namespace Farmacio_Services.Implementation
                 .FirstOrDefault(wp => TimeIntervalUtils
                     .TimeIntervalTimesOverlap(wp.WorkTime.From, wp.WorkTime.To, workTime.From, workTime.To));
             return overlap == null;
-        }
-
-        public IEnumerable<Account> ReadThatPatientCanRate(Guid patientId)
-        {
-            return Read().Where(dermatologist => _appointmentService.DidPatientHaveAppointmentWithMedicalStaff(patientId, dermatologist.UserId) &&
-            !_medicalStaffGradeService.DidPatientGradeMedicalStaff(patientId, dermatologist.UserId)).ToList();
-        }
-
-        public IEnumerable<Account> ReadThatPatientRated(Guid patientId)
-        {
-            return Read().Where(dermatologist => _medicalStaffGradeService.DidPatientGradeMedicalStaff(patientId, dermatologist.UserId)).ToList();
         }
     }
 }

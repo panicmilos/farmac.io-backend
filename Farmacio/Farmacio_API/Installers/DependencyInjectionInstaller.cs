@@ -71,6 +71,8 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IComplaintAnswerService), typeof(ComplaintAnswerService));
             _services.AddScoped(typeof(ILoyaltyPointsService), typeof(LoyaltyPointsService));
             _services.AddScoped(typeof(IPharmacyGradeService), typeof(PharmacyGradeService));
+            _services.AddScoped(typeof(ILoyaltyProgramService), typeof(LoyaltyProgramService));
+            _services.AddScoped(typeof(IAbsenceRequestService), typeof(AbsenceRequestService));
         }
     }
 }

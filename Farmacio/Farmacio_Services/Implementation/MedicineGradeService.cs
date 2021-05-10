@@ -27,6 +27,30 @@ namespace Farmacio_Services.Implementation
             _patientService = patientService;
         }
 
+        public MedicineGrade ChangeGrade(Guid medicineGradeId, int value)
+        {
+            var medicineGrade = TryToRead(medicineGradeId) as MedicineGrade;
+
+            var medicine = _medicineService.TryToRead(medicineGrade.MedicineId);
+
+            if (value < 1 || value > 5)
+            {
+                throw new BadLogicException("The grade can be between 0 and 5.");
+            }
+
+            if (medicineGrade.Value == value)
+            {
+                return medicineGrade;
+            }
+
+            medicine.AverageGrade = (medicine.AverageGrade * medicine.NumberOfGrades - medicineGrade.Value + value) / medicine.NumberOfGrades;
+            _medicineService.UpdateGrade(medicine);
+
+            medicineGrade.Value = value;
+
+            return base.Update(medicineGrade) as MedicineGrade;
+        }
+
         public override Grade Create(Grade grade)
         {
             var medicineGrade = grade as MedicineGrade;
@@ -76,17 +100,28 @@ namespace Farmacio_Services.Implementation
             return medicines.Where(medicine => !DidPatientRateMedicine(medicine.Id, patientId));
         }
 
+        public IEnumerable<Medicine> ReadMedicinesThatPatientRated(Guid patientId)
+        {
+            return _medicineService.Read().ToList().Where(medicine => DidPatientRateMedicine(medicine.Id, patientId)).ToList();
+        }
+
         private bool DidPatientRateMedicine(Guid medicineId, Guid patientId)
+        {
+            var grades = Read().ToList().Where(grade =>
+            {
+                var medicineGrade = grade as MedicineGrade;
+                return medicineGrade?.MedicineId == medicineId && medicineGrade?.PatientId == patientId;
+            }).ToList();
+            return grades?.FirstOrDefault() != null;
+        }
+
+        public MedicineGrade Read(Guid patientId, Guid medicineId)
         {
             return Read().Where(grade =>
             {
                 var medicineGrade = grade as MedicineGrade;
-                if(medicineGrade != null)
-                {
-                    return medicineGrade.MedicineId == medicineId && medicineGrade.PatientId == patientId;
-                }
-                return false;
-            }).FirstOrDefault() != null;
+                return medicineGrade?.PatientId == patientId && medicineGrade?.MedicineId == medicineId;
+            }).FirstOrDefault() as MedicineGrade;
         }
     }
 }
