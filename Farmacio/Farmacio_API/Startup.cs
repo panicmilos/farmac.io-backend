@@ -1,3 +1,4 @@
+using Farmacio_API.Filters;
 using Farmacio_API.Installers;
 using Farmacio_API.Settings;
 using Farmacio_Services.Contracts;
@@ -82,7 +83,10 @@ namespace Farmacio_API
                      SubmitMethod.Put, SubmitMethod.Delete });
             });
 
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new DashboardFilter() }
+            });
 
             recurringJobManager.AddOrUpdate("Delete negative points", () => serviceProvider.GetService<IPatientService>().DeleteNegativePoints(), "0 0 1 * *");
             recurringJobManager.AddOrUpdate("Delete not picked up reservations", () => serviceProvider.GetService<IReservationService>().DeleteNotPickedUpReservations(), "0 0 0 * * ?");
