@@ -2,6 +2,7 @@
 using Farmacio_API.Contracts.Requests.LoyaltyPrograms;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -29,6 +30,18 @@ namespace Farmacio_API.Controllers
         public IActionResult ReadLoyaltyPrograms()
         {
             return Ok(_loyaltyProgramService.Read());
+        }
+
+        /// <summary>
+        /// Returns discount percentage for a given patient.
+        /// </summary>
+        /// <response code="200">Discount.</response>
+        /// <response code="404">Given patient is not found.</response>
+        [HttpGet("discount-for/{patientId}")]
+        public IActionResult ReadDiscountFor(Guid patientId)
+        {
+            Console.WriteLine(DiscountUtils.ApplyDiscount(100, 20));
+            return Ok(_loyaltyProgramService.ReadDiscountFor(patientId));
         }
 
         /// <summary>

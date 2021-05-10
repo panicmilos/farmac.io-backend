@@ -16,15 +16,22 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IPatientService _patientService;
+        private readonly ILoyaltyProgramService _loyaltyProgramService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
 
-        public ReservationService(IPharmacyService pharmacyService, IPatientService patientService, IEmailDispatcher emailDispatcher,
-            ITemplatesProvider templatesProvider, IRepository<Reservation> repository) :
+        public ReservationService(
+            IPharmacyService pharmacyService,
+            IPatientService patientService,
+            ILoyaltyProgramService loyaltyProgramService,
+            IEmailDispatcher emailDispatcher,
+            ITemplatesProvider templatesProvider,
+            IRepository<Reservation> repository) :
             base(repository)
         {
             _pharmacyService = pharmacyService;
             _patientService = patientService;
+            _loyaltyProgramService = loyaltyProgramService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
         }
@@ -86,7 +93,7 @@ namespace Farmacio_Services.Implementation
                 var medicineInPharmacy = _pharmacyService.ReadMedicine(reservation.PharmacyId, reservedMedicine.MedicineId);
                 if (medicineInPharmacy.InStock < reservedMedicine.Quantity)
                     throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
-                reservedMedicine.Price = medicineInPharmacy.Price;
+                reservedMedicine.Price = DiscountUtils.ApplyDiscount(medicineInPharmacy.Price, _loyaltyProgramService.ReadDiscountFor(patient.Id));
             }
             foreach (var reservedMedicine in reservation.Medicines)
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, -reservedMedicine.Quantity);
@@ -103,10 +110,9 @@ namespace Farmacio_Services.Implementation
             return createdReservation;
         }
 
-
         public bool DidPatientReserveMedicine(Guid medicineId, Guid patientId)
         {
-            var reservations = Read().ToList().Where(reservation => reservation.PatientId == patientId && reservation.State == ReservationState.Done 
+            var reservations = Read().ToList().Where(reservation => reservation.PatientId == patientId && reservation.State == ReservationState.Done
                                             && reservation.PickupDeadline < DateTime.Now).ToList();
             reservations = reservations.Where(reservation =>
             {
@@ -115,7 +121,7 @@ namespace Farmacio_Services.Implementation
             }).ToList();
             return reservations.Count() > 0;
         }
-        
+
         public IEnumerable<Reservation> ReadFor(Guid patientId)
         {
             return Read().Where(reservation => reservation.PatientId == patientId).ToList();

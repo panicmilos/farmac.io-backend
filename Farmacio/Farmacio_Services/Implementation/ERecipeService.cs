@@ -54,7 +54,7 @@ namespace Farmacio_Services.Implementation
 
             var reservation = new Reservation
             {
-                PatientId = _patientService.ReadByUserId(existingERecipe.PatientId).Id,
+                PatientId = existingERecipe.PatientId,
                 PharmacyId = createERecipeDTO.PharmacyId,
                 PickupDeadline = createERecipeDTO.PickupDeadline,
                 Medicines = existingERecipe.Medicines.Select(prescribedMedicine => new ReservedMedicine
@@ -110,7 +110,7 @@ namespace Farmacio_Services.Implementation
             return Read().Where(eRecipe => eRecipe.PatientId == patientId).ToList();
         }
 
-       public IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending)
+        public IEnumerable<PharmacyForERecipeDTO> SortPharmaciesWithMedicinesFrom(Guid eRecipeId, string sortCriteria, bool isAscending)
         {
             var pharmacies = FindPharmaciesWithMedicinesFrom(eRecipeId);
             var sortingCriteria = new Dictionary<string, Func<PharmacyForERecipeDTO, object>>()
@@ -127,7 +127,7 @@ namespace Farmacio_Services.Implementation
 
             return pharmacies;
         }
-        
+
         public IEnumerable<ERecipeMedicine> ReadMedicinesFromERecipe(Guid eRecipeId)
         {
             var eRecipe = base.TryToRead(eRecipeId);
@@ -148,7 +148,7 @@ namespace Farmacio_Services.Implementation
 
             var eRecipes = Read().ToList().Where(eRecipe => eRecipe.PatientId == patientUserId);
 
-            if(isUsed.HasValue)
+            if (isUsed.HasValue)
             {
                 eRecipes = eRecipes.Where(eRecipe => eRecipe.IsUsed == isUsed);
             }
