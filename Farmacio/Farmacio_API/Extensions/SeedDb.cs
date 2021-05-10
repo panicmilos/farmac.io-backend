@@ -623,6 +623,24 @@ public static class SeedDb
             Pharmacy = pharmacy2,
             Price = 1200,
         };
+        
+        var notInStock1 = new NotInStock
+        {
+            PharmacyId = pharmacy1.Id,
+            MedicineId = medicine1.Id
+        };
+        
+        var notInStock2 = new NotInStock
+        {
+            PharmacyId = pharmacy2.Id,
+            MedicineId = medicine2.Id
+        };
+        
+        var notInStock3 = new NotInStock
+        {
+            PharmacyId = pharmacy3.Id,
+            MedicineId = medicine3.Id
+        };
 
         AddIFNotDuplicate(context, patient1);
         AddIFNotDuplicate(context, patient2);
@@ -646,6 +664,10 @@ public static class SeedDb
         AddIFNotDuplicate(context, appointment1);
         AddIFNotDuplicate(context, appointment2);
         AddIFNotDuplicate(context, appointment3);
+        
+        AddIFNotDuplicate(context, notInStock1);
+        AddIFNotDuplicate(context, notInStock2);
+        AddIFNotDuplicate(context, notInStock3);
 
         var workPlace1 = new DermatologistWorkPlace
         {

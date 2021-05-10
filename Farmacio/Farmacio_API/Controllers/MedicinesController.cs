@@ -194,29 +194,6 @@ namespace Farmacio_API.Controllers
             return Ok(medicineDTOs);
         }
 
-        /// <summary>
-        /// Rate medicine.
-        /// </summary>
-        /// <response code="200">Returns medicine grade.</response>
-        /// <response code="400">Patient cannot rate the medicine or already has rated it.</response>
-        /// <response code="404">Given patient or medicine does not exist in the system.</response>
-        [HttpPost("rate")]
-        public IActionResult RateMedicine(CreateMedicineGradeRequest request)
-        {
-            var medicineGrade = _mapper.Map<MedicineGrade>(request);
-            return Ok(_medicineGradeService.Create(medicineGrade));
-        }
-
-
-        /// <summary>
-        /// Reads medicines that patient can rate.
-        /// </summary>
-        /// <response code="200">Returns medicines.</response>
-        [HttpGet("{patientId}/can-rate")]
-        public IActionResult GetPatientCanRate(Guid patientId)
-        {
-            return Ok(_medicineGradeService.ReadThatPatientCanRate(patientId));
-        }
 
         /// <summary>
         /// Returns medicines from eRecipe

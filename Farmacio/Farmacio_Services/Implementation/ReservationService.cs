@@ -16,15 +16,22 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IPatientService _patientService;
+        private readonly ILoyaltyProgramService _loyaltyProgramService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
 
-        public ReservationService(IPharmacyService pharmacyService, IPatientService patientService, IEmailDispatcher emailDispatcher,
-            ITemplatesProvider templatesProvider, IRepository<Reservation> repository) :
+        public ReservationService(
+            IPharmacyService pharmacyService,
+            IPatientService patientService,
+            ILoyaltyProgramService loyaltyProgramService,
+            IEmailDispatcher emailDispatcher,
+            ITemplatesProvider templatesProvider,
+            IRepository<Reservation> repository) :
             base(repository)
         {
             _pharmacyService = pharmacyService;
             _patientService = patientService;
+            _loyaltyProgramService = loyaltyProgramService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
         }
@@ -45,7 +52,7 @@ namespace Farmacio_Services.Implementation
 
             if (reservation.State == ReservationState.Done)
             {
-                throw new BadLogicException("The reservation has already been picked up");
+                throw new BadLogicException("The reservation has already been picked up.");
             }
 
             if (DateTime.Now.AddHours(24) > reservation.PickupDeadline)
@@ -66,14 +73,14 @@ namespace Farmacio_Services.Implementation
         public override Reservation Create(Reservation reservation)
         {
             _pharmacyService.TryToRead(reservation.PharmacyId);
-            var patientAccount = _patientService.TryToRead(reservation.PatientId);
+            var patientAccount = _patientService.ReadByUserId(reservation.PatientId);
+            if (patientAccount == null)
+                throw new MissingEntityException("Patient not found.");
             var patient = (Patient)patientAccount.User;
             if (_patientService.HasExceededLimitOfNegativePoints(patient.Id))
             {
                 throw new BadLogicException("You have 3 negative points, so you cannot reserve a medicine.");
             }
-
-            reservation.PatientId = patient.Id;
             if (DateTime.Now.AddHours(36) > reservation.PickupDeadline)
             {
                 throw new BadLogicException("You have to reserve medicines at least 36 hours before pickup deadline.");
@@ -86,7 +93,7 @@ namespace Farmacio_Services.Implementation
                 var medicineInPharmacy = _pharmacyService.ReadMedicine(reservation.PharmacyId, reservedMedicine.MedicineId);
                 if (medicineInPharmacy.InStock < reservedMedicine.Quantity)
                     throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
-                reservedMedicine.Price = medicineInPharmacy.Price;
+                reservedMedicine.Price = DiscountUtils.ApplyDiscount(medicineInPharmacy.Price, _loyaltyProgramService.ReadDiscountFor(patient.Id));
             }
             foreach (var reservedMedicine in reservation.Medicines)
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, -reservedMedicine.Quantity);
@@ -103,10 +110,9 @@ namespace Farmacio_Services.Implementation
             return createdReservation;
         }
 
-
         public bool DidPatientReserveMedicine(Guid medicineId, Guid patientId)
         {
-            var reservations = Read().ToList().Where(reservation => reservation.PatientId == patientId && reservation.State == ReservationState.Done 
+            var reservations = Read().ToList().Where(reservation => reservation.PatientId == patientId && reservation.State == ReservationState.Done
                                             && reservation.PickupDeadline < DateTime.Now).ToList();
             reservations = reservations.Where(reservation =>
             {
@@ -115,7 +121,7 @@ namespace Farmacio_Services.Implementation
             }).ToList();
             return reservations.Count() > 0;
         }
-        
+
         public IEnumerable<Reservation> ReadFor(Guid patientId)
         {
             return Read().Where(reservation => reservation.PatientId == patientId).ToList();
@@ -145,6 +151,7 @@ namespace Farmacio_Services.Implementation
                     patientReservations.Add(new SmallReservationDTO
                     {
                         ReservationId = reservation.Id,
+                        UniqueId = reservation.UniqueId,
                         PickupDeadline = reservation.PickupDeadline,
                         Price = price,
                         PharmacyId = reservation.PharmacyId
@@ -189,6 +196,38 @@ namespace Farmacio_Services.Implementation
                     _patientService.Update(patient);
                 }
             }
+        }
+
+        public Reservation ReadReservationInPharmacyByUniqueId(string uniqueId, Guid pharmacyId)
+        {
+            var reservation = Read().FirstOrDefault(reservation => reservation.UniqueId == uniqueId);
+            if (reservation == default)
+                throw new MissingEntityException($"Reservation with id '{uniqueId}' not found.");
+            if (reservation.State != ReservationState.Reserved)
+                throw new BadLogicException("The reservation has been either canceled or picked up.");
+            if (reservation.PharmacyId != pharmacyId)
+                throw new BadLogicException("Reservation was not made in this pharmacy.");
+            return reservation;
+        }
+
+        public void MarkReservationAsDone(Guid reservationId)
+        {
+            var reservation = TryToRead(reservationId);
+            if (reservation.State == ReservationState.Cancelled)
+                throw new BadLogicException("The reservation has already been canceled.");
+            if (reservation.State == ReservationState.Done)
+                throw new BadLogicException("The reservation has already been picked up.");
+            if (reservation.PickupDeadline.AddHours(-24) < DateTime.Now)
+                throw new BadLogicException("The reservation is overdue, or less than 24h remained until the pickup deadline.");
+            reservation.State = ReservationState.Done;
+            base.Update(reservation);
+
+            var email = _templatesProvider.FromTemplate<Email>("ReservationIssued", new
+            {
+                Name = reservation.Patient.FirstName,
+                Id = reservation.UniqueId
+            });
+            _emailDispatcher.Dispatch(email);
         }
     }
 }

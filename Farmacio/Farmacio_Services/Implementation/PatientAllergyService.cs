@@ -26,9 +26,11 @@ namespace Farmacio_Services.Implementation
             var account = _patientService.ReadByUserId(patientId);
             _patientService.TryToRead(account.Id);
             var allergies = GetPatientsAllergies(account.Id).Select(m => m.Id);
-            foreach (var medicineDTO in medicineDTOs)
+            return medicineDTOs.Select(medicineDTO =>
+            {
                 medicineDTO.IsAllergy = allergies.Contains(medicineDTO.MedicineId);
-            return medicineDTOs;
+                return medicineDTO;
+            }).ToList();
         }
 
         public IEnumerable<PatientAllergy> CreateAllergies(PatientAllergyDTO request)

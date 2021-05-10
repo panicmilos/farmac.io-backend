@@ -9,6 +9,8 @@ namespace Farmacio_API.Mappings.ERecipes
         public RequestsToDomain()
         {
             CreateMap<CreateERecipeMedicineRequest, MedicineQuantityDTO>();
+
+            CreateMap<CreateReservationFromERecipeRequest, CreateReservationFromERecipeDTO>();
         }
     }
 }

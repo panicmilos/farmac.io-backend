@@ -161,6 +161,9 @@ namespace Farmacio_API.Migrations
                     b.Property<Guid>("MedicalStaffId")
                         .HasColumnType("char(36)");
 
+                    b.Property<float>("OriginalPrice")
+                        .HasColumnType("float");
+
                     b.Property<Guid?>("PatientId")
                         .HasColumnType("char(36)");
 
@@ -598,6 +601,34 @@ namespace Farmacio_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MedicineType");
+                });
+
+            modelBuilder.Entity("Farmacio_Models.Domain.NotInStock", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsSeen")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid>("MedicineId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("PharmacyId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicineId");
+
+                    b.ToTable("NotInStocks");
                 });
 
             modelBuilder.Entity("Farmacio_Models.Domain.OrderedMedicine", b =>
@@ -1351,6 +1382,15 @@ namespace Farmacio_API.Migrations
                     b.HasOne("Farmacio_Models.Domain.Medicine", "ReplacementMedicine")
                         .WithMany()
                         .HasForeignKey("ReplacementMedicineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Farmacio_Models.Domain.NotInStock", b =>
+                {
+                    b.HasOne("Farmacio_Models.Domain.Medicine", "Medicine")
+                        .WithMany()
+                        .HasForeignKey("MedicineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

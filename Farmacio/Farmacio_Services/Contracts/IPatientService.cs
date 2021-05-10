@@ -7,5 +7,6 @@ namespace Farmacio_Services.Contracts
     {
         bool HasExceededLimitOfNegativePoints(Guid patientId);
         void DeleteNegativePoints();
+        Account UpdateLoyaltyProgram(Guid patientAccountId, Guid? loyaltyProgramId);
     }
 }
