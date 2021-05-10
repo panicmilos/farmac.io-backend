@@ -45,5 +45,15 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Patient account not found.");
             return existingAccount;
         }
+
+        public void DeleteNegativePoints()
+        {
+            foreach (var patientAccount in Read())
+            {
+                var patient = patientAccount.User as Patient;
+                patient.NegativePoints = 0;
+                base.Update(patientAccount);
+            }
+        }
     }
 }

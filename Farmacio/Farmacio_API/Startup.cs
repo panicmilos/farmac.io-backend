@@ -1,5 +1,6 @@
 using Farmacio_API.Installers;
 using Farmacio_API.Settings;
+using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Extensions;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -83,8 +84,7 @@ namespace Farmacio_API
 
             app.UseHangfireDashboard();
 
-            backgroundJobClient.Enqueue(() => Console.WriteLine("Hello"));
-            recurringJobManager.AddOrUpdate("Run every minute", () => Console.WriteLine("Testing recuring job"), "* * * * *");
+            recurringJobManager.AddOrUpdate("Delete negative points", () => serviceProvider.GetService<IPatientService>().DeleteNegativePoints(), "0 0 1 * *");
         }
     }
 }
