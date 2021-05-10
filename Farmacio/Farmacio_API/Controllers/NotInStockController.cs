@@ -33,7 +33,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Marked seen not in stock record.</response>
         /// <response code="404">Not in stock record not found.</response>
-        [HttpPost("not-in-stocks/{notInStockId}/seen")]
+        [HttpPut("not-in-stocks/{notInStockId}/seen")]
         public IActionResult MarkNotInStockRecordAsSeen(Guid notInStockId)
         {
             return Ok(_notInStockService.MarkSeen(notInStockId));
