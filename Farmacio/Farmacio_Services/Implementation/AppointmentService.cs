@@ -19,7 +19,7 @@ namespace Farmacio_Services.Implementation
         private readonly IAccountService _accountService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPatientService _patientService;
-        private readonly ILoyaltyProgramService _loyaltyProgramService;
+        private readonly IDiscountService _discountService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
@@ -30,7 +30,7 @@ namespace Farmacio_Services.Implementation
             , IPharmacyService pharmacyService, IAccountService accountService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IPatientService patientService
-            , ILoyaltyProgramService loyaltyProgramService
+            , IDiscountService discountService
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
             , IReportService reportService
@@ -42,7 +42,7 @@ namespace Farmacio_Services.Implementation
             _accountService = accountService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _patientService = patientService;
-            _loyaltyProgramService = loyaltyProgramService;
+            _discountService = discountService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
@@ -93,11 +93,10 @@ namespace Farmacio_Services.Implementation
                 ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
 
             var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfDermatologistExamination(pharmacy.Id);
-            var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentDTO.PatientId.Value)) : originalPrice;
+            var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _discountService
+                .ReadDiscountFor(appointmentDTO.PharmacyId, appointmentDTO.PatientId.Value)) : originalPrice;
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
-
-            price = _promotionService.ApplyPromotionDiscountForPriceFor(pharmacy.Id, price);
 
             var newAppointment = Create(new Appointment
             {
@@ -165,7 +164,9 @@ namespace Farmacio_Services.Implementation
 
             appointmentWithDermatologist.IsReserved = true;
             appointmentWithDermatologist.PatientId = appointmentRequest.PatientId;
-            appointmentWithDermatologist.Price = DiscountUtils.ApplyDiscount(appointmentWithDermatologist.OriginalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentWithDermatologist.PatientId.Value));
+            appointmentWithDermatologist.Price = DiscountUtils.ApplyDiscount(appointmentWithDermatologist.OriginalPrice,
+                _discountService.ReadDiscountFor(appointmentWithDermatologist.PharmacyId,
+                    appointmentWithDermatologist.PatientId.Value));
 
             var email = _templatesProvider.FromTemplate<Email>("Appointment", new { Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
@@ -312,12 +313,13 @@ namespace Farmacio_Services.Implementation
             var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
             var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
-            var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentDTO.PatientId.Value)) : originalPrice;
+            var price = appointmentDTO.PatientId != null
+                ? DiscountUtils.ApplyDiscount(originalPrice,
+                    _discountService.ReadDiscountFor(appointmentDTO.PharmacyId, appointmentDTO.PatientId.Value))
+                : originalPrice;
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
             
-            price = _promotionService.ApplyPromotionDiscountForPriceFor(pharmacy.Id, price);
-
             var appointmentWithPharmacist = Create(new Appointment
             {
                 PharmacyId = appointmentDTO.PharmacyId,

@@ -8,6 +8,6 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<Promotion> ReadFor(Guid pharmacyId);
         IEnumerable<Promotion> ReadActiveFor(Guid pharmacyId);
-        float ApplyPromotionDiscountForPriceFor(Guid pharmacyId, float price);
+        int ReadDiscountFor(Guid pharmacyId);
     }
 }

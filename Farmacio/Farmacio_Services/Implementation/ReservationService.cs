@@ -16,15 +16,14 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyService _pharmacyService;
         private readonly IPatientService _patientService;
-        private readonly ILoyaltyProgramService _loyaltyProgramService;
+        private readonly IDiscountService _discountService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
-        private readonly IPromotionService _promotionService;
 
         public ReservationService(
             IPharmacyService pharmacyService,
             IPatientService patientService,
-            ILoyaltyProgramService loyaltyProgramService,
+            IDiscountService discountService,
             IEmailDispatcher emailDispatcher,
             ITemplatesProvider templatesProvider,
             IRepository<Reservation> repository) :
@@ -32,10 +31,9 @@ namespace Farmacio_Services.Implementation
         {
             _pharmacyService = pharmacyService;
             _patientService = patientService;
-            _loyaltyProgramService = loyaltyProgramService;
+            _discountService = discountService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
-            _promotionService = promotionService;
         }
 
         public IEnumerable<Reservation> ReadFrom(Guid pharmacyId)
@@ -95,7 +93,8 @@ namespace Farmacio_Services.Implementation
                 var medicineInPharmacy = _pharmacyService.ReadMedicine(reservation.PharmacyId, reservedMedicine.MedicineId);
                 if (medicineInPharmacy.InStock < reservedMedicine.Quantity)
                     throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
-                reservedMedicine.Price = DiscountUtils.ApplyDiscount(medicineInPharmacy.Price, _loyaltyProgramService.ReadDiscountFor(patient.Id));
+                reservedMedicine.Price = DiscountUtils.ApplyDiscount(medicineInPharmacy.Price,
+                    _discountService.ReadDiscountFor(reservation.PharmacyId, patient.Id));
             }
             foreach (var reservedMedicine in reservation.Medicines)
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, -reservedMedicine.Quantity);

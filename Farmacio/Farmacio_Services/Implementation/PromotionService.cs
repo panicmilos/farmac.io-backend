@@ -62,14 +62,9 @@ namespace Farmacio_Services.Implementation
                 .Where(promotion => DateTime.Now >= promotion.From && DateTime.Now <= promotion.To).ToList();
         }
 
-        public float ApplyPromotionDiscountForPriceFor(Guid pharmacyId, float price)
+        public int ReadDiscountFor(Guid pharmacyId)
         {
-            ReadActiveFor(pharmacyId).ToList()
-                .ForEach(promotion =>
-                {
-                    price -= (promotion.Discount / 100f) * price;
-                });
-            return price >= 0f ? price : 0f;
+            return ReadActiveFor(pharmacyId).Sum(promotion => promotion.Discount);
         }
 
         private void ValidatePromotion(Promotion promotion, bool isCreate = true)
