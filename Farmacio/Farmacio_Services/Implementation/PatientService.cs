@@ -46,6 +46,7 @@ namespace Farmacio_Services.Implementation
             return existingAccount;
         }
 
+
         public void DeleteNegativePoints()
         {
             foreach (var patientAccount in Read())
@@ -54,6 +55,16 @@ namespace Farmacio_Services.Implementation
                 patient.NegativePoints = 0;
                 base.Update(patientAccount);
             }
+        }
+
+        public Account UpdateLoyaltyProgram(Guid patientAccountId, Guid? loyaltyProgramId)
+        {
+            var patientAccount = TryToRead(patientAccountId);
+            var patient = patientAccount.User as Patient;
+
+            patient.LoyaltyProgramId = loyaltyProgramId;
+
+            return base.Update(patientAccount);
         }
     }
 }

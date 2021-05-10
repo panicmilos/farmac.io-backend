@@ -50,5 +50,18 @@ namespace Farmacio_API.Controllers
         {
             return _reservationService.ReadMedicinesForReservation(reservationId);
         }
+
+        [HttpGet("in-pharmacy/{pharmacyId}/by-uniqueid/{uniqueId}")]
+        public IActionResult GetReservationInPharmacyByUniqueId(string uniqueId, Guid pharmacyId)
+        {
+            return Ok(_reservationService.ReadReservationInPharmacyByUniqueId(uniqueId, pharmacyId));
+        }
+
+        [HttpPut("issue-medicines/{reservationId}")]
+        public IActionResult MarkReservationAsDone(Guid reservationId)
+        {
+            _reservationService.MarkReservationAsDone(reservationId);
+            return Ok();
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace Farmacio_API.Controllers
         private readonly IMedicineService _medicineService;
         private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IPharmacyGradeService _pharmacyGradeService;
+        private readonly IAbsenceRequestService _absenceRequestService;
         private readonly IMapper _mapper;
 
         public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
@@ -37,6 +38,7 @@ namespace Farmacio_API.Controllers
             , IPharmacyStockService pharmacyStockService
             , IPharmacyPriceListService pharmacyPriceListService
             , IPharmacyGradeService pharmacyGradeService
+            , IAbsenceRequestService absenceRequestService
             , IMedicineService medicineService, IMapper mapper)
         {
             _pharmacyService = pharmacyService;
@@ -49,6 +51,7 @@ namespace Farmacio_API.Controllers
             _medicineService = medicineService;
             _pharmacyPriceListService = pharmacyPriceListService;
             _pharmacyGradeService = pharmacyGradeService;
+            _absenceRequestService = absenceRequestService;
         }
 
         /// <summary>
@@ -176,6 +179,16 @@ namespace Farmacio_API.Controllers
         public IActionResult GetDermatologist(Guid pharmacyId, Guid dermatologistId)
         {
             return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
+        }
+        
+        /// <summary>
+        /// Reads an existing absence requests in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read absence requests.</response>
+        [HttpGet("{pharmacyId}/absence-requests")]
+        public IActionResult GetAbsenceRequestsForPharmacy(Guid pharmacyId)
+        {
+            return Ok(_absenceRequestService.ReadFor(pharmacyId));
         }
         
         /// <summary>
@@ -335,30 +348,6 @@ namespace Farmacio_API.Controllers
             }).Select(pharmacistAccount => (Pharmacist)pharmacistAccount.User);
 
             return Ok(_pharmacistService.SortByGrade(pharmacists.ToList(), searchParams));
-        }
-
-
-        /// <summary>
-        /// Rate pharmacy.
-        /// </summary>
-        /// <response code="200">Returns pharmacy grade.</response>
-        /// <response code="400">Patient cannot rate the pharmacy or already has rated it.</response>
-        /// <response code="404">Given patient or pharmacy does not exist in the system.</response>
-        [HttpPost("rate")]
-        public IActionResult RatePharmacy(CreatePharmacyGradeRequest request)
-        {
-            var pharmacyGrade = _mapper.Map<PharmacyGrade>(request);
-            return Ok(_pharmacyGradeService.Create(pharmacyGrade));
-        }
-
-        /// <summary>
-        /// Reads pharmacies that patient can rate.
-        /// </summary>
-        /// <response code="200">Returns pharmacies.</response>
-        [HttpGet("{patientId}/can-rate")]
-        public IActionResult GetPatientCanRate(Guid patientId)
-        {
-            return Ok(_pharmacyGradeService.ReadThatPatientCanRate(patientId));
         }
     }
 }

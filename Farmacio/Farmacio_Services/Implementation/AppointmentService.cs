@@ -19,6 +19,7 @@ namespace Farmacio_Services.Implementation
         private readonly IAccountService _accountService;
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPatientService _patientService;
+        private readonly ILoyaltyProgramService _loyaltyProgramService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
@@ -28,6 +29,7 @@ namespace Farmacio_Services.Implementation
             , IPharmacyService pharmacyService, IAccountService accountService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IPatientService patientService
+            , ILoyaltyProgramService loyaltyProgramService
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
             , IReportService reportService
@@ -38,6 +40,7 @@ namespace Farmacio_Services.Implementation
             _accountService = accountService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _patientService = patientService;
+            _loyaltyProgramService = loyaltyProgramService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templateProvider;
             _reportService = reportService;
@@ -47,6 +50,11 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
             return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
+        }
+
+        public IEnumerable<Appointment> ReadForMedicalStaffInPharmacy(Guid medicalStaffId, Guid pharmacyId)
+        {
+            return ReadForMedicalStaff(medicalStaffId).Intersect(ReadForPharmacy(pharmacyId));
         }
 
         public IEnumerable<Appointment> ReadForPharmacy(Guid pharmacyId)
@@ -81,7 +89,8 @@ namespace Farmacio_Services.Implementation
             if (withPatient)
                 ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
 
-            var price = appointmentDTO.Price ?? _pharmacyService.GetPriceOfDermatologistExamination(pharmacy.Id);
+            var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfDermatologistExamination(pharmacy.Id);
+            var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentDTO.PatientId.Value)) : originalPrice;
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
@@ -92,6 +101,7 @@ namespace Farmacio_Services.Implementation
                 DateTime = appointmentDTO.DateTime,
                 Duration = appointmentDTO.Duration,
                 Price = price,
+                OriginalPrice = originalPrice,
                 PatientId = appointmentDTO.PatientId,
                 IsReserved = withPatient
             });
@@ -135,7 +145,7 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("The given appointment does not exist in the system.");
 
             if (_patientService.Read().Where(account => account.UserId == appointmentRequest.PatientId) == null)
-                throw new MissingEntityException("The given patient does not exixst in the system.");
+                throw new MissingEntityException("The given patient does not exist in the system.");
 
             if (appointmentWithDermatologist.IsReserved)
                 throw new BadLogicException("The given appointment is already reserved.");
@@ -146,10 +156,12 @@ namespace Farmacio_Services.Implementation
             if (appointmentWithDermatologist.DateTime < DateTime.Now)
                 throw new BadLogicException("The given appointment is in the past.");
 
-            ValidateTimeForPatient(appointmentWithDermatologist.PatientId.Value, appointmentWithDermatologist.DateTime, appointmentWithDermatologist.Duration);
+            ValidateTimeForPatient(appointmentRequest.PatientId, appointmentWithDermatologist.DateTime, appointmentWithDermatologist.Duration);
 
             appointmentWithDermatologist.IsReserved = true;
             appointmentWithDermatologist.PatientId = appointmentRequest.PatientId;
+            appointmentWithDermatologist.Price = DiscountUtils.ApplyDiscount(appointmentWithDermatologist.OriginalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentWithDermatologist.PatientId.Value));
+
             var email = _templatesProvider.FromTemplate<Email>("Appointment", new { Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
             return base.Update(appointmentWithDermatologist);
@@ -193,6 +205,8 @@ namespace Farmacio_Services.Implementation
             appointment.IsReserved = false;
             appointment.PatientId = null;
             appointment.Patient = null;
+            appointment.Price = appointment.OriginalPrice;
+
             base.Update(appointment);
             return appointment;
         }
@@ -292,7 +306,8 @@ namespace Farmacio_Services.Implementation
 
             var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
-            var price = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
+            var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
+            var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _loyaltyProgramService.ReadDiscountFor(appointmentDTO.PatientId.Value)) : originalPrice;
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
 
@@ -303,6 +318,7 @@ namespace Farmacio_Services.Implementation
                 DateTime = appointmentDTO.DateTime,
                 Duration = appointmentDTO.Duration,
                 Price = price,
+                OriginalPrice = originalPrice,
                 PatientId = appointmentDTO.PatientId,
                 IsReserved = true
             });
