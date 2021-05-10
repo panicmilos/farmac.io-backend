@@ -169,5 +169,26 @@ namespace Farmacio_Services.Implementation
         {
             return Read().FirstOrDefault(reservation => reservation.UniqueId == id) == default;
         }
+
+        public void DeleteNotPickedUpReservations()
+        {
+            foreach(var reservation in Read().ToList())
+            {
+                if(reservation.State == ReservationState.Reserved && reservation.PickupDeadline < DateTime.Now)
+                {
+                    foreach (var reservedMedicine in reservation.Medicines.ToList())
+                    {
+                        _pharmacyService.ReturnMedicinesInStock(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity);
+                    }
+
+                    reservation.State = ReservationState.Cancelled;
+                    base.Update(reservation);
+
+                    var patient =_patientService.ReadByUserId(reservation.PatientId);
+                    (patient.User as Patient).NegativePoints++;
+                    _patientService.Update(patient);
+                }
+            }
+        }
     }
 }

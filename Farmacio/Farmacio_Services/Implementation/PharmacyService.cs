@@ -230,5 +230,18 @@ namespace Farmacio_Services.Implementation
 
             return base.Update(existingPharmacy);
         }
+
+        public void ReturnMedicinesInStock(Guid pharmacyId, Guid medicineId, int quantity)
+        {
+            var pharmacy = TryToRead(pharmacyId);
+
+            var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
+            if (medicineStock != null)
+            {
+                medicineStock.Quantity += quantity;
+
+                base.Update(pharmacy);
+            }
+        }
     }
 }

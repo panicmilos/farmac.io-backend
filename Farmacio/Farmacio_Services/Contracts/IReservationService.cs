@@ -17,5 +17,6 @@ namespace Farmacio_Services.Contracts
 
         IEnumerable<SmallReservedMedicineDTO> ReadMedicinesForReservation(Guid reservationId);
         bool DidPatientReserveMedicine(Guid medicineId, Guid patientId);
+        void DeleteNotPickedUpReservations();
     }
 }

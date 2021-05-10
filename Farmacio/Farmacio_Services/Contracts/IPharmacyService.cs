@@ -19,5 +19,6 @@ namespace Farmacio_Services.Contracts
         float GetPriceOfPharmacistConsultation(Guid pharmacyId);
         float GetPriceOfDermatologistExamination(Guid pharmacyId);
         Pharmacy UpdateGrade(Pharmacy pharmacy);
+        void ReturnMedicinesInStock(Guid pharmacyId, Guid medicineId, int quantity);
     }
 }

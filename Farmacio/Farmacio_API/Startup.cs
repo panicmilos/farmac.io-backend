@@ -85,6 +85,7 @@ namespace Farmacio_API
             app.UseHangfireDashboard();
 
             recurringJobManager.AddOrUpdate("Delete negative points", () => serviceProvider.GetService<IPatientService>().DeleteNegativePoints(), "0 0 1 * *");
+            recurringJobManager.AddOrUpdate("Delete not picked up reservations", () => serviceProvider.GetService<IReservationService>().DeleteNotPickedUpReservations(), "0 0 0 * * ?");
         }
     }
 }
