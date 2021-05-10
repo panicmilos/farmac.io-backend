@@ -11,6 +11,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId);
 
         IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId);
+        IEnumerable<Appointment> ReadForMedicalStaffInPharmacy(Guid medicalStaffId, Guid pharmacyId);
 
         IEnumerable<Appointment> ReadReservedButUnreportedForMedicalStaff(Guid medicalStaffId);
 

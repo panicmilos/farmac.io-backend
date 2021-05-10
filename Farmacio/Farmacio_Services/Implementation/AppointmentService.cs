@@ -49,6 +49,11 @@ namespace Farmacio_Services.Implementation
             return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
         }
 
+        public IEnumerable<Appointment> ReadForMedicalStaffInPharmacy(Guid medicalStaffId, Guid pharmacyId)
+        {
+            return ReadForMedicalStaff(medicalStaffId).Intersect(ReadForPharmacy(pharmacyId));
+        }
+
         public IEnumerable<Appointment> ReadForPharmacy(Guid pharmacyId)
         {
             return Read().Where(appointment => appointment.PharmacyId == pharmacyId).ToList();
