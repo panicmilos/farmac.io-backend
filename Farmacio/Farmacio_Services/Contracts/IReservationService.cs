@@ -19,8 +19,11 @@ namespace Farmacio_Services.Contracts
 
         bool DidPatientReserveMedicine(Guid medicineId, Guid patientId);
 
+        void DeleteNotPickedUpReservations();
+
         Reservation ReadReservationInPharmacyByUniqueId(string uniqueId, Guid pharmacyId);
 
         void MarkReservationAsDone(Guid reservationId);
+
     }
 }
