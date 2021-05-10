@@ -240,7 +240,7 @@ namespace Farmacio_Services.Implementation
             {
                 medicineStock.Quantity += quantity;
 
-                base.Update(pharmacy);
+                _pharmacyStockService.Update(medicineStock);
             }
         }
     }
