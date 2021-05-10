@@ -99,5 +99,39 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.Delete(id));
         }
+
+        /// <summary>
+        /// Rate the pharmacist.
+        /// </summary>
+        /// <response code="200">Returns grade.</response>
+        /// <response code="400">Patient cannot rate the pharmacist or already has rated.</response>
+        /// <response code="404">Given patient or pharmacist does not exist in the system.</response>
+        [HttpPost("rate")]
+        public IActionResult RateThePharmacist(CreateMedicalStaffGradeRequest request)
+        {
+            var pharmacistsGrade = _mapper.Map<MedicalStaffGrade>(request);
+            return Ok(_medicalStaffService.GradeMedicalStaff(pharmacistsGrade));
+        }
+
+        /// <summary>
+        /// Reads an existing pharmacist in the system that patient can rate.
+        /// </summary>
+        /// <response code="200">Read pharmacist.</response>
+        [HttpGet("{patientId}/can-rate")]
+        public IActionResult GetPharmacistToRate(Guid patientId)
+        {
+            return Ok(_pharmacistService.ReadThatPatientCanRate(patientId));
+        }
+
+        /// <summary>
+        /// Reads the pharmacy where pharmacist works.
+        /// </summary>
+        /// <response code="200">Read pharmacy.</response>
+        /// <response code="404">Pharmacist not found.</response>
+        [HttpGet("{pharmacistId}/work-place")]
+        public IActionResult GetWorkPlace(Guid pharmacistId)
+        {
+            return Ok(_pharmacistService.ReadWorkPlace(pharmacistId));
+        }
     }
 }

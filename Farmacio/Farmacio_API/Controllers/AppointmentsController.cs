@@ -27,7 +27,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns all pharmacies from the system.
+        /// Returns all appointments from the system.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
         [HttpGet]
@@ -37,7 +37,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns pharmacy specified by id.
+        /// Returns appointment specified by id.
         /// </summary>
         /// <response code="200">Returns pharmacy.</response>
         /// <response code="401">Unable to return pharmacy because it does not exist in the system.</response>

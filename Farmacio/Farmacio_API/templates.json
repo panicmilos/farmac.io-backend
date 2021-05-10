@@ -39,10 +39,10 @@
       "type": "Email",
       "name": "Reservation",
       "template": {
-        "Subject": "Successfull Reservation on Farmac.io",
+        "Subject": "Successful reservation on Farmac.io",
         "From": "panic.milos99@gmail.com",
         "Recipients": [ "panic.milos99@gmail.com" ],
-        "Body": "<p>Dear {{name}},</p><p>You reservation with id {{id}} is successfully created. Please pickup your reservation until: {{deadline}}.</p>"
+        "Body": "<p>Dear {{name}},</p><p>Your reservation with id {{id}} is successfully created. Please pickup your reservation until: {{deadline}}.</p>"
       }
     },
     {
@@ -113,6 +113,16 @@
         "From": "panic.milos99@gmail.com",
         "Recipients": [ "{{to}}" ],
         "Body": "<p>Dear {{name}},</p><p>Promotion has been created in the pharmacy that you're subscribed to.</p>"
+      }
+    },
+    {
+      "type": "Email",
+      "name": "ReservationIssued",
+      "template": {
+        "Subject": "Farmac.io reservation issued",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "makanalbert@gmail.com" ],
+        "Body": "<p>Dear {{name}},</p><p>You have picked up your reservation with id {{id}}.</p>"
       }
     }
   ]
