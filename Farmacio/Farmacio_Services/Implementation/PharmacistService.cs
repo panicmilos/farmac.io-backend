@@ -34,11 +34,11 @@ namespace Farmacio_Services.Implementation
 
             return account?.Role == Role.Pharmacist ? account : null;
         }
-        
+
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);
-            if(existingAccount == null)
+            if (existingAccount == null)
                 throw new MissingEntityException("Pharmacist account not found.");
             return existingAccount;
         }
@@ -52,8 +52,8 @@ namespace Farmacio_Services.Implementation
         public override Account Update(Account account)
         {
             ValidatePharmacyId(account);
-            WorkTimeValidation.ValidateWorkHours(((Pharmacist) account.User).WorkTime);
-            
+            WorkTimeValidation.ValidateWorkHours(((Pharmacist)account.User).WorkTime);
+
             var existingAccount = TryToRead(account.Id);
 
             existingAccount.User.FirstName = account.User.FirstName;
@@ -68,9 +68,9 @@ namespace Farmacio_Services.Implementation
             existingAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
             existingAccount.User.Address.Lat = account.User.Address.Lat;
             existingAccount.User.Address.Lng = account.User.Address.Lng;
-            ((Pharmacist) existingAccount.User).PharmacyId = ((Pharmacist) account.User).PharmacyId;
-            ((Pharmacist) existingAccount.User).WorkTime = ((Pharmacist) account.User).WorkTime;
-            
+            ((Pharmacist)existingAccount.User).PharmacyId = ((Pharmacist)account.User).PharmacyId;
+            ((Pharmacist)existingAccount.User).WorkTime = ((Pharmacist)account.User).WorkTime;
+
             return _repository.Update(existingAccount);
         }
 
@@ -82,7 +82,7 @@ namespace Farmacio_Services.Implementation
         public Account ReadForPharmacy(Guid pharmacyId, Guid pharmacistId)
         {
             var account = Read(pharmacistId);
-            var pharmacist = (Pharmacist) account?.User;
+            var pharmacist = (Pharmacist)account?.User;
             return pharmacist?.PharmacyId == pharmacistId ? account : null;
         }
 
@@ -90,7 +90,7 @@ namespace Farmacio_Services.Implementation
         {
             return FilterByPharmacyId(SearchByName(name), pharmacyId);
         }
-        
+
         public override IEnumerable<Account> ReadBy(MedicalStaffFilterParamsDTO filterParams)
         {
             var pharmacyId = filterParams.PharmacyId;
@@ -101,12 +101,12 @@ namespace Farmacio_Services.Implementation
 
         private void ValidatePharmacyId(Account account)
         {
-            _pharmacyService.TryToRead(((Pharmacist) account.User).PharmacyId);
+            _pharmacyService.TryToRead(((Pharmacist)account.User).PharmacyId);
         }
 
         private static IEnumerable<Account> FilterByPharmacyId(IEnumerable<Account> accounts, Guid pharmacyId)
         {
-            return accounts.Where(p => ((Pharmacist) p.User).PharmacyId == pharmacyId);
+            return accounts.Where(p => ((Pharmacist)p.User).PharmacyId == pharmacyId);
         }
 
         public IEnumerable<Pharmacist> SortByGrade(IList<Pharmacist> pharmacists, SearhSortParamsForAppointments searchSortParams)
@@ -116,12 +116,6 @@ namespace Farmacio_Services.Implementation
                 pharmacists = searchSortParams.IsAsc ? pharmacists.OrderBy(p => p.AverageGrade).ToList() : pharmacists.OrderByDescending(p => p.AverageGrade).ToList();
             }
             return pharmacists;
-        }
-
-        public IEnumerable<Account> ReadThatPatientCanRate(Guid patientId)
-        {
-            return Read().Where(pharmacists => _appointmentService.DidPatientHaveAppointmentWithMedicalStaff(patientId, pharmacists.UserId) &&
-            !_medicalStaffGradeService.DidPatientGradeMedicalStaff(patientId, pharmacists.UserId)).ToList();
         }
 
         public Pharmacy ReadWorkPlace(Guid pharmacistId)
