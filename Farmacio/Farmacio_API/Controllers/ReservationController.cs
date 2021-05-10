@@ -54,7 +54,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("in-pharmacy/{pharmacyId}/by-uniqueid/{uniqueId}")]
         public IActionResult GetReservationInPharmacyByUniqueId(string uniqueId, Guid pharmacyId)
         {
-            return Ok(_reservationService.GetReservationInPharmacyByUniqueId(uniqueId, pharmacyId));
+            return Ok(_reservationService.ReadReservationInPharmacyByUniqueId(uniqueId, pharmacyId));
         }
 
         [HttpPut("issue-medicines/{reservationId}")]

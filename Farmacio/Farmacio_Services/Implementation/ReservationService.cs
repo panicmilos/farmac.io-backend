@@ -171,7 +171,7 @@ namespace Farmacio_Services.Implementation
             return Read().FirstOrDefault(reservation => reservation.UniqueId == id) == default;
         }
 
-        public Reservation GetReservationInPharmacyByUniqueId(string uniqueId, Guid pharmacyId)
+        public Reservation ReadReservationInPharmacyByUniqueId(string uniqueId, Guid pharmacyId)
         {
             var reservation = Read().FirstOrDefault(reservation => reservation.UniqueId == uniqueId);
             if (reservation == default)
@@ -190,6 +190,8 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("The reservation has already been canceled.");
             if (reservation.State == ReservationState.Done)
                 throw new BadLogicException("The reservation has already been picked up.");
+            if (reservation.PickupDeadline.AddHours(-24) < DateTime.Now)
+                throw new BadLogicException("The reservation is overdue, or less than 24h remained until the pickup deadline.");
             reservation.State = ReservationState.Done;
             base.Update(reservation);
 

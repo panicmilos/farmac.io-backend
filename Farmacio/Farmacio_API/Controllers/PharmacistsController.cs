@@ -116,7 +116,7 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Reads an existing pharmacist in the system that patietn can rate.
+        /// Reads an existing pharmacist in the system that patient can rate.
         /// </summary>
         /// <response code="200">Read pharmacist.</response>
         [HttpGet("{patientId}/can-rate")]
@@ -129,7 +129,7 @@ namespace Farmacio_API.Controllers
         /// Reads the pharmacy where pharmacist works.
         /// </summary>
         /// <response code="200">Read pharmacy.</response>
-        /// /// <response code="404">Pharmacist not found.</response>
+        /// <response code="404">Pharmacist not found.</response>
         [HttpGet("{pharmacistId}/work-place")]
         public IActionResult GetWorkPlace(Guid pharmacistId)
         {
