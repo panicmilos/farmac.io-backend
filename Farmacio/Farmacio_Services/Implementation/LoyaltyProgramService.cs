@@ -81,5 +81,18 @@ namespace Farmacio_Services.Implementation
         {
             return Read().All(loyaltyProgram => loyaltyProgram.MinPoints != minPoints);
         }
+
+        public int ReadDiscountFor(Guid patientId)
+        {
+            var patientAccount = _patientService.ReadByUserId(patientId);
+            if (patientAccount == null)
+            {
+                throw new MissingEntityException("Given user doesn't exist in the system.");
+            }
+
+            var patient = patientAccount.User as Patient;
+
+            return patient?.LoyaltyProgramId == null ? 0 : patient.LoyaltyProgram.Discount;
+        }
     }
 }

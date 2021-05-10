@@ -7,6 +7,7 @@ namespace Farmacio_Models.Domain
         public DateTime DateTime { get; set; }
         public int Duration { get; set; }
         public float Price { get; set; }
+        public float OriginalPrice { get; set; }
         public bool IsReserved { get; set; }
         public Guid? PatientId { get; set; }
         public virtual Patient Patient { get; set; }

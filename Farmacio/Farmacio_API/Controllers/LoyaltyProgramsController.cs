@@ -32,6 +32,17 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns discount percentage for a given patient.
+        /// </summary>
+        /// <response code="200">Discount.</response>
+        /// <response code="404">Given patient is not found.</response>
+        [HttpGet("discount-for/{patientId}")]
+        public IActionResult ReadDiscountFor(Guid patientId)
+        {
+            return Ok(_loyaltyProgramService.ReadDiscountFor(patientId));
+        }
+
+        /// <summary>
         /// Creates a new loyalty program in the system.
         /// </summary>
         /// <response code="200">Created loyalty program.</response>
