@@ -64,13 +64,18 @@ namespace Farmacio_Services.Implementation
                 })
                 .ToList();
 
-            var groupedReservationsByDate = doneReservationsForPharmacyInTimePeriod.OrderBy(reservation => reservation.CreatedAt)
-                .GroupBy(reservation => isPeriodLongerThanAMonth ? reservation.CreatedAt.Month : reservation.CreatedAt.Day)
+            var groupedReservationsByDate = doneReservationsForPharmacyInTimePeriod
+                .OrderBy(reservation => reservation.CreatedAt)
+                .GroupBy(reservation =>
+                    isPeriodLongerThanAMonth ? reservation.CreatedAt.Month : reservation.CreatedAt.Day)
                 .Select(group => new PharmacyReportRecordDTO
                 {
                     Group = group.Key.ToString(),
-                    Value = group.Sum(reservation => reservation.State == ReservationState.Done ?
-                        reservation.Medicines.Sum(orderedMedicine => orderedMedicine.Price) : 0)
+                    Value = group.Sum(reservation =>
+                        reservation.State == ReservationState.Done
+                            ? reservation.Medicines.Sum(orderedMedicine =>
+                                orderedMedicine.Price * orderedMedicine.Quantity)
+                            : 0)
                 })
                 .ToList();
             return groupedAppointmentsByDate.Concat(groupedReservationsByDate)
