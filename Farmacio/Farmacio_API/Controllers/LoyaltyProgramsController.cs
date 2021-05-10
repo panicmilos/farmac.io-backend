@@ -2,7 +2,6 @@
 using Farmacio_API.Contracts.Requests.LoyaltyPrograms;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
-using Farmacio_Services.Implementation.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
