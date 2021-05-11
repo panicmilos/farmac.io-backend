@@ -437,7 +437,7 @@ public static class SeedDb
             Salt = "fJHZyhp6wai3LWwkXrrrCgLSqMFKxnYgphKiQ55XUCE=",
             Email = "janko.jankovic@gmail.com",
             Role = Role.Patient,
-            IsVerified = true,
+            IsVerified = false,
             ShouldChangePassword = false,
             User = patient3
         };
@@ -623,19 +623,19 @@ public static class SeedDb
             Pharmacy = pharmacy2,
             Price = 1200,
         };
-        
+
         var notInStock1 = new NotInStock
         {
             PharmacyId = pharmacy1.Id,
             MedicineId = medicine1.Id
         };
-        
+
         var notInStock2 = new NotInStock
         {
             PharmacyId = pharmacy2.Id,
             MedicineId = medicine2.Id
         };
-        
+
         var notInStock3 = new NotInStock
         {
             PharmacyId = pharmacy3.Id,
@@ -664,7 +664,7 @@ public static class SeedDb
         AddIFNotDuplicate(context, appointment1);
         AddIFNotDuplicate(context, appointment2);
         AddIFNotDuplicate(context, appointment3);
-        
+
         AddIFNotDuplicate(context, notInStock1);
         AddIFNotDuplicate(context, notInStock2);
         AddIFNotDuplicate(context, notInStock3);
