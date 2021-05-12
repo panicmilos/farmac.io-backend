@@ -28,6 +28,10 @@ namespace Farmacio_Services.Implementation
             var listOfPharmacies = new List<PharmaciesOfMedicineDTO>();
             foreach (var pharmacy in base.Read().ToList())
             {
+                var medicineInStock = _pharmacyStockService.ReadForPharmacy(pharmacy.Id, medicineId);
+                if (medicineInStock == null)
+                    continue;
+
                 var medicinePrice = GetMedicinePriceInPharmacy(medicineId, pharmacy.Id);
                 if (medicinePrice == null)
                     continue;

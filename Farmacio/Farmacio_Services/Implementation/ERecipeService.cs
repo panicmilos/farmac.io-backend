@@ -64,7 +64,7 @@ namespace Farmacio_Services.Implementation
                 }).ToList()
             };
 
-            var createdReservation = _reservationService.Create(reservation);
+            var createdReservation = _reservationService.CreateReservation(reservation, true);
             existingERecipe.IsUsed = true;
             Update(existingERecipe);
 
