@@ -682,6 +682,169 @@ public static class SeedDb
 
         AddIFNotDuplicate(context, workPlace1);
 
+        var supplierUser = new Supplier
+        {
+            Active = true,
+            Address = new Address
+            {
+                Active = true,
+                CreatedAt = DateTime.Now,
+                City = "Zrenjanin",
+                State = "Srbija",
+                StreetName = "Prvomajska",
+                StreetNumber = "19",
+                Lat = 45.395820f,
+                Lng = 20.397990f
+            },
+            CreatedAt = DateTime.Now,
+            DateOfBirth = new DateTime(2000, 3, 6),
+            FirstName = "The",
+            LastName = "Ebay",
+            PhoneNumber = "060123123123",
+            PID = "1231231231231"
+        };
+
+        var supplierAccount = new Account
+        {
+            Active = true,
+            CreatedAt = DateTime.Now,
+            Email = "the.proebay@gmail.com",
+            IsVerified = true,
+            Password = "CD0C+ld3sdL7580LaAmI0Z2cpqebg6qsABQU9Rp2ZoM=",
+            Salt = "Xc8pdY61u9IdCe8Ec9Pb2L+6J++zQNxMKbQ6SsgFqg8=",
+            User = supplierUser,
+            Role = Role.Supplier,
+            Username = "theebay",
+            ShouldChangePassword = false
+        };
+
+        AddIFNotDuplicate(context, supplierAccount);
+
+        var supplierMedicine1 = new SupplierMedicine
+        {
+            Active = true,
+            CreatedAt = DateTime.Now,
+            SupplierId = supplierUser.Id,
+            MedicineId = medicine1.Id,
+            Quantity = 4
+        };
+
+        var supplierMedicine2 = new SupplierMedicine
+        {
+            Active = true,
+            CreatedAt = DateTime.Now,
+            SupplierId = supplierUser.Id,
+            MedicineId = medicine2.Id,
+            Quantity = 2
+        };
+
+        AddIFNotDuplicate(context, supplierMedicine1);
+        AddIFNotDuplicate(context, supplierMedicine2);
+
+        var pharmacyOrder1 = new PharmacyOrder
+        {
+            Active = true,
+            CreatedAt = DateTime.Now,
+            IsProcessed = true,
+            PharmacyAdmin = pharmacyAdmin1,
+            OffersDeadline = DateTime.Now.AddYears(10),
+            Pharmacy = pharmacy1,
+            OrderedMedicines = new List<OrderedMedicine>
+            {
+                new OrderedMedicine
+                {
+                    Medicine = medicine1,
+                    Quantity = 2
+                }
+            }
+        };
+
+        var supplierOffer1 = new SupplierOffer
+        {
+            Id = new Guid("a0913d33-0b11-42a5-ad2f-4b7b4ef16ce8"),
+            Active = true,
+            CreatedAt = DateTime.Now,
+            PharmacyOrder = pharmacyOrder1,
+            DeliveryDeadline = DateTime.Now.AddYears(11),
+            SupplierId = supplierUser.Id,
+            Status = OfferStatus.WaitingForAnswer,
+            TotalPrice = 1000
+        };
+
+        AddIFNotDuplicate(context, pharmacyOrder1);
+        AddIFNotDuplicate(context, supplierOffer1);
+
+        var pharmacyOrder2 = new PharmacyOrder
+        {
+            Active = true,
+            CreatedAt = DateTime.Now,
+            IsProcessed = false,
+            PharmacyAdmin = pharmacyAdmin1,
+            OffersDeadline = DateTime.Now.AddDays(-1),
+            Pharmacy = pharmacy1,
+            OrderedMedicines = new List<OrderedMedicine>
+            {
+                new OrderedMedicine
+                {
+                    Medicine = medicine1,
+                    Quantity = 2
+                }
+            }
+        };
+
+        var supplierOffer2 = new SupplierOffer
+        {
+            Id = new Guid("72978073-01eb-4e6e-a623-1f5d41fda64d"),
+            Active = true,
+            CreatedAt = DateTime.Now,
+            PharmacyOrder = pharmacyOrder2,
+            DeliveryDeadline = DateTime.Now.AddDays(1),
+            SupplierId = supplierUser.Id,
+            Status = OfferStatus.WaitingForAnswer,
+            TotalPrice = 1000
+        };
+
+        AddIFNotDuplicate(context, pharmacyOrder2);
+        AddIFNotDuplicate(context, supplierOffer2);
+
+        var pharmacyOrder3 = new PharmacyOrder
+        {
+            Active = true,
+            CreatedAt = DateTime.Now,
+            IsProcessed = false,
+            PharmacyAdmin = pharmacyAdmin1,
+            OffersDeadline = DateTime.Now.AddYears(10),
+            Pharmacy = pharmacy1,
+            OrderedMedicines = new List<OrderedMedicine>
+            {
+                new OrderedMedicine
+                {
+                    Medicine = medicine1,
+                    Quantity = 2
+                },
+                new OrderedMedicine
+                {
+                    Medicine = medicine2,
+                    Quantity = 3
+                }
+            }
+        };
+
+        var supplierOffer3 = new SupplierOffer
+        {
+            Id = new Guid("771ae913-8707-45e6-a4e6-3e71c21067f6"),
+            Active = true,
+            CreatedAt = DateTime.Now,
+            PharmacyOrder = pharmacyOrder3,
+            DeliveryDeadline = DateTime.Now.AddYears(11),
+            SupplierId = supplierUser.Id,
+            Status = OfferStatus.WaitingForAnswer,
+            TotalPrice = 200
+        };
+
+        AddIFNotDuplicate(context, pharmacyOrder3);
+        AddIFNotDuplicate(context, supplierOffer3);
+
         context.SaveChanges();
     }
 }
