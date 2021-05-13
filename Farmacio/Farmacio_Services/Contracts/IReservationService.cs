@@ -25,5 +25,7 @@ namespace Farmacio_Services.Contracts
 
         void MarkReservationAsDone(Guid reservationId);
 
+        Reservation CreateReservation(Reservation reservation, bool checkIsMedicineForRecipe);
+
     }
 }

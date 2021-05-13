@@ -27,7 +27,7 @@ namespace Farmacio_API.Controllers
         public IActionResult CreateReservation(CreateReservationRequest request)
         {
             var reservation = _mapper.Map<Reservation>(request);
-            _reservationService.Create(reservation);
+            _reservationService.CreateReservation(reservation, false);
 
             return Ok();
         }

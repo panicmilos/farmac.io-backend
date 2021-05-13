@@ -13,27 +13,20 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IMedicineReplacementService _replacementService;
         private readonly IMedicineIngredientService _ingredientService;
-        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IPharmacyService _pharmacyService;
-        private readonly IERecipeService _eRecipeService;
-        private readonly IReservationService _reservationService;
         private readonly ICrudService<NotInStock> _notInStockService;
 
         public MedicineService(IMedicineReplacementService replacementService, IMedicineIngredientService ingredientService,
-            IPharmacyPriceListService pharmacyPriceListService, IPharmacyService pharmacyService, IPharmacyStockService pharmacyStockService,
-            IERecipeService eRecipeService, IReservationService reservationService,
+            IPharmacyService pharmacyService, IPharmacyStockService pharmacyStockService,
             ICrudService<NotInStock> notInStockService,
             IRepository<Medicine> repository) :
             base(repository)
         {
             _replacementService = replacementService;
             _ingredientService = ingredientService;
-            _pharmacyPriceListService = pharmacyPriceListService;
             _pharmacyStockService = pharmacyStockService;
             _pharmacyService = pharmacyService;
-            _eRecipeService = eRecipeService;
-            _reservationService = reservationService;
             _notInStockService = notInStockService;
         }
 

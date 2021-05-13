@@ -19,6 +19,7 @@ namespace Farmacio_Services.Implementation
         private readonly IDiscountService _discountService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
+        private readonly IMedicineService _medicineService;
 
         public ReservationService(
             IPharmacyService pharmacyService,
@@ -26,6 +27,7 @@ namespace Farmacio_Services.Implementation
             IDiscountService discountService,
             IEmailDispatcher emailDispatcher,
             ITemplatesProvider templatesProvider,
+            IMedicineService medicineService,
             IRepository<Reservation> repository) :
             base(repository)
         {
@@ -34,6 +36,7 @@ namespace Farmacio_Services.Implementation
             _discountService = discountService;
             _emailDispatcher = emailDispatcher;
             _templatesProvider = templatesProvider;
+            _medicineService = medicineService;
         }
 
         public IEnumerable<Reservation> ReadFrom(Guid pharmacyId)
@@ -70,32 +73,47 @@ namespace Farmacio_Services.Implementation
             return base.Update(reservation);
         }
 
-        public override Reservation Create(Reservation reservation)
+        public Reservation CreateReservation(Reservation reservation, bool checkIsMedicineForRecipe)
         {
             _pharmacyService.TryToRead(reservation.PharmacyId);
             var patientAccount = _patientService.ReadByUserId(reservation.PatientId);
             if (patientAccount == null)
                 throw new MissingEntityException("Patient not found.");
             var patient = (Patient)patientAccount.User;
+
             if (_patientService.HasExceededLimitOfNegativePoints(patient.Id))
             {
                 throw new BadLogicException("You have 3 negative points, so you cannot reserve a medicine.");
             }
+
             if (DateTime.Now.AddHours(36) > reservation.PickupDeadline)
             {
                 throw new BadLogicException("You have to reserve medicines at least 36 hours before pickup deadline.");
             }
+
             reservation.UniqueId = GetUniqueId();
             reservation.State = ReservationState.Reserved;
 
             foreach (var reservedMedicine in reservation.Medicines)
             {
                 var medicineInPharmacy = _pharmacyService.ReadMedicine(reservation.PharmacyId, reservedMedicine.MedicineId);
+
+                var medicine = _medicineService.TryToRead(reservedMedicine.MedicineId);
+
+                if (!checkIsMedicineForRecipe)
+                {
+                    if (medicine.IsRecipeOnly)
+                    {
+                        throw new BadLogicException($"The {medicine.Name} solds only with recipe.");
+                    }
+                }
+
                 if (medicineInPharmacy.InStock < reservedMedicine.Quantity)
                     throw new MissingEntityException($"Pharmacy does not have enough {medicineInPharmacy.Name}.");
                 reservedMedicine.Price = DiscountUtils.ApplyDiscount(medicineInPharmacy.Price,
                     _discountService.ReadDiscountFor(reservation.PharmacyId, patient.Id));
             }
+
             foreach (var reservedMedicine in reservation.Medicines)
                 _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, -reservedMedicine.Quantity);
 
