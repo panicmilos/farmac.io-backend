@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_Repositories.Implementation
 {
@@ -37,6 +38,14 @@ namespace Farmacio_Repositories.Implementation
         public virtual IEnumerable<T> Read()
         {
             return _entities.Where(entity => entity.Active);
+        }
+
+        public IEnumerable<T> ReadPage(PageDTO pageDto)
+        {
+            var numberOfEntitiesToSkip = (pageDto.Number - 1) * pageDto.Size;
+            return Read()
+                .Skip(numberOfEntitiesToSkip)
+                .Take(pageDto.Size);
         }
 
         public IEnumerable<T> Read(Predicate<T> predicate)
