@@ -38,9 +38,9 @@ namespace Farmacio_Tests.IntegrationTests.SupplierOfferServiceTests
         [Fact]
         public void CancelOffer_ThrowsOrderIsAlreadyProcessedException_BecauseOrderIsProcessed()
         {
-            var offerThatIsAlreadyProcessed = new Guid("a0913d33-0b11-42a5-ad2f-4b7b4ef16ce8");
+            var supplierOfferWhichOrderIsAlreadyProcessed = new Guid("a0913d33-0b11-42a5-ad2f-4b7b4ef16ce8");
 
-            Action cancelAction = () => _supplierOfferService.CancelOffer(offerThatIsAlreadyProcessed);
+            Action cancelAction = () => _supplierOfferService.CancelOffer(supplierOfferWhichOrderIsAlreadyProcessed);
 
             cancelAction.Should().Throw<OrderIsAlreadyProcessedException>();
         }
@@ -48,9 +48,9 @@ namespace Farmacio_Tests.IntegrationTests.SupplierOfferServiceTests
         [Fact]
         public void CancelOffer_BadLogicException_BecauseOffersDeadlineIsInPast()
         {
-            var offerWhichDeadlinePassed = new Guid("72978073-01eb-4e6e-a623-1f5d41fda64d");
+            var supplierOfferWhichOrderDeadlinePassed = new Guid("72978073-01eb-4e6e-a623-1f5d41fda64d");
 
-            Action cancelAction = () => _supplierOfferService.CancelOffer(offerWhichDeadlinePassed);
+            Action cancelAction = () => _supplierOfferService.CancelOffer(supplierOfferWhichOrderDeadlinePassed);
 
             cancelAction.Should().Throw<BadLogicException>();
         }
