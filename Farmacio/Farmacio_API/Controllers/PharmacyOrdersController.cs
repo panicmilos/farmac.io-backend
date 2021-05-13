@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using Farmacio_API.Contracts.Requests.PharmacyOrders;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_API.Controllers
@@ -46,6 +47,22 @@ namespace Farmacio_API.Controllers
         {
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.ReadFor(pharmacyId, isProcessed));
+        }
+        
+        /// <summary>
+        /// Paginated filter existing pharmacy orders by processed status.
+        /// </summary>
+        /// <response code="200">Filtered pharmacy orders page.</response>
+        /// <response code="404">Pharmacy not found.</response>
+        [HttpGet("/pharmacy/{pharmacyId}/pharmacy-orders/filter/page")]
+        public IActionResult FilterPharmacyOrders(Guid pharmacyId, bool? isProcessed, int number, int size)
+        {
+            _pharmacyService.TryToRead(pharmacyId);
+            return Ok(_pharmacyOrderService.ReadPageFor(pharmacyId, isProcessed, new PageDTO
+            {
+                Number = number,
+                Size = size
+            }));
         }
         
         /// <summary>

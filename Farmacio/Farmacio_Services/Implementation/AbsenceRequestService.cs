@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EmailService.Constracts;
 using EmailService.Models;
+using Farmacio_Services.Implementation.Utils;
 
 namespace Farmacio_Services.Implementation
 {
@@ -39,6 +40,11 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<AbsenceRequest> ReadFor(Guid pharmacyId)
         {
             return Read().Where(absenceRequest => absenceRequest.PharmacyId == pharmacyId).ToList();
+        }
+
+        public IEnumerable<AbsenceRequest> ReadPageFor(Guid pharmacyId, PageDTO pageDto)
+        {
+            return PaginationUtils<AbsenceRequest>.Page(ReadFor(pharmacyId), pageDto);
         }
 
         public AbsenceRequest AcceptAbsenceRequest(Guid absenceRequestId)

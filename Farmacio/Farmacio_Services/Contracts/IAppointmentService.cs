@@ -9,6 +9,7 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<Appointment> ReadForPharmacy(Guid pharmacyId);
         IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId);
+        IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDto);
 
         IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId);
         IEnumerable<Appointment> ReadForMedicalStaffInPharmacy(Guid medicalStaffId, Guid pharmacyId);

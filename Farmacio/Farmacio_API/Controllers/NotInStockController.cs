@@ -29,6 +29,20 @@ namespace Farmacio_API.Controllers
         }
         
         /// <summary>
+        /// Filters not in stock records page by seen status in a pharmacy.
+        /// </summary>
+        /// <response code="200">Filtered not in stock records page.</response>
+        [HttpGet("pharmacies/{pharmacyId}/not-in-stocks/page")]
+        public IActionResult FilterNotInStockRecordsPageFor(Guid pharmacyId, bool? isSeen, int number, int size)
+        {
+            return Ok(_notInStockService.ReadPageFor(pharmacyId, isSeen, new PageDTO
+            {
+                Number = number,
+                Size = size
+            }));
+        }
+        
+        /// <summary>
         /// Marks not in stock record as seen.
         /// </summary>
         /// <response code="200">Marked seen not in stock record.</response>
