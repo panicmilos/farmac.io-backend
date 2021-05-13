@@ -73,7 +73,7 @@ namespace Farmacio_Services.Implementation
             return base.Update(reservation);
         }
 
-        public Reservation CreateReservation(Reservation reservation, bool isERecipe)
+        public Reservation CreateReservation(Reservation reservation, bool checkIsMedicineForRecipe)
         {
             _pharmacyService.TryToRead(reservation.PharmacyId);
             var patientAccount = _patientService.ReadByUserId(reservation.PatientId);
@@ -100,11 +100,11 @@ namespace Farmacio_Services.Implementation
 
                 var medicine = _medicineService.TryToRead(reservedMedicine.MedicineId);
 
-                if (!isERecipe)
+                if (!checkIsMedicineForRecipe)
                 {
                     if (medicine.IsRecipeOnly)
                     {
-                        throw new BadLogicException("The medicine solds only with recipe.");
+                        throw new BadLogicException($"The {medicine.Name} solds only with recipe.");
                     }
                 }
 
