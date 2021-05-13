@@ -6,16 +6,16 @@ namespace Farmacio_API.Authorization
 {
     public class UserSpecific : AuthorizationRule
     {
-        public readonly Guid _specificId;
+        public readonly Guid _userId;
 
-        public UserSpecific(Guid specificId)
+        public UserSpecific(Guid userId)
         {
-            _specificId = specificId;
+            _userId = userId;
         }
 
-        public static IAuthorizationRule For(Guid specificId)
+        public static IAuthorizationRule For(Guid userId)
         {
-            return new UserSpecific(specificId);
+            return new UserSpecific(userId);
         }
 
         public override bool IsAuthorized()
@@ -23,7 +23,7 @@ namespace Farmacio_API.Authorization
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 var authorizedUserId = new Guid(HttpContext.User.Claims.First(claim => claim.Type == "UserId").Value);
-                return authorizedUserId == _specificId;
+                return authorizedUserId == _userId;
             }
             return false;
         }
