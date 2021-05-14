@@ -371,7 +371,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
 
             _medicineService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Medicine()
             {
-                IsRecipeOnly = false
+                IsRecipeOnly = true
             });
 
             _pharmacyService.Setup(service => service.ReadMedicine(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns((Guid pharmacyId, Guid medicineId) => new MedicineInPharmacyDTO()
