@@ -58,7 +58,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _medicineService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Never);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Never);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _medicineService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Never);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Never);
         }
 
         [Fact]
@@ -96,6 +96,8 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
                     NegativePoints = 3
                 }
             });
+
+            _patientService.Setup(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>())).Returns((Guid id) => true);
 
             Action reserveMedicines = () => _reservationService.CreateReservation(new Reservation
             {
@@ -112,7 +114,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _medicineService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Never);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Never);
         }
 
         [Fact]
@@ -126,6 +128,8 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
                     NegativePoints = 0
                 }
             });
+
+            _patientService.Setup(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>())).Returns((Guid id) => false);
 
             Action reserveMedicines = () => _reservationService.CreateReservation(new Reservation
             {
@@ -143,11 +147,11 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _medicineService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Never);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Never);
         }
 
         [Fact]
-        public void ReserveMedicines_ThrowMissingEntityException_BecauseMedicineInReservationDoesntExsist()
+        public void ReserveMedicines_ThrowMissingEntityException_BecauseMedicineInReservationDoesntExist()
         {
             _pharmacyService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Pharmacy());
             _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
@@ -157,6 +161,9 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
                     NegativePoints = 0
                 }
             });
+
+            _patientService.Setup(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>())).Returns((Guid id) => false);
+
             _medicineService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Throws<MissingEntityException>();
 
             Action reserveMedicines = () => _reservationService.CreateReservation(new Reservation
@@ -186,7 +193,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _pharmacyService.Verify(service => service.ReadMedicine(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Never);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Never);
         }
 
         [Fact]
@@ -200,6 +207,9 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
                     NegativePoints = 0
                 }
             });
+
+            _patientService.Setup(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>())).Returns((Guid id) => false);
+
             _medicineService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Medicine()
             {
                 IsRecipeOnly = true
@@ -231,7 +241,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _pharmacyService.Verify(service => service.ReadMedicine(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Never);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Never);
         }
 
         [Fact]
@@ -245,6 +255,9 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
                     NegativePoints = 0
                 }
             });
+
+            _patientService.Setup(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>())).Returns((Guid id) => false);
+
             _medicineService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Medicine()
             {
                 IsRecipeOnly = false
@@ -280,11 +293,11 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _pharmacyService.Verify(service => service.ReadMedicine(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Never);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Never);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Never);
         }
 
         [Fact]
-        public void ReserveMedicines_ReturnNewReservation()
+        public void ReserveMedicines_ReturnNewReservation_IsRecipeOnlyFalse()
         {
             _pharmacyService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Pharmacy());
             _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
@@ -294,6 +307,9 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
                     NegativePoints = 0
                 }
             });
+
+            _patientService.Setup(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>())).Returns((Guid id) => false);
+
             _medicineService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Medicine()
             {
                 IsRecipeOnly = false
@@ -320,13 +336,13 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
                 Id = new Guid("08d8f518-58cc-41e9-810e-0a83d243cd60")
             };
 
-            _reservationRepository.Setup(repositoty => repositoty.Create(reservation)).Returns(new Reservation());
+            _reservationRepository.Setup(repository => repository.Create(reservation)).Returns((Reservation reservation) => reservation);
 
 
-            var reserveMedicines = _reservationService.CreateReservation(reservation, false);
+            var createdReservation = _reservationService.CreateReservation(reservation, false);
 
-            reserveMedicines.Should().NotBeNull();
-            reserveMedicines.Active.Should().BeTrue();
+            createdReservation.Should().NotBeNull();
+            createdReservation.Active.Should().BeTrue();
             
             _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
@@ -335,7 +351,66 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
             _pharmacyService.Verify(service => service.ReadMedicine(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
             _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Once);
-            _reservationRepository.Verify(repositoty => repositoty.Create(It.IsAny<Reservation>()), Times.Once);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Once);
+        }
+
+
+        [Fact]
+        public void ReserveMedicines_ReturnNewReservation_IsRecipeOnlyTrue()
+        {
+            _pharmacyService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Pharmacy());
+            _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
+            {
+                User = new Patient
+                {
+                    NegativePoints = 0
+                }
+            });
+
+            _patientService.Setup(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>())).Returns((Guid id) => false);
+
+            _medicineService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Medicine()
+            {
+                IsRecipeOnly = false
+            });
+
+            _pharmacyService.Setup(service => service.ReadMedicine(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns((Guid pharmacyId, Guid medicineId) => new MedicineInPharmacyDTO()
+            {
+                InStock = 5
+            });
+
+            Reservation reservation = new Reservation
+            {
+                Medicines = new List<ReservedMedicine>()
+                {
+                    new ReservedMedicine
+                    {
+                        MedicineId = new Guid("08d8f514-677c-4a9f-8d0c-b863603902e4"),
+                        Quantity = 3
+                    }
+                },
+                PharmacyId = new Guid("08d8f514-577c-4a9f-8d0c-b863603902e4"),
+                PatientId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd60"),
+                PickupDeadline = DateTime.Now.AddHours(37),
+                Id = new Guid("08d8f518-58cc-41e9-810e-0a83d243cd60")
+            };
+
+            _reservationRepository.Setup(repository => repository.Create(reservation)).Returns((Reservation reservation) => reservation);
+
+
+            var createdReservation = _reservationService.CreateReservation(reservation, true);
+
+            createdReservation.Should().NotBeNull();
+            createdReservation.Active.Should().BeTrue();
+
+            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
+            _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
+            _patientService.Verify(service => service.HasExceededLimitOfNegativePoints(It.IsAny<Guid>()), Times.Once);
+            _medicineService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
+            _pharmacyService.Verify(service => service.ReadMedicine(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
+            _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
+            _pharmacyService.Verify(service => service.ChangeStockFor(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>()), Times.Once);
+            _reservationRepository.Verify(repository => repository.Create(It.IsAny<Reservation>()), Times.Once);
         }
     }
 }
