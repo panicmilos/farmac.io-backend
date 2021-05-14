@@ -96,9 +96,9 @@ namespace Farmacio_Services.Implementation
 
             foreach (var reservedMedicine in reservation.Medicines)
             {
-                var medicineInPharmacy = _pharmacyService.ReadMedicine(reservation.PharmacyId, reservedMedicine.MedicineId);
-
                 var medicine = _medicineService.TryToRead(reservedMedicine.MedicineId);
+
+                var medicineInPharmacy = _pharmacyService.ReadMedicine(reservation.PharmacyId, reservedMedicine.MedicineId);
 
                 if (!checkIsMedicineForRecipe)
                 {
