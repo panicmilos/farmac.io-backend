@@ -219,8 +219,8 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created supplier's offer.</response>
         /// <response code="400">
         /// Unable to create supplier's offer because supplier already gave offer
-        /// for given order or delivery date is after deadline or
-        /// order is already processed or supplier don't have enough medicines.
+        /// for given order or delivery deadline time is too early or
+        /// orders deadline passed or supplier don't have enough medicines.
         /// </response>
         /// <response code="404">Given supplier or pharmacy order doesn't exist.</response>
         [HttpPost("{supplierId}/offers")]
@@ -237,8 +237,8 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated supplier's offer.</response>
         /// <response code="400">
-        /// Unable to update supplier's offer because delivery date is after deadline or
-        /// order is already processed.
+        /// Unable to update supplier's offer because delivery deadline time is too early or
+        /// orders deadline passed.
         /// </response>
         /// <response code="404">Given offer doesn't exist.</response>
         [HttpPut("{supplierId}/offers")]
