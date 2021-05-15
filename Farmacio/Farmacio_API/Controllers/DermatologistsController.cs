@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Accounts;
+using Farmacio_API.Contracts.Responses.Dermatologists;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using Farmacio_API.Contracts.Responses.Dermatologists;
-using Farmacio_Models.DTO;
-using Farmacio_API.Contracts.Requests.Grades;
-using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_API.Controllers
 {
@@ -34,6 +34,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing dermatologists in the system.
         /// </summary>
         /// <response code="200">Read dermatologists.</response>
+        [Authorize(Roles = "Patient, SystemAdmin, PharmacyAdmin")]
         [HttpGet]
         public IActionResult GetDermatologists()
         {
@@ -44,10 +45,22 @@ namespace Farmacio_API.Controllers
         /// Search all existing dermatologists in the system.
         /// </summary>
         /// <response code="200">Searched dermatologists.</response>
+        [Authorize(Roles = "Patient, SystemAdmin, PharmacyAdmin")]
         [HttpGet("search")]
         public IActionResult SearchDermatologists(string name)
         {
             return Ok(_dermatologistService.SearchByName(name));
+        }
+
+        /// <summary>
+        /// Returns dermatologists that match the given params from the system.
+        /// </summary>
+        /// <response code="200">List of dermatologists.</response>
+        [Authorize(Roles = "Patient, SystemAdmin, PharmacyAdmin")]
+        [HttpGet("filter")]
+        public IActionResult FilterDermatologists([FromQuery] MedicalStaffFilterParamsDTO filterParams)
+        {
+            return Ok(_dermatologistService.ReadBy(filterParams));
         }
 
         /// <summary>
@@ -77,17 +90,7 @@ namespace Farmacio_API.Controllers
                 WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
             }));
         }
-        
-        /// <summary>
-        /// Returns dermatologists that match the given params from the system.
-        /// </summary>
-        /// <response code="200">List of dermatologists.</response>
-        [HttpGet("filter")]
-        public IActionResult FilterDermatologists([FromQuery] MedicalStaffFilterParamsDTO filterParams)
-        {
-            return Ok(_dermatologistService.ReadBy(filterParams));
-        }
-        
+
         /// <summary>
         /// Filter all existing dermatologists in the system with their work places.
         /// </summary>
@@ -106,9 +109,15 @@ namespace Farmacio_API.Controllers
         /// Reads an existing dermatologist in the system.
         /// </summary>
         /// <response code="200">Read dermatologist.</response>
+        [Authorize(Roles = "Dermatologist, SystemAdmin")]
         [HttpGet("{id}")]
         public IActionResult GetDermatologist(Guid id)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(id))
+                                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                                .Authorize();
+
             return Ok(_dermatologistService.TryToRead(id));
         }
 
@@ -117,6 +126,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns created dermatologist.</response>
         /// <response code="401">Unable to create dermatologist because username or email is already taken.</response>
+        [Authorize(Roles = "SystemAdmin, PharmacyAdmin")]
         [HttpPost]
         public IActionResult CreateDermatologist(CreateDermatologistRequest request)
         {
@@ -131,9 +141,15 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated dermatologist.</response>
         /// <response code="404">Unable to update dermatologist because he does not exist.</response>
+        [Authorize(Roles = "Dermatologist, SystemAdmin")]
         [HttpPut]
         public IActionResult UpdateDermatologist(UpdateDermatologistRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(request.Account.Id))
+                                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                                .Authorize();
+
             var dermatologist = _mapper.Map<Account>(request);
             var updatedDermatologist = _dermatologistService.Update(dermatologist);
 
@@ -145,6 +161,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted dermatologist.</response>
         /// <response code="404">Unable to delete dermatologist because he does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteDermatologist(Guid id)
         {

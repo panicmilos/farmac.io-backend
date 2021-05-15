@@ -1,14 +1,13 @@
 using AutoMapper;
-using Farmacio_API.Contracts.Requests.Grades;
 using Farmacio_API.Contracts.Requests.Medicines;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Farmacio_API.Controllers
 {
@@ -21,7 +20,6 @@ namespace Farmacio_API.Controllers
         private readonly IPharmacyService _pharmacyService;
         private readonly IMedicinePdfService _medicinePdfService;
         private readonly IPatientAllergyService _patientAllergyService;
-        private readonly IMedicineGradeService _medicineGradeService;
         private readonly IERecipeService _eRecipeService;
         private readonly IMapper _mapper;
 
@@ -29,7 +27,6 @@ namespace Farmacio_API.Controllers
             IPharmacyService pharmacyService,
             IMedicinePdfService medicinePdfService,
             IPatientAllergyService patientAllergyService,
-            IMedicineGradeService medicineGradeService,
             IERecipeService eRecipeService,
             IMapper mapper)
         {
@@ -37,7 +34,6 @@ namespace Farmacio_API.Controllers
             _pharmacyService = pharmacyService;
             _medicinePdfService = medicinePdfService;
             _patientAllergyService = patientAllergyService;
-            _medicineGradeService = medicineGradeService;
             _eRecipeService = eRecipeService;
             _mapper = mapper;
         }
@@ -133,6 +129,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created medicine.</response>
         /// <response code="400">Unable to create medicine because code is already taken.</response>
         /// <response code="404">Unable to create medicine because replacement medicine does not.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPost]
         public IActionResult CreateMedicine(CreateMedicineRequest request)
         {
@@ -148,8 +145,9 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated medicine.</response>
         /// <response code="404">Unable to update medicine because it does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPut]
-        public IActionResult UpdatePharmacyAdmin(UpdateMedicineRequest request)
+        public IActionResult UpdateMedicine(UpdateMedicineRequest request)
         {
             var fullMedicineDto = _mapper.Map<FullMedicineDTO>(request);
             var updatedMedicine = _medicineService.Update(fullMedicineDto);
@@ -163,6 +161,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted medicine.</response>
         /// <response code="404">Unable to delete medicine because it does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteMedicine(Guid id)
         {
@@ -193,7 +192,6 @@ namespace Farmacio_API.Controllers
             medicineDTOs = _patientAllergyService.ForEachMedicineInListCheckIfPatientHasAnAllergyToIt(medicineDTOs, patientId);
             return Ok(medicineDTOs);
         }
-
 
         /// <summary>
         /// Returns medicines from eRecipe

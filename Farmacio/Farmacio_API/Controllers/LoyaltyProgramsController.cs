@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.LoyaltyPrograms;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -25,6 +27,7 @@ namespace Farmacio_API.Controllers
         /// Returns all loyalty programs from the system.
         /// </summary>
         /// <response code="200">List of loyalty programs.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet]
         public IActionResult ReadLoyaltyPrograms()
         {
@@ -36,9 +39,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Discount.</response>
         /// <response code="404">Given patient is not found.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("discount-for/{patientId}")]
         public IActionResult ReadDiscountFor(Guid patientId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(patientId))
+                                .Authorize();
+
             return Ok(_loyaltyProgramService.ReadDiscountFor(patientId));
         }
 
@@ -47,6 +55,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Created loyalty program.</response>
         /// <response code="400">Loyalty program with given minimum points already exists.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPost]
         public IActionResult CreateLoyaltyProgram(CreateLoyaltyProgramRequest request)
         {
@@ -62,6 +71,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Updated loyalty program.</response>
         /// <response code="400">Loyalty program with given minimum points already exists.</response>
         /// <response code="404">Given loyalty program doesn't exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPut]
         public IActionResult UpdateLoyaltyProgram(UpdateLoyaltyProgramRequest request)
         {
@@ -76,6 +86,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Deleted loyalty program.</response>
         /// <response code="404">Given loyalty program doesn't exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteLoyaltyProgram(Guid id)
         {

@@ -3,6 +3,7 @@ using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace Farmacio_API.Controllers
         /// Returns all system admins from the system.
         /// </summary>
         /// <response code="200">Returns list of system admins.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet]
         public IEnumerable<Account> GetSystemAdmins()
         {
@@ -38,6 +40,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns system admin.</response>
         /// <response code="404">Unable to return system admin because it does not exist in the system.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet("{id}")]
         public IActionResult GetSystemAdmin(Guid id)
         {
@@ -49,6 +52,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns system pharmacy.</response>
         /// <response code="401">Unable to create system admin because username or email is already taken.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPost]
         public IActionResult CreateSystemAdmin(CreateSystemAdminRequest request)
         {
@@ -63,6 +67,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns system pharmacist.</response>
         /// <response code="404">Unable to update system admin because he does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPut]
         public IActionResult UpdateSystemAdmin(UpdateSystemAdminRequest request)
         {
@@ -77,6 +82,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted system admin.</response>
         /// <response code="404">Unable to delete system admin because he does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteSystemAdmin(Guid id)
         {
