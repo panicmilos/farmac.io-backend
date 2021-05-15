@@ -5,6 +5,7 @@ using System;
 using Farmacio_API.Contracts.Requests.PharmacyOrders;
 using Farmacio_API.Contracts.Requests.Promotions;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_API.Controllers
@@ -34,6 +35,21 @@ namespace Farmacio_API.Controllers
         public IActionResult ReadPharmacyPromotions(Guid pharmacyId)
         {
             return Ok(_promotionService.ReadFor(pharmacyId));
+        }
+        
+        /// <summary>
+        /// Read existing promotions page for pharmacy.
+        /// </summary>
+        /// <response code="200">Read promotions page.</response>
+        /// <response code="404">Pharmacy not found.</response>
+        [HttpGet("/pharmacy/{pharmacyId}/promotions/page")]
+        public IActionResult ReadPharmacyPromotionsPage(Guid pharmacyId, int number, int size)
+        {
+            return Ok(_promotionService.ReadPageFor(pharmacyId, new PageDTO
+            {
+                Number = number,
+                Size = size
+            }));
         }
         
         /// <summary>

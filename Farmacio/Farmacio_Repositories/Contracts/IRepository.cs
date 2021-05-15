@@ -1,6 +1,7 @@
 ﻿using Farmacio_Models.Contracts;
 using System;
 using System.Collections.Generic;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_Repositories.Contracts
 {
@@ -11,6 +12,7 @@ namespace Farmacio_Repositories.Contracts
         IEnumerable<T> Create(IEnumerable<T> entities);
 
         IEnumerable<T> Read();
+        IEnumerable<T> ReadPage(PageDTO pageDto);
 
         IEnumerable<T> Read(Predicate<T> predicate);
 
