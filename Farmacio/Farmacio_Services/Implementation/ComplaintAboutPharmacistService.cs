@@ -28,7 +28,7 @@ namespace Farmacio_Services.Implementation
         {
             var pharmacistsIds = _pharmacistService.Read().Select(pharmacist => pharmacist.UserId).ToHashSet();
 
-            return _appointmentService.ReadFor(patientId)
+            return _appointmentService.ReadForPatient(patientId)
                 .Where(appointment => appointment.DateTime < DateTime.Now &&
                                       appointment.IsReserved &&
                                       pharmacistsIds.Contains(appointment.MedicalStaffId))
@@ -49,7 +49,7 @@ namespace Farmacio_Services.Implementation
         {
             var pharmacistsIds = _pharmacistService.Read().Select(pharmacist => pharmacist.UserId).ToHashSet();
 
-            return _appointmentService.ReadFor(patientId)
+            return _appointmentService.ReadForPatient(patientId)
                 .FirstOrDefault(appointment => appointment.DateTime < DateTime.Now &&
                                                appointment.IsReserved &&
                                                appointment.MedicalStaffId == pharmacistId &&

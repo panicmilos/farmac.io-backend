@@ -37,7 +37,7 @@ namespace Farmacio_Services.Implementation
                     .Select(reservation => reservation.Pharmacy));
 
             pharmaciesThatPatientComplaintAbout.AddRange(
-                _appointmentService.ReadFor(patientId)
+                _appointmentService.ReadForPatient(patientId)
                     .Where(appointment => appointment.DateTime < DateTime.Now &&
                                           appointment.IsReserved)
                     .Select(appointment => appointment.Pharmacy));
@@ -70,7 +70,7 @@ namespace Farmacio_Services.Implementation
                 return true;
             }
 
-            var hasConsultationOrExaminationInPast = _appointmentService.ReadFor(patientId)
+            var hasConsultationOrExaminationInPast = _appointmentService.ReadForPatient(patientId)
                 .FirstOrDefault(appointment => appointment.PharmacyId == pharmacyId &&
                                                appointment.DateTime < DateTime.Now &&
                                                appointment.IsReserved) != null;
