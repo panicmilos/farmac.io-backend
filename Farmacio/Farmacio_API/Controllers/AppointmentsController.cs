@@ -16,13 +16,13 @@ namespace Farmacio_API.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
-        private readonly IPharmacyService _pharmacyService;
+        private readonly ILoyaltyPointsService _loyaltyPointsService;
         private readonly IMapper _mapper;
 
-        public AppointmentsController(IAppointmentService appointmentService, IPharmacyService pharmacyService, IMapper mapper)
+        public AppointmentsController(IAppointmentService appointmentService, ILoyaltyPointsService loyaltyPointsService, IMapper mapper)
         {
             _appointmentService = appointmentService;
-            _pharmacyService = pharmacyService;
+            _loyaltyPointsService = loyaltyPointsService;
             _mapper = mapper;
         }
 
@@ -52,7 +52,7 @@ namespace Farmacio_API.Controllers
 
             return Ok(appointment);
         }
-        
+
         /// <summary>
         /// Creates a new appointment in the system.
         /// </summary>
@@ -104,7 +104,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId));
         }
-        
+
         /// <summary>
         /// Sort History of dermatology visits.
         /// </summary>
@@ -150,7 +150,13 @@ namespace Farmacio_API.Controllers
         {
             var reportDTO = _mapper.Map<CreateReportDTO>(request);
             reportDTO.AppointmentId = appointmentId;
-            return Ok(_appointmentService.CreateReport(reportDTO));
+
+            var createdReport = _appointmentService.CreateReport(reportDTO);
+
+            var appointment = _appointmentService.Read(appointmentId);
+            _loyaltyPointsService.GivePointsFor(appointment);
+
+            return Ok(createdReport);
         }
 
         /// <summary>

@@ -23,9 +23,8 @@ namespace Farmacio_Services.Contracts
 
         Reservation ReadReservationInPharmacyByUniqueId(string uniqueId, Guid pharmacyId);
 
-        void MarkReservationAsDone(Guid reservationId);
+        Reservation MarkReservationAsDone(Guid reservationId);
 
         Reservation CreateReservation(Reservation reservation, bool checkIsMedicineForRecipe);
-
     }
 }

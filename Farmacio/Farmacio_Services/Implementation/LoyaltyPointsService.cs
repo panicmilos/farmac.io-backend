@@ -10,16 +10,19 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IMedicineService _medicineService;
         private readonly ICrudService<MedicinePoints> _medicinePointsService;
+        private readonly IPatientService _patientService;
 
         public LoyaltyPointsService(
             IMedicineService medicineService,
             ICrudService<MedicinePoints> medicinePointsService,
+            IPatientService patientService,
             IRepository<LoyaltyPoints> repository
         ) :
             base(repository)
         {
             _medicineService = medicineService;
             _medicinePointsService = medicinePointsService;
+            _patientService = patientService;
         }
 
         public LoyaltyPoints ReadOrCreate()
@@ -67,6 +70,23 @@ namespace Farmacio_Services.Implementation
             existingLoyaltyPoints.MedicinePointsList = loyaltyPoints.MedicinePointsList;
 
             return _repository.Update(existingLoyaltyPoints);
+        }
+
+        public Account GivePointsFor(Reservation reservation)
+        {
+            var numberOfPoints = reservation.Medicines.Sum(reservedMedicine => ReadPointsFor(reservedMedicine.MedicineId) * reservedMedicine.Quantity);
+
+            return _patientService.UpdateLoyaltyPoints(reservation.PatientId, numberOfPoints);
+        }
+
+        public Account GivePointsFor(Appointment appointment)
+        {
+            if (appointment.MedicalStaff is Dermatologist)
+            {
+                return _patientService.UpdateLoyaltyPoints(appointment.PatientId.Value, ReadExaminationPoints());
+            }
+
+            return _patientService.UpdateLoyaltyPoints(appointment.PatientId.Value, ReadConsultationPoints());
         }
     }
 }
