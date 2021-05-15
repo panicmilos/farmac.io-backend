@@ -23,7 +23,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<T> ReadPagesToOfComplaintsBy(Guid writerId, PageDTO page)
         {
-            return PaginationUtils<T>.PageTo(ReadBy(writerId), page);
+            return PaginationUtils<T>.PagesTo(ReadBy(writerId), page);
         }
     }
 }

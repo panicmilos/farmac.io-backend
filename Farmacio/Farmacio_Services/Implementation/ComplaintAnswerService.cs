@@ -49,7 +49,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<ComplaintAnswer> ReadPagesToOfAnswersBy(Guid writerId, PageDTO page)
         {
-            return PaginationUtils<ComplaintAnswer>.PageTo(ReadBy(writerId), page);
+            return PaginationUtils<ComplaintAnswer>.PagesTo(ReadBy(writerId), page);
         }
 
         private bool HasSystemAdminAnsweredComplaint(Guid systemAdminId, Guid complaintId)

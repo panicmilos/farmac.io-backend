@@ -3,6 +3,7 @@ using Farmacio_API.Contracts.Requests.LoyaltyPrograms;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -36,6 +37,7 @@ namespace Farmacio_API.Controllers
         /// Returns page of loyalty programs from the system.
         /// </summary>
         /// <response code="200">Page of loyalty programs.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet("page")]
         public IActionResult ReadLoyaltyProgramsPage([FromQuery] PageDTO page)
         {

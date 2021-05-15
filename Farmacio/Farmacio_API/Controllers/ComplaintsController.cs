@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Complaints;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -51,6 +53,7 @@ namespace Farmacio_API.Controllers
         /// Returns first N pages of complaints from the system.
         /// </summary>
         /// <response code="200">Returns pages of complaints.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet("pages-to")]
         public IActionResult ReadComplaintsPagesTo([FromQuery] PageDTO page)
         {
@@ -81,9 +84,14 @@ namespace Farmacio_API.Controllers
         /// Returns first N pages of complaints from the system writen by given writerId.
         /// </summary>
         /// <response code="200">Returns pages of complaints.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("by/{writerId}/pages-to")]
         public IActionResult ReadComplaintsByPagesTo(Guid writerId, [FromQuery] PageDTO page)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(UserSpecific.For(writerId))
+                    .Authorize();
+
             return Ok(_complaintService.ReadPagesToOfComplaintsBy(writerId, page));
         }
 
@@ -179,6 +187,7 @@ namespace Farmacio_API.Controllers
         /// Returns first N pages of answers from the system writen by given writerId.
         /// </summary>
         /// <response code="200">Returns pages of answers.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet("answered-by/{writerId}/pages-to")]
         public IActionResult ReadAnswersByPagesTo(Guid writerId, [FromQuery] PageDTO page)
         {

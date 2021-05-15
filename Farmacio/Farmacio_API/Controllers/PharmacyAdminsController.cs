@@ -4,6 +4,7 @@ using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace Farmacio_API.Controllers
         /// Returns page of pharmacy admins from the system.
         /// </summary>
         /// <response code="200">Returns page of pharmacy admins.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet("page")]
         public IEnumerable<Account> GetPharmacyAdminsPage([FromQuery] PageDTO page)
         {

@@ -2,6 +2,7 @@
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -163,7 +164,8 @@ namespace Farmacio_Services.Implementation
         {
             var medicines = _pharmacyStockService.ReadForPharmacy(pharmacyId)?
                 .Select(mp => mp.Medicine).Where(m => m.Name == name)
-                .Select(m => {
+                .Select(m =>
+                {
                     var medicineInPharmacy = _pharmacyService.ReadMedicine(pharmacyId, m.Id);
                     if (medicineInPharmacy.InStock == 0)
                         _notInStockService.Create(new NotInStock { MedicineId = m.Id, PharmacyId = pharmacyId });
@@ -213,6 +215,11 @@ namespace Farmacio_Services.Implementation
             existingMedicine.NumberOfGrades = medicine.NumberOfGrades;
 
             return base.Update(existingMedicine);
+        }
+
+        public IEnumerable<SmallMedicineDTO> ReadPagesToBy(MedicineSearchParams searchParams, PageDTO page)
+        {
+            return PaginationUtils<SmallMedicineDTO>.PagesTo(ReadBy(searchParams), page);
         }
     }
 }

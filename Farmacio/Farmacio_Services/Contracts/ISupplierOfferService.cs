@@ -1,4 +1,5 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using System;
 using System.Collections.Generic;
 
@@ -17,5 +18,7 @@ namespace Farmacio_Services.Contracts
         SupplierOffer CancelOffer(Guid offerId);
 
         IEnumerable<SupplierOffer> ReadByStatusFor(Guid supplierId, OfferStatus? status);
+
+        IEnumerable<SupplierOffer> ReadPageOfOffersByStatusFor(Guid supplierId, OfferStatus? status, PageDTO page);
     }
 }

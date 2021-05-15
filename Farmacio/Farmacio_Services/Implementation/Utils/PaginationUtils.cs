@@ -14,7 +14,7 @@ namespace Farmacio_Services.Implementation.Utils
                 .Take(pageDto.Size);
         }
 
-        public static IEnumerable<T> PageTo(IEnumerable<T> enumerable, PageDTO pageDto)
+        public static IEnumerable<T> PagesTo(IEnumerable<T> enumerable, PageDTO pageDto)
         {
             var numberOfEntitiesToTake = pageDto.Number * pageDto.Size;
             return enumerable.Take(numberOfEntitiesToTake);
