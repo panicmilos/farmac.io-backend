@@ -765,7 +765,7 @@ public static class SeedDb
             Active = true,
             CreatedAt = DateTime.Now,
             PharmacyOrder = pharmacyOrder1,
-            DeliveryDeadline = DateTime.Now.AddYears(11),
+            DeliveryDeadline = 2,
             SupplierId = supplierUser.Id,
             Status = OfferStatus.WaitingForAnswer,
             TotalPrice = 1000
@@ -798,7 +798,7 @@ public static class SeedDb
             Active = true,
             CreatedAt = DateTime.Now,
             PharmacyOrder = pharmacyOrder2,
-            DeliveryDeadline = DateTime.Now.AddDays(1),
+            DeliveryDeadline = 1,
             SupplierId = supplierUser.Id,
             Status = OfferStatus.WaitingForAnswer,
             TotalPrice = 1000
@@ -836,7 +836,7 @@ public static class SeedDb
             Active = true,
             CreatedAt = DateTime.Now,
             PharmacyOrder = pharmacyOrder3,
-            DeliveryDeadline = DateTime.Now.AddYears(11),
+            DeliveryDeadline = 3,
             SupplierId = supplierUser.Id,
             Status = OfferStatus.WaitingForAnswer,
             TotalPrice = 200
