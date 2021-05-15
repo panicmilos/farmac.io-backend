@@ -13,7 +13,7 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyService _pharmacyService;
 
         public PharmacyAdminService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService,
-            IRepository<Account> repository) :
+            IAccountRepository repository) :
             base(emailVerificationService, repository)
         {
             _pharmacyService = pharmacyService;
@@ -30,11 +30,11 @@ namespace Farmacio_Services.Implementation
 
             return account?.Role == Role.PharmacyAdmin ? account : null;
         }
-        
+
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);
-            if(existingAccount == null)
+            if (existingAccount == null)
                 throw new MissingEntityException("Pharmacy Admin account not found.");
             return existingAccount;
         }
@@ -62,13 +62,13 @@ namespace Farmacio_Services.Implementation
             existingAccount.User.Address.StreetNumber = account.User.Address.StreetNumber;
             existingAccount.User.Address.Lat = account.User.Address.Lat;
             existingAccount.User.Address.Lng = account.User.Address.Lng;
-            
+
             return _repository.Update(existingAccount);
         }
 
         private void ValidatePharmacyId(Account account)
         {
-            _pharmacyService.TryToRead(((PharmacyAdmin) account.User).PharmacyId);
+            _pharmacyService.TryToRead(((PharmacyAdmin)account.User).PharmacyId);
         }
     }
 }

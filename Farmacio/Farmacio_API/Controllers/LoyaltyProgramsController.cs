@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.LoyaltyPrograms;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -29,6 +30,16 @@ namespace Farmacio_API.Controllers
         public IActionResult ReadLoyaltyPrograms()
         {
             return Ok(_loyaltyProgramService.Read());
+        }
+
+        /// <summary>
+        /// Returns page of loyalty programs from the system.
+        /// </summary>
+        /// <response code="200">Page of loyalty programs.</response>
+        [HttpGet("page")]
+        public IActionResult ReadLoyaltyProgramsPage([FromQuery] PageDTO page)
+        {
+            return Ok(_loyaltyProgramService.ReadPage(page));
         }
 
         /// <summary>

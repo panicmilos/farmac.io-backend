@@ -12,7 +12,10 @@ namespace Farmacio_Repositories.Contracts
         IEnumerable<T> Create(IEnumerable<T> entities);
 
         IEnumerable<T> Read();
+
         IEnumerable<T> ReadPage(PageDTO pageDto);
+
+        IEnumerable<T> ReadAllPagesTo(PageDTO pageDto);
 
         IEnumerable<T> Read(Predicate<T> predicate);
 

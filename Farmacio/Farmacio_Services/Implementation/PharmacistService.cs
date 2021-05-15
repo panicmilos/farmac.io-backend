@@ -16,7 +16,7 @@ namespace Farmacio_Services.Implementation
         private readonly IAppointmentService _appointmentService;
 
         public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService,
-            IAppointmentService appointmentService, IRepository<Account> repository) :
+            IAppointmentService appointmentService, IAccountRepository repository) :
             base(emailVerificationService, appointmentService, repository)
         {
             _pharmacyService = pharmacyService;

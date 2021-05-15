@@ -10,7 +10,7 @@ namespace Farmacio_Services.Implementation
 {
     public class SystemAdminService : AccountService, ISystemAdminService
     {
-        public SystemAdminService(IEmailVerificationService emailVerificationService, IRepository<Account> repository) :
+        public SystemAdminService(IEmailVerificationService emailVerificationService, IAccountRepository repository) :
             base(emailVerificationService, repository)
         {
         }
@@ -26,11 +26,11 @@ namespace Farmacio_Services.Implementation
 
             return account?.Role == Role.SystemAdmin ? account : null;
         }
-        
+
         public override Account TryToRead(Guid id)
         {
             var existingAccount = Read(id);
-            if(existingAccount == null)
+            if (existingAccount == null)
                 throw new MissingEntityException("System Admin account not found.");
             return existingAccount;
         }

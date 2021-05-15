@@ -24,6 +24,7 @@ namespace Farmacio_API.Installers
         private void AddRepositories()
         {
             _services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            _services.AddScoped(typeof(IAccountRepository), typeof(AccountRepository));
         }
 
         private void AddServices()

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,16 @@ namespace Farmacio_API.Controllers
         public IEnumerable<Account> GetSystemAdmins()
         {
             return _systemAdminService.Read();
+        }
+
+        /// <summary>
+        /// Returns page of system admins from the system.
+        /// </summary>
+        /// <response code="200">Returns page of system admins.</response>
+        [HttpGet("page")]
+        public IEnumerable<Account> GetSystemAdminsPage([FromQuery] PageDTO page)
+        {
+            return _systemAdminService.ReadPageOf(Role.SystemAdmin, page);
         }
 
         /// <summary>

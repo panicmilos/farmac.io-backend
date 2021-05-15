@@ -19,7 +19,7 @@ namespace Farmacio_Services.Implementation
 
         public DermatologistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService, IAppointmentService appointmentService
-            , IRepository<Account> repository)
+            , IAccountRepository repository)
             : base(emailVerificationService, appointmentService, repository)
         {
             _pharmacyService = pharmacyService;
@@ -85,7 +85,7 @@ namespace Farmacio_Services.Implementation
                 throw new AlreadyEmployedInPharmacyException("Dermatologist already employed in pharmacy.");
 
             WorkTimeValidation.ValidateWorkHours(workTime);
-            
+
             if (!IsWorkTimeForDermatologistValid(workTime, dermatologistAccount.UserId))
                 throw new WorkTimesOverlapException("Work time overlaps with another.");
 

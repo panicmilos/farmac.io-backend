@@ -1,4 +1,5 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
@@ -14,7 +15,7 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IEmailVerificationService _emailVerificationService;
 
-        public AccountService(IEmailVerificationService emailVerificationService, IRepository<Account> repository) :
+        public AccountService(IEmailVerificationService emailVerificationService, IAccountRepository repository) :
             base(repository)
         {
             _emailVerificationService = emailVerificationService;
@@ -120,6 +121,11 @@ namespace Farmacio_Services.Implementation
         public Account ReadByUserId(Guid userId)
         {
             return _repository.Read().FirstOrDefault(account => account.UserId == userId);
+        }
+
+        public IEnumerable<Account> ReadPageOf(Role role, PageDTO page)
+        {
+            return (_repository as IAccountRepository).ReadPageOf(role, page).ToList();
         }
     }
 }

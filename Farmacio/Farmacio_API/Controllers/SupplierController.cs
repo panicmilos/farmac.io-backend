@@ -7,6 +7,7 @@ using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_API.Controllers
 {
@@ -40,6 +41,16 @@ namespace Farmacio_API.Controllers
         public IEnumerable<Account> GetSuppliers()
         {
             return _supplierService.Read();
+        }
+
+        /// <summary>
+        /// Returns page of suppliers from the system.
+        /// </summary>
+        /// <response code="200">Returns page of suppliers.</response>
+        [HttpGet("page")]
+        public IEnumerable<Account> GetSuppliersPage([FromQuery] PageDTO page)
+        {
+            return _supplierService.ReadPageOf(Role.Supplier, page);
         }
 
         /// <summary>
@@ -102,6 +113,16 @@ namespace Farmacio_API.Controllers
         public IActionResult GetMedicinesInStock(Guid supplierId)
         {
             return Ok(_supplierStockService.ReadFor(supplierId));
+        }
+
+        /// <summary>
+        /// Returns page of supplier's medicines from the stock.
+        /// </summary>
+        /// <response code="200">Returns page of supplier's medicines.</response>
+        [HttpGet("{supplierId}/medicines-in-stock/page")]
+        public IActionResult GetMedicinesInStockPage(Guid supplierId, [FromQuery] PageDTO page)
+        {
+            return Ok(_supplierStockService.ReadPageOfMedicinesFor(supplierId, page));
         }
 
         /// <summary>

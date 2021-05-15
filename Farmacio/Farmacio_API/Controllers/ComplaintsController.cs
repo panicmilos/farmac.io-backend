@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Farmacio_API.Contracts.Requests.Complaints;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -47,6 +48,16 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns first N pages of complaints from the system.
+        /// </summary>
+        /// <response code="200">Returns pages of complaints.</response>
+        [HttpGet("pages-to")]
+        public IActionResult ReadComplaintsPagesTo([FromQuery] PageDTO page)
+        {
+            return Ok(_complaintService.ReadAllPagesTo(page));
+        }
+
+        /// <summary>
         /// Returns existing complaint from the system specified by id.
         /// </summary>
         /// <response code="200">Return complaint.</response>
@@ -64,6 +75,16 @@ namespace Farmacio_API.Controllers
         public IActionResult ReadComplaintsBy(Guid writerId)
         {
             return Ok(_complaintService.ReadBy(writerId));
+        }
+
+        /// <summary>
+        /// Returns first N pages of complaints from the system writen by given writerId.
+        /// </summary>
+        /// <response code="200">Returns pages of complaints.</response>
+        [HttpGet("by/{writerId}/pages-to")]
+        public IActionResult ReadComplaintsByPagesTo(Guid writerId, [FromQuery] PageDTO page)
+        {
+            return Ok(_complaintService.ReadPagesToOfComplaintsBy(writerId, page));
         }
 
         /// <summary>
@@ -152,6 +173,16 @@ namespace Farmacio_API.Controllers
         public IActionResult ReadAnswersBy(Guid writerId)
         {
             return Ok(_complaintAnswerService.ReadBy(writerId));
+        }
+
+        /// <summary>
+        /// Returns first N pages of answers from the system writen by given writerId.
+        /// </summary>
+        /// <response code="200">Returns pages of answers.</response>
+        [HttpGet("answered-by/{writerId}/pages-to")]
+        public IActionResult ReadAnswersByPagesTo(Guid writerId, [FromQuery] PageDTO page)
+        {
+            return Ok(_complaintAnswerService.ReadPagesToOfAnswersBy(writerId, page));
         }
 
         /// <summary>
