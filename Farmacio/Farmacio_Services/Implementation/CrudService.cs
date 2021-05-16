@@ -5,6 +5,7 @@ using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using Farmacio_Models.DTO;
+using System.Linq;
 
 namespace Farmacio_Services.Implementation
 {
@@ -35,6 +36,11 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<T> ReadPage(PageDTO pageDto)
         {
             return _repository.ReadPage(pageDto);
+        }
+
+        public IEnumerable<T> ReadAllPagesTo(PageDTO pageDto)
+        {
+            return _repository.ReadAllPagesTo(pageDto).ToList();
         }
 
         public virtual IEnumerable<T> Read(Predicate<T> predicate)

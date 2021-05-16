@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Farmacio_Models.DTO;
+using Microsoft.AspNetCore.Authorization;
+using Farmacio_API.Authorization;
 
 namespace Farmacio_API.Controllers
 {
@@ -46,6 +49,17 @@ namespace Farmacio_API.Controllers
         public IEnumerable<Account> GetSuppliers()
         {
             return _supplierService.Read();
+        }
+
+        /// <summary>
+        /// Returns page of suppliers from the system.
+        /// </summary>
+        /// <response code="200">Returns page of suppliers.</response>
+        [Authorize(Roles = "SystemAdmin")]
+        [HttpGet("page")]
+        public IEnumerable<Account> GetSuppliersPage([FromQuery] PageDTO page)
+        {
+            return _supplierService.ReadPageOf(Role.Supplier, page);
         }
 
         /// <summary>
@@ -127,6 +141,21 @@ namespace Farmacio_API.Controllers
                     .Authorize();
 
             return Ok(_supplierStockService.ReadFor(supplierId));
+        }
+
+        /// <summary>
+        /// Returns page of supplier's medicines from the stock.
+        /// </summary>
+        /// <response code="200">Returns page of supplier's medicines.</response>
+        [Authorize(Roles = "Supplier")]
+        [HttpGet("{supplierId}/medicines-in-stock/page")]
+        public IActionResult GetMedicinesInStockPage(Guid supplierId, [FromQuery] PageDTO page)
+        {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(supplierId))
+                    .Authorize();
+
+            return Ok(_supplierStockService.ReadPageOfMedicinesFor(supplierId, page));
         }
 
         /// <summary>
@@ -242,6 +271,21 @@ namespace Farmacio_API.Controllers
                     .Authorize();
 
             return Ok(_supplierOfferService.ReadByStatusFor(supplierId, status));
+        }
+
+        /// <summary>
+        /// Returns page of supplier's offers from the system filtered by given status.
+        /// </summary>
+        /// <response code="200">Returns page of supplier's offers.</response>
+        [Authorize(Roles = "Supplier")]
+        [HttpGet("{supplierId}/offers/filter/page")]
+        public IActionResult GetSuppliersOffersFilteredByStatusPage(Guid supplierId, OfferStatus? status, [FromQuery] PageDTO page)
+        {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(supplierId))
+                    .Authorize();
+
+            return Ok(_supplierOfferService.ReadPageOfOffersByStatusFor(supplierId, status, page));
         }
 
         /// <summary>

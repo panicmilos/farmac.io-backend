@@ -21,6 +21,8 @@ namespace Farmacio_Services.Contracts
 
         IEnumerable<SmallMedicineDTO> ReadBy(MedicineSearchParams searchParams);
 
+        IEnumerable<SmallMedicineDTO> ReadPagesToBy(MedicineSearchParams searchParams, PageDTO page);
+
         IEnumerable<string> ReadMedicineTypes();
 
         Medicine UpdateGrade(Medicine medicine);

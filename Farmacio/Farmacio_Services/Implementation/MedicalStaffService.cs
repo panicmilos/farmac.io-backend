@@ -14,7 +14,7 @@ namespace Farmacio_Services.Implementation
         private readonly IAppointmentService _appointmentService;
 
         public MedicalStaffService(IEmailVerificationService emailVerificationService, IAppointmentService appointmentService,
-            IRepository<Account> repository)
+            IAccountRepository repository)
             : base(emailVerificationService, repository)
         {
             _appointmentService = appointmentService;
@@ -54,15 +54,15 @@ namespace Farmacio_Services.Implementation
                 patients = isAsc ? patients.OrderBy(sortCrit) : patients.OrderByDescending(sortCrit);
             return patients;
         }
-        
+
         public virtual IEnumerable<Account> ReadBy(MedicalStaffFilterParamsDTO filterParams)
         {
             var (name, pharmacyId, gradeFrom, gradeTo) = filterParams;
             return SearchByName(name)
                 .Where(acc =>
                 {
-                    var dermatologist = (MedicalStaff) acc.User;
-                    return (gradeFrom == 0 || dermatologist.AverageGrade >= gradeFrom) 
+                    var dermatologist = (MedicalStaff)acc.User;
+                    return (gradeFrom == 0 || dermatologist.AverageGrade >= gradeFrom)
                            && (gradeTo == 0 || dermatologist.AverageGrade <= gradeTo);
                 });
         }

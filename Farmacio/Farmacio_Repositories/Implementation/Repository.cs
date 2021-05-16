@@ -48,6 +48,13 @@ namespace Farmacio_Repositories.Implementation
                 .Take(pageDto.Size);
         }
 
+        public IEnumerable<T> ReadAllPagesTo(PageDTO pageDto)
+        {
+            var numberOfEntitiesToTake = pageDto.Number * pageDto.Size;
+            return Read()
+                .Take(numberOfEntitiesToTake);
+        }
+
         public IEnumerable<T> Read(Predicate<T> predicate)
         {
             return _entities.Where(entity => entity.Active && predicate(entity));

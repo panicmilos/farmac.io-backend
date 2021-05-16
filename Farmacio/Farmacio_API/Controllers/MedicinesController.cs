@@ -79,6 +79,16 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns first N pages of medicines that contains given params from the system for home page.
+        /// </summary>
+        /// <response code="200">Returns pages of medicines.</response>
+        [HttpGet("search/pages-to")]
+        public IEnumerable<SmallMedicineDTO> SearchMedicinesPagesTo([FromQuery] MedicineSearchParams searchParams, [FromQuery] PageDTO page)
+        {
+            return _medicineService.ReadPagesToBy(searchParams, page);
+        }
+
+        /// <summary>
         /// Returns medicine specified by id.
         /// </summary>
         /// <response code="200">Returns medicine.</response>

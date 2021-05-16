@@ -1,9 +1,11 @@
 ﻿using EmailService.Constracts;
 using EmailService.Models;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -219,6 +221,11 @@ namespace Farmacio_Services.Implementation
             }
 
             return ReadFor(supplierId).Where(offer => offer.Status == status);
+        }
+
+        public IEnumerable<SupplierOffer> ReadPageOfOffersByStatusFor(Guid supplierId, OfferStatus? status, PageDTO page)
+        {
+            return PaginationUtils<SupplierOffer>.Page(ReadByStatusFor(supplierId, status), page);
         }
     }
 }
