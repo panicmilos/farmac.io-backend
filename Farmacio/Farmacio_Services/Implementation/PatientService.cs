@@ -46,7 +46,6 @@ namespace Farmacio_Services.Implementation
             return existingAccount;
         }
 
-
         public void DeleteNegativePoints()
         {
             foreach (var patientAccount in Read())
@@ -63,6 +62,20 @@ namespace Farmacio_Services.Implementation
             var patient = patientAccount.User as Patient;
 
             patient.LoyaltyProgramId = loyaltyProgramId;
+
+            return base.Update(patientAccount);
+        }
+
+        public Account UpdateLoyaltyPoints(Guid patientUserId, int forPoints)
+        {
+            var patientAccount = ReadByUserId(patientUserId);
+            if (patientAccount == null)
+            {
+                throw new MissingEntityException("Patient doesn't exist in the system.");
+            }
+
+            var patient = patientAccount.User as Patient;
+            patient.Points += forPoints;
 
             return base.Update(patientAccount);
         }

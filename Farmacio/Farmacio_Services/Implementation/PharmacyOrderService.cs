@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
@@ -52,7 +54,12 @@ namespace Farmacio_Services.Implementation
                                                  (isProcessed == null ||
                                                   pharmacyOrder.IsProcessed == isProcessed.Value)).ToList();
         }
-        
+
+        public IEnumerable<PharmacyOrder> ReadPageFor(Guid pharmacyId, bool? isProcessed, PageDTO pageDto)
+        {
+            return PaginationUtils<PharmacyOrder>.Page(ReadFor(pharmacyId, isProcessed), pageDto);
+        }
+
         private void ValidatePharmacyOrder(PharmacyOrder pharmacyOrder, Guid pharmacyId, Guid pharmacyAdminId)
         {
             _pharmacyService.TryToRead(pharmacyId);

@@ -198,9 +198,9 @@ namespace Farmacio_Services.Implementation
 
         public void DeleteNotPickedUpReservations()
         {
-            foreach(var reservation in Read().ToList())
+            foreach (var reservation in Read().ToList())
             {
-                if(reservation.State == ReservationState.Reserved && reservation.PickupDeadline < DateTime.Now)
+                if (reservation.State == ReservationState.Reserved && reservation.PickupDeadline < DateTime.Now)
                 {
                     foreach (var reservedMedicine in reservation.Medicines.ToList())
                     {
@@ -210,7 +210,7 @@ namespace Farmacio_Services.Implementation
                     reservation.State = ReservationState.Cancelled;
                     base.Update(reservation);
 
-                    var patient =_patientService.ReadByUserId(reservation.PatientId);
+                    var patient = _patientService.ReadByUserId(reservation.PatientId);
                     (patient.User as Patient).NegativePoints++;
                     _patientService.Update(patient);
                 }
@@ -229,7 +229,7 @@ namespace Farmacio_Services.Implementation
             return reservation;
         }
 
-        public void MarkReservationAsDone(Guid reservationId)
+        public Reservation MarkReservationAsDone(Guid reservationId)
         {
             var reservation = TryToRead(reservationId);
             if (reservation.State == ReservationState.Cancelled)
@@ -247,6 +247,8 @@ namespace Farmacio_Services.Implementation
                 Id = reservation.UniqueId
             });
             _emailDispatcher.Dispatch(email);
+
+            return reservation;
         }
     }
 }

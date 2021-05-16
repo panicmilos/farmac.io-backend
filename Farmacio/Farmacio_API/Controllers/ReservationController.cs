@@ -15,11 +15,13 @@ namespace Farmacio_API.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly IReservationService _reservationService;
+        private readonly ILoyaltyPointsService _loyaltyPointsService;
         private readonly IMapper _mapper;
 
-        public ReservationsController(IReservationService reservationService, IMapper mapper)
+        public ReservationsController(IReservationService reservationService, ILoyaltyPointsService loyaltyPointsService, IMapper mapper)
         {
             _reservationService = reservationService;
+            _loyaltyPointsService = loyaltyPointsService;
             _mapper = mapper;
         }
 
@@ -60,7 +62,9 @@ namespace Farmacio_API.Controllers
         [HttpPut("issue-medicines/{reservationId}")]
         public IActionResult MarkReservationAsDone(Guid reservationId)
         {
-            _reservationService.MarkReservationAsDone(reservationId);
+            var issuedReservation = _reservationService.MarkReservationAsDone(reservationId);
+            _loyaltyPointsService.GivePointsFor(issuedReservation);
+
             return Ok();
         }
     }

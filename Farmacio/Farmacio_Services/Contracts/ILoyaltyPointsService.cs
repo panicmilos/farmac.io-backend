@@ -12,5 +12,9 @@ namespace Farmacio_Services.Contracts
         int ReadConsultationPoints();
 
         int ReadPointsFor(Guid medicineId);
+
+        Account GivePointsFor(Reservation reservation);
+
+        Account GivePointsFor(Appointment appointment);
     }
 }

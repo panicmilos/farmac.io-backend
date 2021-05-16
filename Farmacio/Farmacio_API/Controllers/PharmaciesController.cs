@@ -190,6 +190,20 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Reads an existing absence requests page in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read absence requests page.</response>
+        [HttpGet("{pharmacyId}/absence-requests/page")]
+        public IActionResult GetAbsenceRequestsPageForPharmacy(Guid pharmacyId, int number, int size)
+        {
+            return Ok(_absenceRequestService.ReadPageFor(pharmacyId, new PageDTO
+            {
+                Number = number,
+                Size = size
+            }));
+        }
+        
+        /// <summary>
         /// Reads all medicines that are in stock in the pharmacy.
         /// </summary>
         /// <response code="200">Read medicines that are in stock in the pharmacy.</response>
@@ -270,6 +284,20 @@ namespace Farmacio_API.Controllers
             return Ok(_appointmentService.ReadForDermatologistsInPharmacy(pharmacyId));
         }
 
+        /// <summary>
+        /// Reads existing dermatologists appointments page in the pharmacy.
+        /// </summary>
+        /// <response code="200">Read dermatologists appointments page from the pharmacy.</response>
+        [HttpGet("{pharmacyId}/dermatologists/appointments/page")]
+        public IActionResult GetDermatologistAppointmentsPageForPharmacy(Guid pharmacyId, int number, int size)
+        {
+            return Ok(_appointmentService.ReadPageForDermatologistsInPharmacy(pharmacyId, new PageDTO
+            {
+                Number = number,
+                Size = size
+            }));
+        }
+        
         /// <summary>
         /// Creates a new pharmacy in the system.
         /// </summary>

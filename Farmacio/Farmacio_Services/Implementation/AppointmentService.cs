@@ -50,6 +50,11 @@ namespace Farmacio_Services.Implementation
             _promotionService = promotionService;
         }
 
+        public IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDto)
+        {
+            return PaginationUtils<Appointment>.Page(ReadForDermatologistsInPharmacy(pharmacyId), pageDto);
+        }
+
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
             return Read().ToList().Where(a => a.MedicalStaff.Id == medicalStaffId).ToList();
