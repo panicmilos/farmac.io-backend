@@ -236,6 +236,7 @@ namespace Farmacio_API.Controllers
         /// Returns all supplier's offers for a pharmacy order.
         /// </summary>
         /// <response code="200">Returns list of supplier's offers for a pharmacy order.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpGet("offers/pharmacy-order/{pharmacyOrderId}")]
         public IActionResult GetSuppliersOffersForPharmacyOrder(Guid pharmacyOrderId)
         {
@@ -252,10 +253,17 @@ namespace Farmacio_API.Controllers
         ///     The offer or order has already been handled or
         ///     The pharmacy admin is not the creator of the order.
         /// </response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPost("offers/{offerId}")]
         public IActionResult AcceptSupplierOffer(Guid offerId)
         {
-            return Ok(_supplierOfferService.AcceptOffer(offerId, new Guid("08d906fa-8314-4183-818c-66f029870c3a")));
+            var offer = _supplierOfferService.Read(offerId);
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(offer.PharmacyOrder.PharmacyId))
+                .And(UserSpecific.For(offer.PharmacyOrder.PharmacyAdminId))
+                .Authorize();
+            
+            return Ok(_supplierOfferService.AcceptOffer(offerId, offer.PharmacyOrder.PharmacyAdminId));
         }
 
         /// <summary>

@@ -6,7 +6,9 @@ using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Appointments;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Farmacio_API.Controllers
 {
@@ -30,6 +32,7 @@ namespace Farmacio_API.Controllers
         /// Returns all appointments from the system.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet]
         public IEnumerable<Appointment> ReadAppointments()
         {
@@ -60,8 +63,12 @@ namespace Farmacio_API.Controllers
         /// <response code="404">Pharmacy, dermatologist or dermatologists work place not found.</response>
         /// <response code="400">Invalid date-time and duration.</response>
         [HttpPost("dermatologist")]
+        [Authorize(Roles = "PharmacyAdmin")]
         public IActionResult CreateDermatologistAppointment(CreateAppointmentRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(request.PharmacyId))
+                .Authorize();
             var appointment = _mapper.Map<CreateAppointmentDTO>(request);
             _appointmentService.CreateDermatologistAppointment(appointment);
 

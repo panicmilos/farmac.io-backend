@@ -93,6 +93,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing pharmacists employed in the pharmacy.
         /// </summary>
         /// <response code="200">Read pharmacists from the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/pharmacists")]
         public IActionResult GetPharmacists(Guid pharmacyId)
         {
@@ -103,6 +104,7 @@ namespace Farmacio_API.Controllers
         /// Search all existing pharmacists in the pharmacy.
         /// </summary>
         /// <response code="200">Searched pharmacists.</response>
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/pharmacists/search")]
         public IActionResult SearchPharmacists(Guid pharmacyId, string name)
         {
@@ -113,6 +115,7 @@ namespace Farmacio_API.Controllers
         /// Reads an existing pharmacist employed in the pharmacy.
         /// </summary>
         /// <response code="200">Read pharmacist from the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/pharmacists/{pharmacistId}")]
         public IActionResult GetPharmacist(Guid pharmacyId, Guid pharmacistId)
         {
@@ -123,6 +126,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing dermatologists employed in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologists from the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists")]
         public IActionResult GetDermatologists(Guid pharmacyId)
         {
@@ -133,6 +137,7 @@ namespace Farmacio_API.Controllers
         /// Search all existing dermatologists in the pharmacy.
         /// </summary>
         /// <response code="200">Searched dermatologists.</response>
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/search")]
         public IActionResult SearchDermatologists(Guid pharmacyId, string name)
         {
@@ -143,6 +148,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing dermatologists employed in the pharmacy with their work places.
         /// </summary>
         /// <response code="200">Read dermatologists with their work places from the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/with-work-places")]
         public IActionResult GetDermatologistsWithWorkPlaces(Guid pharmacyId)
         {
@@ -158,6 +164,7 @@ namespace Farmacio_API.Controllers
         /// Search all existing dermatologists in the pharmacy with their work places.
         /// </summary>
         /// <response code="200">Searched dermatologists with their work places.</response>
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/with-work-places/search")]
         public IActionResult SearchDermatologistsWithWorkPlaces(Guid pharmacyId, string name)
         {
@@ -173,9 +180,13 @@ namespace Farmacio_API.Controllers
         /// Reads an existing dermatologist employed in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologist from the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpGet("{pharmacyId}/dermatologists/{dermatologistId}")]
         public IActionResult GetDermatologist(Guid pharmacyId, Guid dermatologistId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
         }
 
@@ -183,9 +194,13 @@ namespace Farmacio_API.Controllers
         /// Reads an existing absence requests in the pharmacy.
         /// </summary>
         /// <response code="200">Read absence requests.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpGet("{pharmacyId}/absence-requests")]
         public IActionResult GetAbsenceRequestsForPharmacy(Guid pharmacyId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_absenceRequestService.ReadFor(pharmacyId));
         }
 
@@ -193,9 +208,13 @@ namespace Farmacio_API.Controllers
         /// Reads an existing absence requests page in the pharmacy.
         /// </summary>
         /// <response code="200">Read absence requests page.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpGet("{pharmacyId}/absence-requests/page")]
         public IActionResult GetAbsenceRequestsPageForPharmacy(Guid pharmacyId, int number, int size)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_absenceRequestService.ReadPageFor(pharmacyId, new PageDTO
             {
                 Number = number,
@@ -207,9 +226,13 @@ namespace Farmacio_API.Controllers
         /// Reads all medicines that are in stock in the pharmacy.
         /// </summary>
         /// <response code="200">Read medicines that are in stock in the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpGet("{pharmacyId}/medicines-in-stock")]
         public IActionResult GetMedicinesInStock(Guid pharmacyId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_pharmacyStockService.ReadForPharmacyInStock(pharmacyId));
         }
 
@@ -217,9 +240,13 @@ namespace Farmacio_API.Controllers
         /// Searches through all medicines that are in stock in the pharmacy.
         /// </summary>
         /// <response code="200">Searched medicines that are in stock in the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpGet("{pharmacyId}/medicines-in-stock/search")]
         public IActionResult SearchMedicinesInStock(Guid pharmacyId, [FromQuery] string name)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_pharmacyStockService.SearchForPharmacyInStock(pharmacyId, name));
         }
 
@@ -229,9 +256,13 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Added pharmacy medicine.</response>
         /// <response code="404">Medicine or Pharmacy not found.</response>
         /// <response code="400">Pharmacy-Medicine already exists in the Pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPost("{pharmacyId}/medicines")]
         public IActionResult AddMedicineToPharmacy(Guid pharmacyId, CreatePharmacyMedicineRequest pharmacyMedicineRequest)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             var pharmacyMedicine = _mapper.Map<PharmacyMedicine>(pharmacyMedicineRequest);
             pharmacyMedicine.PharmacyId = pharmacyId;
             _pharmacyService.TryToRead(pharmacyMedicine.PharmacyId);
@@ -244,9 +275,13 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Removed pharmacy medicine.</response>
         /// <response code="404">Pharmacy-Medicine not found.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpDelete("{pharmacyId}/medicines/{pharmacyMedicineId}")]
         public IActionResult RemoveMedicineFromPharmacy(Guid pharmacyId, Guid pharmacyMedicineId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_pharmacyStockService.Delete(pharmacyMedicineId));
         }
 
@@ -256,9 +291,13 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Added dermatologist.</response>
         /// <response code="404">Dermatologist or Pharmacy not found.</response>
         /// <response code="400">Dermatologist already employed in the Pharmacy, work time invalid or overlaps with and existing one.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPost("{pharmacyId}/dermatologists/{dermatologistId}")]
         public IActionResult AddDermatologistToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTimeRequest workTime)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_dermatologistService.AddToPharmacy(pharmacyId, dermatologistId, _mapper.Map<WorkTime>(workTime)));
         }
 
@@ -268,9 +307,13 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Removed dermatologist.</response>
         /// <response code="404">Dermatologist not found.</response>
         /// <response code="400">Dermatologist not employed in the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpDelete("{pharmacyId}/dermatologists/{dermatologistId}")]
         public IActionResult RemoveDermatologistFromPharmacy(Guid pharmacyId, Guid dermatologistId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             return Ok(_dermatologistService.RemoveFromPharmacy(pharmacyId, dermatologistId));
         }
 
@@ -278,6 +321,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing appointments in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologists from the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/appointments")]
         public IActionResult GetDermatologistAppointmentsForPharmacy(Guid pharmacyId)
         {
@@ -288,6 +332,7 @@ namespace Farmacio_API.Controllers
         /// Reads existing dermatologists appointments page in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologists appointments page from the pharmacy.</response>
+        [Authorize(Roles = "PharmacyAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/appointments/page")]
         public IActionResult GetDermatologistAppointmentsPageForPharmacy(Guid pharmacyId, int number, int size)
         {
