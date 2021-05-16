@@ -43,6 +43,7 @@ namespace Farmacio_API.Controllers
         /// Returns all existing complaints from the system.
         /// </summary>
         /// <response code="200">Returns list of complaints.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet]
         public IActionResult ReadComplaints()
         {
@@ -64,19 +65,32 @@ namespace Farmacio_API.Controllers
         /// Returns existing complaint from the system specified by id.
         /// </summary>
         /// <response code="200">Return complaint.</response>
+        [Authorize(Roles = "Patient, SystemAdmin")]
         [HttpGet("{id}")]
         public IActionResult ReadComplaint(Guid id)
         {
-            return Ok(_complaintService.TryToRead(id));
+            var complaint = _complaintService.TryToRead(id);
+
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(complaint.WriterId))
+                                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                                .Authorize();
+
+            return Ok(complaint);
         }
 
         /// <summary>
         /// Returns all existing complaints from the system writen by given writerId.
         /// </summary>
         /// <response code="200">Returns list of complaints.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("by/{writerId}")]
         public IActionResult ReadComplaintsBy(Guid writerId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(UserSpecific.For(writerId))
+                    .Authorize();
+
             return Ok(_complaintService.ReadBy(writerId));
         }
 
@@ -100,9 +114,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns list of dermatologists.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/complaintable/dermatologists")]
         public IActionResult ReadDermatologistsThatPatientCanComplaintAbout(Guid patientId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(patientId))
+                                .Authorize();
+
             return Ok(_complaintAboutDermatologistService.ReadThatPatientCanComplaintAbout(patientId));
         }
 
@@ -112,9 +131,14 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created complaint.</response>
         /// <response code="400">Given patient didn't have an appointment with given dermatologist in the past.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpPost("about-dermatologist")]
         public IActionResult CreateComplaintAboutDermatologist(CreateComplaintAboutDermatologistRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(request.WriterId))
+                                .Authorize();
+
             var complaint = _mapper.Map<ComplaintAboutDermatologist>(request);
             var createdComplaint = _complaintAboutDermatologistService.Create(complaint);
 
@@ -126,9 +150,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns list of pharmacists.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/complaintable/pharmacists")]
         public IActionResult ReadPharmacistsThatPatientCanComplaintAbout(Guid patientId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(patientId))
+                                .Authorize();
+
             return Ok(_complaintAboutPharmacistService.ReadThatPatientCanComplaintAbout(patientId));
         }
 
@@ -138,9 +167,14 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created complaint.</response>
         /// <response code="400">Given patient didn't have an appointment with given pharmacist in the past.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpPost("about-pharmacists")]
         public IActionResult CreateComplaintAboutPharmacists(CreateComplaintAboutPharmacistRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(request.WriterId))
+                                .Authorize();
+
             var complaint = _mapper.Map<ComplaintAboutPharmacist>(request);
             var createdComplaint = _complaintAboutPharmacistService.Create(complaint);
 
@@ -152,9 +186,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/complaintable/pharmacies")]
         public IActionResult ReadPharmaciesThatPatientCanComplaintAbout(Guid patientId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(patientId))
+                                .Authorize();
+
             return Ok(_complaintAboutPharmacyService.ReadThatPatientCanComplaintAbout(patientId));
         }
 
@@ -164,9 +203,14 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created pharmacy.</response>
         /// <response code="400">Given patient didn't consume services of with given pharmacy in the past.</response>
         /// <response code="404">Given patient doesn't exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpPost("about-pharmacies")]
         public IActionResult CreateComplaintAboutPharmacy(CreateComplaintAboutPharmacyRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(request.WriterId))
+                                .Authorize();
+
             var complaint = _mapper.Map<ComplaintAboutPharmacy>(request);
             var createdComplaint = _complaintAboutPharmacyService.Create(complaint);
 
@@ -177,6 +221,7 @@ namespace Farmacio_API.Controllers
         /// Returns all existing answers from the system writen by given writerId.
         /// </summary>
         /// <response code="200">Returns list of answers.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet("answered-by/{writerId}")]
         public IActionResult ReadAnswersBy(Guid writerId)
         {
@@ -200,9 +245,14 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created answer.</response>
         /// <response code="400">Given system admin has already answered to given complaint.</response>
         /// <response code="404">Given system admin or complaint doesn't exist in the system.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPost("{complaintId}/answers")]
-        public IActionResult CreateAnswerToCompaint(CreateComplaintAnswerRequest request)
+        public IActionResult CreateAnswerToComplaint(CreateComplaintAnswerRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(request.WriterId))
+                                .Authorize();
+
             var answer = _mapper.Map<ComplaintAnswer>(request);
             var createdAnswer = _complaintAnswerService.Create(answer);
 

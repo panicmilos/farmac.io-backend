@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.ERecipes;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -26,9 +28,16 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns list of pharmacies with total price.</response>
         /// <response code="404">Given eRecipe doesn't exist.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{eRecipeId}/pharmacies")]
         public IActionResult GetPharmaciesWithMedicines(Guid eRecipeId)
         {
+            var eRecipe = _eRecipeService.TryToRead(eRecipeId);
+
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(eRecipe.PatientId))
+                                .Authorize();
+
             return Ok(_eRecipeService.FindPharmaciesWithMedicinesFrom(eRecipeId));
         }
 
@@ -39,6 +48,12 @@ namespace Farmacio_API.Controllers
         [HttpGet("{eRecipeId}/pharmacies/sort")]
         public IActionResult SortPharmaciesWithMedicines(Guid eRecipeId, string criteria, bool isAsc)
         {
+            var eRecipe = _eRecipeService.TryToRead(eRecipeId);
+
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(eRecipe.PatientId))
+                                .Authorize();
+
             return Ok(_eRecipeService.SortPharmaciesWithMedicinesFrom(eRecipeId, criteria, isAsc));
         }
 
@@ -51,6 +66,12 @@ namespace Farmacio_API.Controllers
         [HttpPost("to-reservation")]
         public IActionResult CreateReservationFromERecipe(CreateReservationFromERecipeRequest request)
         {
+            var eRecipe = _eRecipeService.TryToRead(request.ERecipeId);
+
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(eRecipe.PatientId))
+                                .Authorize();
+
             var createReservationDTO = _mapper.Map<CreateReservationFromERecipeDTO>(request);
             var createdReservation = _eRecipeService.CreateReservationFromERecipe(createReservationDTO);
 

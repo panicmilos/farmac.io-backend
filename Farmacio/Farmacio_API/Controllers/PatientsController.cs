@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_API.Contracts.Requests.Followings;
 using Farmacio_API.Contracts.Responses.Dermatologists;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -74,9 +76,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns patient.</response>
         /// <response code="404">Unable to return patient because he does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{id}")]
         public IActionResult GetPatient(Guid id)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(id))
+                                .Authorize();
+
             return Ok(_patientService.TryToRead(id));
         }
 
@@ -85,7 +92,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Created patient.</response>
         /// <response code="401">Username or email is already taken.</response>
-        [HttpPost("")]
+        [HttpPost]
         public IActionResult CreatePatient(CreatePatientRequest request)
         {
             var patient = _mapper.Map<Account>(request);
@@ -99,9 +106,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated patient.</response>
         /// <response code="404">Unable to update patient because he does not exist.</response>
-        [HttpPut("")]
+        [Authorize(Roles = "Patient")]
+        [HttpPut]
         public IActionResult UpdatePatient(UpdatePatientRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(request.Account.Id))
+                    .Authorize();
+
             var patient = _mapper.Map<Account>(request);
             var updatedPatient = _patientService.Update(patient);
 
@@ -137,9 +149,14 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created patient follow object.</response>
         /// <response code="400">Unable to follow pharmacy because patient already follow it.</response>
         /// <response code="404">Given patient or pharmacy does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpPost("{patientId}/followings")]
         public IActionResult Follow(CreatePatientFollowRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(request.PatientId))
+                    .Authorize();
+
             return Ok(_patientFollowingsService.Follow(request.PatientId, request.PharmacyId));
         }
 
@@ -148,9 +165,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns list of pharmacies that patient follow.</response>
         /// <response code="404">Given patient does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/followings")]
         public IActionResult GetPatientFollowings(Guid patientId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(patientId))
+                    .Authorize();
+
             var patientFollowings = _patientFollowingsService.ReadFollowingsOf(patientId);
 
             return Ok(patientFollowings.Select(follow => new PatientFollowResponse
@@ -166,9 +188,15 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted patient follow object.</response>
         /// <response code="404">Given follow does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpDelete("{patientId}/followings/{followId}")]
         public IActionResult Unfollow(Guid followId)
         {
+            var follow = _patientFollowingsService.Read(followId);
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(follow.PatientId))
+                                .Authorize();
+
             return Ok(_patientFollowingsService.Unfollow(followId));
         }
 
@@ -182,7 +210,6 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_patientAllergyService.Delete(patientId, medicineId));
         }
-
 
         /// <summary>
         /// Returns patient's eRecipes.

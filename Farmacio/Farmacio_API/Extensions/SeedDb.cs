@@ -140,6 +140,7 @@ public static class SeedDb
 
         var medicine2 = new Medicine
         {
+            Id = new Guid("08d91521-5bf4-4a5e-8740-d68fcde43c58"),
             UniqueId = "321cba",
             Name = "Brufen",
             Form = MedicineForm.Tablet,
@@ -155,12 +156,13 @@ public static class SeedDb
 
         var medicine3 = new Medicine
         {
+            Id = new Guid("08d91521-5c05-422b-8f14-df14e1ee1016"),
             UniqueId = "321cba",
             Name = "Caffetin",
             Form = MedicineForm.Tablet,
             Type = medicineType1,
             Manufacturer = "Hemofarm",
-            IsRecipeOnly = false,
+            IsRecipeOnly = true,
             Contraindications = "Gadjenje, povracanje, nesanica, lupanje srca ili ubrzan rad srca, porecemaji funkcije jetre i bubrega, zavisnost.",
             AdditionalInfo = "Izgled: bela, ovalna, ravna.",
             RecommendedDose = "3-4 tablete dnevno",
@@ -230,6 +232,7 @@ public static class SeedDb
 
         var pharmacy1 = new Pharmacy
         {
+            Id = new Guid("08d91521-5c7d-4f06-85b3-85ce3c1ad6a3"),
             Name = "BENU Apoteka",
             Address = address1,
             Description = "Apotekarska ustanova BENU je najveci lanac apoteka u Srbiji i deo je velike medjunarodne kompanije PHOENIX iz Nemacke.",
@@ -246,6 +249,7 @@ public static class SeedDb
 
         var pharmacy3 = new Pharmacy
         {
+            Id = new Guid("08d91521-5ca1-4f12-841c-270f430cde13"),
             Name = "Dr.Max",
             Address = address3,
             Description = "Dr.Max je me�unarodni lanac apoteka, koji je prisutan u 6 " +
@@ -361,6 +365,7 @@ public static class SeedDb
 
         var patient1 = new Patient
         {
+            Id = new Guid("08d91521-5da2-43ab-8c3b-c16c102f0848"),
             FirstName = "Pera",
             LastName = "Peric",
             DateOfBirth = DateTime.Now,
@@ -419,6 +424,7 @@ public static class SeedDb
 
         var patient3 = new Patient
         {
+            Id = new Guid("08d91521-5dc6-45c3-81ec-26b64d85b5ea"),
             FirstName = "Janko",
             LastName = "Jankovic",
             DateOfBirth = DateTime.Now,
@@ -426,7 +432,7 @@ public static class SeedDb
             PhoneNumber = "0654789123",
             Address = address3,
             Points = 0,
-            NegativePoints = 0,
+            NegativePoints = 3,
             LoyaltyProgram = loyaltyProgram3
         };
 

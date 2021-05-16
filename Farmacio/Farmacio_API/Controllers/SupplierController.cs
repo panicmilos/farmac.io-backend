@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
-using Farmacio_API.Contracts.Requests.SupplierOffers;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_API.Contracts.Requests.SupplierMedicines;
+using Farmacio_API.Contracts.Requests.SupplierOffers;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,17 +23,20 @@ namespace Farmacio_API.Controllers
         private readonly ISupplierService _supplierService;
         private readonly ISupplierStockService _supplierStockService;
         private readonly ISupplierOfferService _supplierOfferService;
+        private readonly ICrudService<SupplierMedicine> _supplierMedicineService;
         private readonly IMapper _mapper;
 
         public SupplierController(
             ISupplierService supplierService,
             ISupplierStockService supplierStockService,
             ISupplierOfferService supplierOfferService,
+            ICrudService<SupplierMedicine> supplierMedicineService,
             IMapper mapper)
         {
             _supplierService = supplierService;
             _supplierStockService = supplierStockService;
             _supplierOfferService = supplierOfferService;
+            _supplierMedicineService = supplierMedicineService;
             _mapper = mapper;
         }
 
@@ -39,6 +44,7 @@ namespace Farmacio_API.Controllers
         /// Returns all suppliers from the system.
         /// </summary>
         /// <response code="200">Returns list of suppliers.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet]
         public IEnumerable<Account> GetSuppliers()
         {
@@ -61,9 +67,15 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns supplier.</response>
         /// <response code="404">Unable to return supplier because he does not exist in the system.</response>
+        [Authorize(Roles = "Supplier, SystemAdmin")]
         [HttpGet("{id}")]
         public IActionResult GetSupplier(Guid id)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(id))
+                    .Or(AllDataAllowed.For(Role.SystemAdmin))
+                    .Authorize();
+
             return Ok(_supplierService.TryToRead(id));
         }
 
@@ -72,6 +84,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns created supplier.</response>
         /// <response code="400">Unable to create supplier because username or email is already taken.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPost]
         public IActionResult CreateSupplier(CreateSupplierRequest request)
         {
@@ -86,9 +99,15 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated supplier.</response>
         /// <response code="404">Unable to update supplier because he does not exist.</response>
+        [Authorize(Roles = "Supplier, SystemAdmin")]
         [HttpPut]
         public IActionResult UpdateSupplier(UpdateSupplierRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(request.Account.Id))
+                    .Or(AllDataAllowed.For(Role.SystemAdmin))
+                    .Authorize();
+
             var supplier = _mapper.Map<Account>(request);
             var updatedSupplier = _supplierService.Update(supplier);
 
@@ -100,6 +119,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted supplier.</response>
         /// <response code="404">Unable to delete supplier because he does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteSupplier(Guid id)
         {
@@ -112,9 +132,14 @@ namespace Farmacio_API.Controllers
         /// Returns all supplier's medicines from the stock.
         /// </summary>
         /// <response code="200">Returns list of supplier's medicines.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpGet("{supplierId}/medicines-in-stock")]
         public IActionResult GetMedicinesInStock(Guid supplierId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(supplierId))
+                    .Authorize();
+
             return Ok(_supplierStockService.ReadFor(supplierId));
         }
 
@@ -139,9 +164,14 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created supplier's medicine.</response>
         /// <response code="400">Unable to add medicine to supplier's stock because it is already there.</response>
         /// <response code="404">Given supplier or medicine doesn't exist.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpPost("{supplierId}/medicines-in-stock")]
         public IActionResult AddMedicineToSupplierStock(CreateSupplierMedicineRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(request.SupplierId))
+                    .Authorize();
+
             var medicine = _mapper.Map<SupplierMedicine>(request);
             _supplierStockService.Create(medicine);
 
@@ -153,9 +183,15 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated supplier's medicine.</response>
         /// <response code="404">Given supplier's medicine doesn't exist.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpPut("{supplierId}/medicines-in-stock")]
         public IActionResult UpdateMedicineFromSupplierStock(UpdateSupplierMedicineRequest request)
         {
+            var supplierMedicine = _supplierMedicineService.TryToRead(request.Id);
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(supplierMedicine.SupplierId))
+                    .Authorize();
+
             var medicine = _mapper.Map<SupplierMedicine>(request);
             var updatedMedicine = _supplierStockService.Update(medicine);
 
@@ -167,9 +203,15 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted supplier's medicine.</response>
         /// <response code="404">Given supplier's medicine doesn't exist.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpDelete("{supplierId}/medicines-in-stock/{id}")]
         public IActionResult DeleteMedicineFromSupplierStock(Guid id)
         {
+            var supplierMedicine = _supplierMedicineService.TryToRead(id);
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(supplierMedicine.SupplierId))
+                    .Authorize();
+
             var deletedMedicine = _supplierStockService.Delete(id);
 
             return Ok(deletedMedicine);
@@ -179,9 +221,14 @@ namespace Farmacio_API.Controllers
         /// Returns all supplier's offers from the system.
         /// </summary>
         /// <response code="200">Returns list of supplier's offers.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpGet("{supplierId}/offers")]
         public IActionResult GetSuppliersOffers(Guid supplierId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(supplierId))
+                    .Authorize();
+
             return Ok(_supplierOfferService.ReadFor(supplierId));
         }
 
@@ -215,9 +262,14 @@ namespace Farmacio_API.Controllers
         /// Returns all supplier's offers from the system filtered by given status.
         /// </summary>
         /// <response code="200">Returns list of supplier's offers.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpGet("{supplierId}/offers/filter")]
         public IActionResult GetSuppliersOffersFilteredByStatus(Guid supplierId, OfferStatus? status)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(supplierId))
+                    .Authorize();
+
             return Ok(_supplierOfferService.ReadByStatusFor(supplierId, status));
         }
 
@@ -246,9 +298,14 @@ namespace Farmacio_API.Controllers
         /// orders deadline passed or supplier don't have enough medicines.
         /// </response>
         /// <response code="404">Given supplier or pharmacy order doesn't exist.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpPost("{supplierId}/offers")]
         public IActionResult CreateSupplierOffer(CreateSupplierOfferRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(request.SupplierId))
+                    .Authorize();
+
             var offer = _mapper.Map<SupplierOffer>(request);
             _supplierOfferService.Create(offer);
 
@@ -264,9 +321,15 @@ namespace Farmacio_API.Controllers
         /// orders deadline passed.
         /// </response>
         /// <response code="404">Given offer doesn't exist.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpPut("{supplierId}/offers")]
         public IActionResult UpdateSupplierOffer(UpdateSupplierOfferRequest request)
         {
+            var existingOffer = _supplierOfferService.TryToRead(request.Id);
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(existingOffer.SupplierId))
+                    .Authorize();
+
             var offer = _mapper.Map<SupplierOffer>(request);
             var updatedOffer = _supplierOfferService.Update(offer);
 
@@ -282,9 +345,15 @@ namespace Farmacio_API.Controllers
         /// order is already processed.
         /// </response>
         /// <response code="404">Given offer doesn't exist.</response>
+        [Authorize(Roles = "Supplier")]
         [HttpDelete("{supplierId}/offers/{offerId}")]
         public IActionResult CancelSupplierOffer(Guid offerId)
         {
+            var existingOffer = _supplierOfferService.TryToRead(offerId);
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(existingOffer.SupplierId))
+                    .Authorize();
+
             var canceledOffer = _supplierOfferService.CancelOffer(offerId);
 
             return Ok(canceledOffer);
