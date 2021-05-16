@@ -99,7 +99,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
-        [HttpGet("history/{patientId}")]
+        [HttpGet("history-with-dermatologists/{patientId}")]
         public IActionResult ReadPatientsHistoryOfDermatologistsVisits(Guid patientId)
         {
             return Ok(_appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId));
@@ -109,7 +109,7 @@ namespace Farmacio_API.Controllers
         /// Sort History of dermatology visits.
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
-        [HttpGet("history/{patientId}/sort")]
+        [HttpGet("history-with-dermatologists/{patientId}/sort")]
         public IActionResult SortHistoryOfVisitingDermatologist(Guid patientId, string criteria, bool isAsc)
         {
             var appointments = _appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId);
@@ -265,6 +265,59 @@ namespace Farmacio_API.Controllers
         {
             var appointments = _appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId);
             return Ok(_appointmentService.SortAppointments(appointments, criteria, isAsc));
+        }
+
+
+        /// <summary>
+        /// Returns patients history of visits to a pharmacists for n-th page.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
+        [HttpGet("history-visit-pharmacists/{patientId}/page-to")]
+        public IActionResult ReadPatientsHistoryOfVisitngPharmacistsByPagesTo(Guid patientId, [FromQuery] PageDTO pageDTO)
+        {
+            return Ok(_appointmentService.ReadPagesOfPatientHistoryVisitingPharmaccists(patientId, pageDTO));
+        }
+
+        /// <summary>
+        /// Sort history of pharmacists visits for n-th page.
+        /// </summary>
+        /// <response code="200">Sorted appointments.</response>
+        [HttpGet("history-visit-pharmacists/{patientId}/sort/page-to")]
+        public IActionResult SortHistoryOfVisitingPharmacistsByPagesTo(Guid patientId, string criteria, bool isAsc, int number, int size)
+        {
+            var appointments = _appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId);
+            return Ok(_appointmentService.SortAppointmentsPageTo(appointments, criteria, isAsc, new PageDTO
+            {
+                Number = number,
+                Size = size
+            }));
+        }
+
+        /// <summary>
+        /// Returns patients history of visits to a dermatologist for n-th page.
+        /// </summary>
+        /// <response code="200">Returns appointments.</response>
+        /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
+        [HttpGet("history-with-dermatologists/{patientId}/page-to")]
+        public IActionResult ReadPatientsHistoryOfDermatologistsVisitsByPagesTo(Guid patientId, [FromQuery] PageDTO pageDTO)
+        {
+            return Ok(_appointmentService.ReadPageOfPatientHistoryVisitingDermatologists(patientId, pageDTO));
+        }
+
+        /// <summary>
+        /// Sort History of dermatology visits for n-th page.
+        /// </summary>
+        /// <response code="200">Sorted appointments.</response>
+        [HttpGet("history-with-dermatologists/{patientId}/sort/page-to")]
+        public IActionResult SortHistoryOfVisitingDermatologistByPagesTo(Guid patientId, string criteria, bool isAsc, int number, int size)
+        {
+            var appointments = _appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId);
+            return Ok(_appointmentService.SortAppointmentsPageTo(appointments, criteria, isAsc, new PageDTO
+            {
+                Number = number,
+                Size = size
+            }));
         }
     }
 }

@@ -377,5 +377,44 @@ namespace Farmacio_API.Controllers
 
             return Ok(_pharmacistService.SortByGrade(pharmacists.ToList(), searchParams));
         }
+
+        /// <summary>
+        /// Returns first N pages of pharmacies that contains given params.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacies.</response>
+        [HttpGet("search/pages-to")]
+        public IEnumerable<SmallPharmacyDTO> SearchPharmaciesPagesTo([FromQuery] PharmacySearchParams searchParams, [FromQuery] PageDTO pageDTO)
+        {
+            return _pharmacyService.ReadPagesToBy(searchParams, pageDTO);
+        }
+
+        /// <summary>
+        /// Returns pharmacies that have available pharmacists in chosen time.
+        /// </summary>
+        /// <response code="200">Returns list of pharmacies.</response>
+        [HttpGet("available/pages-to")]
+        public IActionResult SearchAvailableForConsultationsPagesTo([FromQuery] SearhSortParamsForAppointments searchParams, [FromQuery] PageDTO pageDTO)
+        {
+            var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
+            return Ok(_pharmacyService.GetPharmaciesOfPharmacistsPagesTo(pharmacists.ToList(), searchParams, pageDTO));
+
+        }
+
+        /// <summary>
+        /// Returns all pharmacies from the system for home page with less information for n pages.
+        /// </summary>
+        /// <response code="200">Returns list of small pharmacy objects.</response>
+        [HttpGet("page-to")]
+        public IEnumerable<SmallPharmacyDTO> ReadForHomePage([FromQuery] PageDTO pageDTO)
+        {
+            return _pharmacyService.ReadAllPagesTo(pageDTO).Select(pharmacy => new SmallPharmacyDTO
+            {
+                Id = pharmacy.Id,
+                Name = pharmacy.Name,
+                Description = pharmacy.Description,
+                Address = pharmacy.Address,
+                AverageGrade = pharmacy.AverageGrade
+            });
+        }
     }
 }

@@ -47,6 +47,13 @@ namespace Farmacio_Services.Contracts
         IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId);
         
         IEnumerable<Appointment> ReadFor(Guid patientId);
+
         IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId);
+
+        IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmaccists(Guid patientId, PageDTO pageDto);
+
+        IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO);
+
+        IEnumerable<Appointment> SortAppointmentsPageTo(IEnumerable<Appointment> appointments, string criteria, bool isAsc, PageDTO pageDTO);
     }
 }
