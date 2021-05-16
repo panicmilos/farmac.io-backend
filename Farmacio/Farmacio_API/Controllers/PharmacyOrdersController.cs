@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Farmacio_API.Contracts.Requests.PharmacyOrders;
+using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -24,7 +26,7 @@ namespace Farmacio_API.Controllers
             _pharmacyService = pharmacyService;
             _mapper = mapper;
         }
-        
+
         /// <summary>
         /// Read an existing pharmacy order by id.
         /// </summary>
@@ -36,7 +38,7 @@ namespace Farmacio_API.Controllers
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.TryToRead(pharmacyOrderId));
         }
-        
+
         /// <summary>
         /// Filter existing pharmacy orders by processed status.
         /// </summary>
@@ -48,7 +50,7 @@ namespace Farmacio_API.Controllers
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.ReadFor(pharmacyId, isProcessed));
         }
-        
+
         /// <summary>
         /// Paginated filter existing pharmacy orders by processed status.
         /// </summary>
@@ -78,7 +80,7 @@ namespace Farmacio_API.Controllers
 
             return Ok(_pharmacyOrderService.Create(pharmacyOrder));
         }
-        
+
         /// <summary>
         /// Update existing pharmacy order.
         /// </summary>
