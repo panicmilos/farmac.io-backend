@@ -18,6 +18,9 @@ namespace Farmacio_Services.Contracts
         Reservation CreateReservationFromERecipe(CreateReservationFromERecipeDTO createERecipeDTO);
 
         IEnumerable<ERecipeDTO> SortFor(Guid patientId, ERecipesSortFilterParams sortFilterParams);
+
         IEnumerable<ERecipeMedicine> ReadMedicinesFromERecipe(Guid eRecipeId);
+
+        IEnumerable<ERecipeDTO> SortForPageTo(Guid patientId, ERecipesSortFilterParams sortFilterParams, PageDTO pageDTO);
     }
 }

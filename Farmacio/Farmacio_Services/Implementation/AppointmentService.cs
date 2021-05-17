@@ -444,5 +444,20 @@ namespace Farmacio_Services.Implementation
             return ReadForPatient(patientId).Where(appointment =>
                 appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Pharmacist);
         }
+
+        public IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDto)
+        {
+            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitingPharmacists(patientId), pageDto);
+        }
+
+        public IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO)
+        {
+            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitsToDermatologist(patientId), pageDTO);
+        }
+
+        public IEnumerable<Appointment> SortAppointmentsPageTo(IEnumerable<Appointment> appointments, string criteria, bool isAsc, PageDTO pageDTO)
+        {
+            return PaginationUtils<Appointment>.Page(SortAppointments(appointments, criteria, isAsc), pageDTO);
+        }
     }
 }

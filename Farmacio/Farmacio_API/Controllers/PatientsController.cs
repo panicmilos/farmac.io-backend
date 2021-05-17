@@ -221,5 +221,16 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_eRecipeService.SortFor(patientUserId, sortFilterParams));
         }
+
+        /// <summary>
+        /// Returns patient's eRecipes for n-th page.
+        /// </summary>
+        /// <response code="200">Returns patient's eRecipes.</response>
+        /// <response code="404">Given patient does not exist in the system.</response>
+        [HttpGet("{patientUserId}/eRecipes/sort/page")]
+        public IActionResult SortERecipesPageTo(Guid patientUserId, [FromQuery] ERecipesSortFilterParams sortFilterParams, [FromQuery] PageDTO pageDTO)
+        {
+            return Ok(_eRecipeService.SortForPageTo(patientUserId, sortFilterParams, pageDTO));
+        }
     }
 }
