@@ -83,6 +83,32 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
         }
 
         [Fact]
+        public void CreatePharmacistAppointment_ThrowsMissingEntityException_BecausePharmacyDoesntExist()
+        {
+            _accountService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account { User = new Pharmacist() });
+            _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account { User = new Patient() });
+            _pharmacyService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Throws<MissingEntityException>();
+
+            Action createAppointment = () => _appointmentService.CreatePharmacistAppointment(new CreateAppointmentDTO
+            {
+                MedicalStaffId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd61"),
+                PatientId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd60"),
+                PharmacyId = new Guid("08d8f514-577c-4a9f-8d0c-b863603902e5"),
+                DateTime = DateTime.Today.AddDays(3),
+            });
+
+            createAppointment.Should().Throw<MissingEntityException>();
+
+            _accountService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
+            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
+            _pharmacyService.Verify(service => service.GetPriceOfPharmacistConsultation(It.IsAny<Guid>()), Times.Never);
+            _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
+            _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
+            _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
+            _appointmentRepository.Verify(repository => repository.Read(), Times.Never);
+        }
+
+        [Fact]
         public void CreatePharmacistAppointment_ThrowsBadLogicException_BecausePharmacistDoesntWorkInThatPharmacy()
         {
             _accountService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
@@ -105,7 +131,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             createAppointment.Should().Throw<BadLogicException>();
 
             _accountService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
-            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
+            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
             _pharmacyService.Verify(service => service.GetPriceOfPharmacistConsultation(It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
@@ -142,7 +168,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             createAppointment.Should().Throw<InvalidAppointmentDateTimeException>();
 
             _accountService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
-            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
+            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
             _pharmacyService.Verify(service => service.GetPriceOfPharmacistConsultation(It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
@@ -188,7 +214,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             createAppointment.Should().Throw<InvalidAppointmentDateTimeException>();
 
             _accountService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
-            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
+            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
             _pharmacyService.Verify(service => service.GetPriceOfPharmacistConsultation(It.IsAny<Guid>()), Times.Never);
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
@@ -232,45 +258,6 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             });
 
             createAppointment.Should().Throw<InvalidAppointmentDateTimeException>();
-
-            _accountService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
-            _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Never);
-            _pharmacyService.Verify(service => service.GetPriceOfPharmacistConsultation(It.IsAny<Guid>()), Times.Never);
-            _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
-            _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
-            _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Exactly(2));
-        }
-
-        [Fact]
-        public void CreatePharmacistAppointment_ThrowsMissingEntityException_BecausePharmacyDoesntExist()
-        {
-            _accountService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
-            {
-                User = new Pharmacist
-                {
-                    PharmacyId = new Guid("08d8f514-577c-4a9f-8d0c-b863603902e4"),
-                    WorkTime = new WorkTime
-                    {
-                        From = new DateTime(2020, 1, 1, 8, 0, 0),   // 8:00
-                        To = new DateTime(2020, 1, 1, 13, 0, 0),    // 13:00
-                    }
-                }
-            });
-            _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account { User = new Patient() });
-            _appointmentRepository.Setup(repository => repository.Read()).Returns(() => new List<Appointment>());
-            _pharmacyService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Throws<MissingEntityException>();
-
-            Action createAppointment = () => _appointmentService.CreatePharmacistAppointment(new CreateAppointmentDTO
-            {
-                MedicalStaffId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd61"),
-                PatientId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd60"),
-                PharmacyId = new Guid("08d8f514-577c-4a9f-8d0c-b863603902e4"),
-                DateTime = DateTime.Today.AddDays(2).AddHours(10),   // 10:00
-                Duration = 20,
-            });
-
-            createAppointment.Should().Throw<MissingEntityException>();
 
             _accountService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _pharmacyService.Verify(service => service.TryToRead(It.IsAny<Guid>()), Times.Once);
