@@ -243,9 +243,13 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns patient's eRecipes.</response>
         /// <response code="404">Given patient does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientUserId}/eRecipes/sort/page")]
         public IActionResult SortERecipesPageTo(Guid patientUserId, [FromQuery] ERecipesSortFilterParams sortFilterParams, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientUserId))
+                .Authorize();
             return Ok(_eRecipeService.SortForPageTo(patientUserId, sortFilterParams, pageDTO));
         }
     }

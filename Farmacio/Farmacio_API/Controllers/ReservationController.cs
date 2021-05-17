@@ -52,9 +52,16 @@ namespace Farmacio_API.Controllers
             return _reservationService.ReadPatientReservations(patientId);
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpDelete("cancel/{reservationId}")]
         public IActionResult CancelMedicineReservation(Guid reservationId)
         {
+            var reservation = _reservationService.TryToRead(reservationId);
+
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(reservation.PatientId))
+                .Authorize();
+
             _reservationService.CancelMedicineReservation(reservationId);
             return Ok();
         }

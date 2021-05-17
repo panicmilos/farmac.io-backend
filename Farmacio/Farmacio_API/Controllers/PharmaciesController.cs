@@ -436,6 +436,7 @@ namespace Farmacio_API.Controllers
         /// Returns first N pages of pharmacies that contains given params.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("search/pages-to")]
         public IEnumerable<SmallPharmacyDTO> SearchPharmaciesPagesTo([FromQuery] PharmacySearchParams searchParams, [FromQuery] PageDTO pageDTO)
         {
@@ -446,6 +447,7 @@ namespace Farmacio_API.Controllers
         /// Returns pharmacies that have available pharmacists in chosen time for n-th page.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("available/page")]
         public IActionResult SearchAvailableForConsultationsPagesTo([FromQuery] SearhSortParamsForAppointments searchParams, [FromQuery] PageDTO pageDTO)
         {

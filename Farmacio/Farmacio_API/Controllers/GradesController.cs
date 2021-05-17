@@ -100,9 +100,14 @@ namespace Farmacio_API.Controllers
         /// Reads an existing dermatologists in the system that patient rated for n-th page.
         /// </summary>
         /// <response code="200">Read dermatologist.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/rated-dermatologists/page-to")]
         public IActionResult GetRatedDermatologistPageTo(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(AccountSpecific.For(patientId))
+                .Authorize();
+
             return Ok(_medicalStaffGradeService.ReadDermatologistThatPatientRatedPageTo(patientId, pageDTO).Select(dermatologist =>
             {
                 var grade = _medicalStaffGradeService.Read(patientId, dermatologist.UserId);
@@ -302,9 +307,14 @@ namespace Farmacio_API.Controllers
         /// Reads an existing medicines in the system that patient rated for n-th page.
         /// </summary>
         /// <response code="200">Read medicines.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/rated-medicines/pages-to")]
         public IActionResult GetRatedMedicinesPageTo(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
             return Ok(_medicineGradeService.ReadMedicinesThatPatientRatedPageTo(patientId, pageDTO).Select(medicine =>
             {
                 var grade = _medicineGradeService.Read(patientId, medicine.Id);
@@ -345,9 +355,14 @@ namespace Farmacio_API.Controllers
         /// Reads an existing pharmacies in the system that patient rated for n-th page.
         /// </summary>
         /// <response code="200">Read pharmacies.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/rated-pharmacies/page-to")]
         public IActionResult GetRatedPharmacies(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
             return Ok(_pharmacyGradeService.ReadPharmaciesThatPatientRatedPageTo(patientId, pageDTO).Select(pharmacy =>
             {
                 var grade = _pharmacyGradeService.Read(patientId, pharmacy.Id);
@@ -388,9 +403,14 @@ namespace Farmacio_API.Controllers
         /// Reads an existing pharmacists in the system that patient rated for n-th page.
         /// </summary>
         /// <response code="200">Read pharmacists.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientId}/rated-pharmacists/page-to")]
         public IActionResult GetRatedPharmacistsPageTo(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(AccountSpecific.For(patientId))
+                .Authorize();
+
             return Ok(_medicalStaffGradeService.ReadPharmacistsThatPatientRatedPageTo(patientId, pageDTO).Select(pharmacist => {
                 var grade = _medicalStaffGradeService.Read(patientId, pharmacist.UserId);
                 return new MedicalStafftWithGradeResponse
