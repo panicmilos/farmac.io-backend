@@ -5,6 +5,7 @@ using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
@@ -65,6 +66,11 @@ namespace Farmacio_Services.Implementation
                     return (gradeFrom == 0 || dermatologist.AverageGrade >= gradeFrom)
                            && (gradeTo == 0 || dermatologist.AverageGrade <= gradeTo);
                 });
+        }
+
+        public IEnumerable<Account> ReadPageBy(MedicalStaffFilterParamsDTO filterParams, PageDTO pageDto)
+        {
+            return PaginationUtils<Account>.Page(ReadBy(filterParams), pageDto);
         }
 
         public IEnumerable<PatientDTO> SearchPatientsForMedicalStaff(Guid medicalAccountId, string name)

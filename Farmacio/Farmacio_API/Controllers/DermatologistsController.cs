@@ -104,6 +104,21 @@ namespace Farmacio_API.Controllers
                 WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
             }));
         }
+        
+        /// <summary>
+        /// Filter page of existing dermatologists in the system with their work places.
+        /// </summary>
+        /// <response code="200">Filtered page of dermatologists with their work places.</response>
+        [HttpGet("with-work-places/filter/page")]
+        public IActionResult FilterDermatologistsWithWorkPlacesPage([FromQuery] MedicalStaffFilterParamsDTO filterParams,
+            [FromQuery] PageDTO pageDto)
+        {
+            return Ok(_dermatologistService.ReadPageBy(filterParams, pageDto).Select(dermatologistAccount => new DermatologistWithWorkPlacesResponse
+            {
+                DermatologistAccount = dermatologistAccount,
+                WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
+            }));
+        }
 
         /// <summary>
         /// Reads an existing dermatologist in the system.

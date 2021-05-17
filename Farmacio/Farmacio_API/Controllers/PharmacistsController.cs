@@ -56,6 +56,18 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.ReadBy(filterParams));
         }
+        
+        /// <summary>
+        /// Returns pharmacists page that match the given params from the system.
+        /// </summary>
+        /// <response code="200">List of pharmacists page.</response>
+        [Authorize(Roles = "Patient, SystemAdmin")]
+        [HttpGet("filter/page")]
+        public IActionResult FilterPharmacistsPage([FromQuery] MedicalStaffFilterParamsDTO filterParams,
+            [FromQuery] PageDTO pageDto)
+        {
+            return Ok(_pharmacistService.ReadPageBy(filterParams, pageDto));
+        }
 
         /// <summary>
         /// Reads an existing pharmacist in the system.
