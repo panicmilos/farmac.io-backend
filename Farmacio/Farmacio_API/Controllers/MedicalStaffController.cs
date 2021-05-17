@@ -30,21 +30,21 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Accepted absence request.</response>
         [HttpPost("absence-requests/{absenceRequestId}/accept")]
-        public IActionResult CreateAbsenceRequest(Guid absenceRequestId)
+        public IActionResult CreateAbsenceResponse(Guid absenceRequestId)
         {
             return Ok(_absenceRequestService.AcceptAbsenceRequest(absenceRequestId));
         }
-        
+
         /// <summary>
         /// Declines absence request.
         /// </summary>
         /// <response code="200">Declined absence request.</response>
         [HttpPost("absence-requests/{absenceRequestId}/decline")]
-        public IActionResult CreateAbsenceRequest(Guid absenceRequestId, DeclineAbsenceRequestRequest declineAbsenceRequest)
+        public IActionResult CreateAbsenceResponse(Guid absenceRequestId, DeclineAbsenceRequestRequest declineAbsenceRequest)
         {
             return Ok(_absenceRequestService.DeclineAbsenceRequest(absenceRequestId, declineAbsenceRequest.Reason));
         }
-        
+
         /// <summary>
         /// Creates absence request.
         /// </summary>

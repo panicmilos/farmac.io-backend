@@ -1,11 +1,12 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Accounts;
-using Farmacio_API.Contracts.Requests.Grades;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Farmacio_API.Controllers
 {
@@ -27,6 +28,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing pharmacists in the system.
         /// </summary>
         /// <response code="200">Read pharmacists.</response>
+        [Authorize(Roles = "Patient, SystemAdmin")]
         [HttpGet]
         public IActionResult GetPharmacists()
         {
@@ -37,6 +39,7 @@ namespace Farmacio_API.Controllers
         /// Search all existing pharmacists in the system.
         /// </summary>
         /// <response code="200">Searched pharmacists.</response>
+        [Authorize(Roles = "Patient, SystemAdmin")]
         [HttpGet("search")]
         public IActionResult SearchPharmacists(string name)
         {
@@ -47,19 +50,38 @@ namespace Farmacio_API.Controllers
         /// Returns pharmacists that match the given params from the system.
         /// </summary>
         /// <response code="200">List of pharmacists.</response>
+        [Authorize(Roles = "Patient, SystemAdmin")]
         [HttpGet("filter")]
         public IActionResult FilterPharmacists([FromQuery] MedicalStaffFilterParamsDTO filterParams)
         {
             return Ok(_pharmacistService.ReadBy(filterParams));
+        }
+        
+        /// <summary>
+        /// Returns pharmacists page that match the given params from the system.
+        /// </summary>
+        /// <response code="200">List of pharmacists page.</response>
+        [Authorize(Roles = "Patient, SystemAdmin")]
+        [HttpGet("filter/page")]
+        public IActionResult FilterPharmacistsPage([FromQuery] MedicalStaffFilterParamsDTO filterParams,
+            [FromQuery] PageDTO pageDto)
+        {
+            return Ok(_pharmacistService.ReadPageBy(filterParams, pageDto));
         }
 
         /// <summary>
         /// Reads an existing pharmacist in the system.
         /// </summary>
         /// <response code="200">Read pharmacist.</response>
+        [Authorize(Roles = "Pharmacist, SystemAdmin")]
         [HttpGet("{id}")]
         public IActionResult GetPharmacist(Guid id)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(id))
+                                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                                .Authorize();
+
             return Ok(_pharmacistService.TryToRead(id));
         }
 
@@ -69,9 +91,15 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created pharmacist.</response>
         /// <response code="404">Pharmacy not found.</response>
         /// <response code="401">Username or email is already taken.</response>
+        [Authorize(Roles = "SystemAdmin, PharmacyAdmin")]
         [HttpPost]
         public IActionResult CreatePharmacist(CreatePharmacistRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(IsPharmacyAdmin.Of(request.User.PharmacyId))
+                                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                                .Authorize();
+
             var pharmacist = _mapper.Map<Account>(request);
             return Ok(_pharmacistService.Create(pharmacist));
         }
@@ -82,9 +110,15 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Updated pharmacist.</response>
         /// <response code="404">Pharmacy or Pharmacist not found.</response>
         /// <response code="401">Username or email is already taken.</response>
+        [Authorize(Roles = "Pharmacist, SystemAdmin")]
         [HttpPut]
         public IActionResult UpdatePharmacist(UpdatePharmacistRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(request.Account.Id))
+                    .Or(AllDataAllowed.For(Role.SystemAdmin))
+                    .Authorize();
+
             var pharmacist = _mapper.Map<Account>(request);
             return Ok(_pharmacistService.Update(pharmacist));
         }
@@ -94,6 +128,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Deleted pharmacist.</response>
         /// <response code="404">Pharmacist not found.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePharmacist(Guid id)
         {

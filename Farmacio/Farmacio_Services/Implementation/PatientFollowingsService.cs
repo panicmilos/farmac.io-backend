@@ -66,5 +66,10 @@ namespace Farmacio_Services.Implementation
 
             return _followingsService.Delete(followId);
         }
+
+        public PatientPharmacyFollow Read(Guid followId)
+        {
+            return _followingsService.TryToRead(followId);
+        }
     }
 }

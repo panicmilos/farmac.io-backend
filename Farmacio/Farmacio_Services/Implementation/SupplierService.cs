@@ -10,7 +10,7 @@ namespace Farmacio_Services.Implementation
 {
     public class SupplierService : AccountService, ISupplierService
     {
-        public SupplierService(IEmailVerificationService emailVerificationService, IRepository<Account> repository) :
+        public SupplierService(IEmailVerificationService emailVerificationService, IAccountRepository repository) :
             base(emailVerificationService, repository)
         {
         }

@@ -5,6 +5,7 @@ using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
@@ -14,7 +15,7 @@ namespace Farmacio_Services.Implementation
         private readonly IAppointmentService _appointmentService;
 
         public MedicalStaffService(IEmailVerificationService emailVerificationService, IAppointmentService appointmentService,
-            IRepository<Account> repository)
+            IAccountRepository repository)
             : base(emailVerificationService, repository)
         {
             _appointmentService = appointmentService;
@@ -54,17 +55,22 @@ namespace Farmacio_Services.Implementation
                 patients = isAsc ? patients.OrderBy(sortCrit) : patients.OrderByDescending(sortCrit);
             return patients;
         }
-        
+
         public virtual IEnumerable<Account> ReadBy(MedicalStaffFilterParamsDTO filterParams)
         {
             var (name, pharmacyId, gradeFrom, gradeTo) = filterParams;
             return SearchByName(name)
                 .Where(acc =>
                 {
-                    var dermatologist = (MedicalStaff) acc.User;
-                    return (gradeFrom == 0 || dermatologist.AverageGrade >= gradeFrom) 
+                    var dermatologist = (MedicalStaff)acc.User;
+                    return (gradeFrom == 0 || dermatologist.AverageGrade >= gradeFrom)
                            && (gradeTo == 0 || dermatologist.AverageGrade <= gradeTo);
                 });
+        }
+
+        public IEnumerable<Account> ReadPageBy(MedicalStaffFilterParamsDTO filterParams, PageDTO pageDto)
+        {
+            return PaginationUtils<Account>.Page(ReadBy(filterParams), pageDto);
         }
 
         public IEnumerable<PatientDTO> SearchPatientsForMedicalStaff(Guid medicalAccountId, string name)

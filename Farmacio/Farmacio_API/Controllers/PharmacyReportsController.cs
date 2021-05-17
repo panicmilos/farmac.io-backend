@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
-using Farmacio_Models.Domain;
+using Farmacio_API.Contracts.Requests.PharmacyReports;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
-using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using Farmacio_API.Contracts.Requests.Appointments;
-using Farmacio_API.Contracts.Requests.PharmacyReports;
 
 namespace Farmacio_API.Controllers
 {
@@ -34,7 +30,7 @@ namespace Farmacio_API.Controllers
             var timePeriodDto = _mapper.Map<TimePeriodDTO>(timePeriodRequest);
             return Ok(_pharmacyReportsService.GenerateExaminationsReportFor(pharmacyId, timePeriodDto));
         }
-        
+
         /// <summary>
         /// Generates a pharmacy medicine consumption report based on the given time interval.
         /// </summary>
@@ -45,7 +41,7 @@ namespace Farmacio_API.Controllers
             var timePeriodDto = _mapper.Map<TimePeriodDTO>(timePeriodRequest);
             return Ok(_pharmacyReportsService.GenerateMedicineConsumptionReportFor(pharmacyId, timePeriodDto));
         }
-        
+
         /// <summary>
         /// Generates a pharmacy income report based on the given time interval.
         /// </summary>
@@ -56,6 +52,5 @@ namespace Farmacio_API.Controllers
             var timePeriodDto = _mapper.Map<TimePeriodDTO>(timePeriodRequest);
             return Ok(_pharmacyReportsService.GeneratePharmacyIncomeReportFor(pharmacyId, timePeriodDto));
         }
-        
     }
 }

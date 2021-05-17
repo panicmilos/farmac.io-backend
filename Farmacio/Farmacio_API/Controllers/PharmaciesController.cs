@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Pharmacies;
+using Farmacio_API.Contracts.Requests.PharmacyMedicines;
+using Farmacio_API.Contracts.Requests.WorkTimes;
+using Farmacio_API.Contracts.Responses.Dermatologists;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Farmacio_API.Contracts.Requests.PharmacyMedicines;
-using Farmacio_API.Contracts.Requests.WorkTimes;
-using Farmacio_API.Contracts.Responses.Dermatologists;
-using Farmacio_API.Contracts.Requests.Grades;
 
 namespace Farmacio_API.Controllers
 {
@@ -27,31 +28,28 @@ namespace Farmacio_API.Controllers
         private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
         private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IMedicineService _medicineService;
-        private readonly IPharmacyPriceListService _pharmacyPriceListService;
-        private readonly IPharmacyGradeService _pharmacyGradeService;
         private readonly IAbsenceRequestService _absenceRequestService;
         private readonly IMapper _mapper;
 
-        public PharmaciesController(IPharmacyService pharmacyService, IPharmacistService pharmacistService
-            , IDermatologistService dermatologistService, IAppointmentService appointmentService
-            , IDermatologistWorkPlaceService dermatologistWorkPlaceService
-            , IPharmacyStockService pharmacyStockService
-            , IPharmacyPriceListService pharmacyPriceListService
-            , IPharmacyGradeService pharmacyGradeService
-            , IAbsenceRequestService absenceRequestService
-            , IMedicineService medicineService, IMapper mapper)
+        public PharmaciesController(IPharmacyService pharmacyService,
+            IPharmacistService pharmacistService,
+            IDermatologistService dermatologistService,
+            IAppointmentService appointmentService,
+            IDermatologistWorkPlaceService dermatologistWorkPlaceService,
+            IPharmacyStockService pharmacyStockService,
+            IMedicineService medicineService,
+            IAbsenceRequestService absenceRequestService,
+            IMapper mapper)
         {
             _pharmacyService = pharmacyService;
             _pharmacistService = pharmacistService;
             _dermatologistService = dermatologistService;
-            _mapper = mapper;
             _appointmentService = appointmentService;
             _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
             _pharmacyStockService = pharmacyStockService;
             _medicineService = medicineService;
-            _pharmacyPriceListService = pharmacyPriceListService;
-            _pharmacyGradeService = pharmacyGradeService;
             _absenceRequestService = absenceRequestService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -90,7 +88,7 @@ namespace Farmacio_API.Controllers
 
             return Ok(pharmacy);
         }
-        
+
         /// <summary>
         /// Reads all existing pharmacists employed in the pharmacy.
         /// </summary>
@@ -100,7 +98,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.ReadForPharmacy(pharmacyId));
         }
-        
+
         /// <summary>
         /// Search all existing pharmacists in the pharmacy.
         /// </summary>
@@ -110,7 +108,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.SearchByNameForPharmacy(pharmacyId, name));
         }
-        
+
         /// <summary>
         /// Reads an existing pharmacist employed in the pharmacy.
         /// </summary>
@@ -120,7 +118,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.ReadForPharmacy(pharmacyId, pharmacistId));
         }
-        
+
         /// <summary>
         /// Reads all existing dermatologists employed in the pharmacy.
         /// </summary>
@@ -130,7 +128,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.ReadForPharmacy(pharmacyId));
         }
-        
+
         /// <summary>
         /// Search all existing dermatologists in the pharmacy.
         /// </summary>
@@ -140,7 +138,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.SearchByNameForPharmacy(pharmacyId, name));
         }
-        
+
         /// <summary>
         /// Reads all existing dermatologists employed in the pharmacy with their work places.
         /// </summary>
@@ -155,7 +153,7 @@ namespace Farmacio_API.Controllers
                     WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
                 }));
         }
-        
+
         /// <summary>
         /// Search all existing dermatologists in the pharmacy with their work places.
         /// </summary>
@@ -170,7 +168,7 @@ namespace Farmacio_API.Controllers
                     WorkPlaces = _dermatologistWorkPlaceService.GetWorkPlacesFor(dermatologistAccount.User.Id)
                 }));
         }
-        
+
         /// <summary>
         /// Reads an existing dermatologist employed in the pharmacy.
         /// </summary>
@@ -180,7 +178,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.ReadForPharmacy(pharmacyId, dermatologistId));
         }
-        
+
         /// <summary>
         /// Reads an existing absence requests in the pharmacy.
         /// </summary>
@@ -190,7 +188,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_absenceRequestService.ReadFor(pharmacyId));
         }
-        
+
         /// <summary>
         /// Reads an existing absence requests page in the pharmacy.
         /// </summary>
@@ -214,7 +212,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacyStockService.ReadForPharmacyInStock(pharmacyId));
         }
-        
+
         /// <summary>
         /// Searches through all medicines that are in stock in the pharmacy.
         /// </summary>
@@ -224,7 +222,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacyStockService.SearchForPharmacyInStock(pharmacyId, name));
         }
-        
+
         /// <summary>
         /// Add an existing medicine to the pharmacy.
         /// </summary>
@@ -240,7 +238,7 @@ namespace Farmacio_API.Controllers
             _medicineService.TryToRead(pharmacyMedicine.MedicineId);
             return Ok(_pharmacyStockService.Create(pharmacyMedicine));
         }
-        
+
         /// <summary>
         /// Remove an existing medicine from the pharmacy.
         /// </summary>
@@ -263,7 +261,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.AddToPharmacy(pharmacyId, dermatologistId, _mapper.Map<WorkTime>(workTime)));
         }
-        
+
         /// <summary>
         /// Remove dermatologist from the pharmacy.
         /// </summary>
@@ -275,7 +273,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_dermatologistService.RemoveFromPharmacy(pharmacyId, dermatologistId));
         }
-        
+
         /// <summary>
         /// Reads all existing appointments in the pharmacy.
         /// </summary>
@@ -285,7 +283,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_appointmentService.ReadForDermatologistsInPharmacy(pharmacyId));
         }
-        
+
         /// <summary>
         /// Reads existing dermatologists appointments page in the pharmacy.
         /// </summary>
@@ -304,6 +302,7 @@ namespace Farmacio_API.Controllers
         /// Creates a new pharmacy in the system.
         /// </summary>
         /// <response code="200">Returns created pharmacy.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPost]
         public IActionResult CreatePharmacy(CreatePharmacyRequest request)
         {
@@ -312,14 +311,20 @@ namespace Farmacio_API.Controllers
 
             return Ok(pharmacy);
         }
-        
+
         /// <summary>
         /// Updates an existing pharmacy in the system.
         /// </summary>
         /// <response code="200">Updated pharmacy.</response>
+        [Authorize(Roles = "SystemAdmin, PharmacyAdmin")]
         [HttpPut]
         public IActionResult UpdatePharmacy(UpdatePharmacyRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(IsPharmacyAdmin.Of(request.Id))
+                                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                                .Authorize();
+
             var pharmacy = _mapper.Map<Pharmacy>(request);
             return Ok(_pharmacyService.Update(pharmacy));
         }
@@ -329,6 +334,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted pharmacy.</response>
         /// <response code="401">Unable to delete pharmacy because it does not exist in the system.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePharmacy(Guid id)
         {
@@ -356,9 +362,7 @@ namespace Farmacio_API.Controllers
         {
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);
             return Ok(_pharmacyService.GetPharmaciesOfPharmacists(pharmacists.ToList(), searchParams));
-            
         }
-
 
         /// <summary>
         /// Returns available pharmacist from pharmacy.

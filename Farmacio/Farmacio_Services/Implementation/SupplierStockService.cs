@@ -1,7 +1,9 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
+using Farmacio_Services.Implementation.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,6 +62,11 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<SupplierMedicine> ReadFor(Guid supplierId)
         {
             return Read().Where(supplierMedicine => supplierMedicine.SupplierId == supplierId).ToList();
+        }
+
+        public IEnumerable<SupplierMedicine> ReadPageOfMedicinesFor(Guid supplierId, PageDTO page)
+        {
+            return PaginationUtils<SupplierMedicine>.Page(ReadFor(supplierId), page);
         }
     }
 }

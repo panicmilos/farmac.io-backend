@@ -7,5 +7,10 @@ namespace Farmacio_API.Authorization
         public HttpContext HttpContext { get; set; }
 
         public abstract bool IsAuthorized();
+
+        protected T GetService<T>()
+        {
+            return (T)HttpContext.RequestServices.GetService(typeof(T));
+        }
     }
 }

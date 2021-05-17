@@ -1,6 +1,8 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -43,6 +45,11 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<ComplaintAnswer> ReadBy(Guid writerId)
         {
             return Read().Where(answer => answer.WriterId == writerId).ToList();
+        }
+
+        public IEnumerable<ComplaintAnswer> ReadPagesToOfAnswersBy(Guid writerId, PageDTO page)
+        {
+            return PaginationUtils<ComplaintAnswer>.PagesTo(ReadBy(writerId), page);
         }
 
         private bool HasSystemAdminAnsweredComplaint(Guid systemAdminId, Guid complaintId)

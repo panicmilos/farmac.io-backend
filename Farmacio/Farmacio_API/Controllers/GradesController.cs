@@ -50,7 +50,6 @@ namespace Farmacio_API.Controllers
             return Ok(_medicalStaffGradeService.GradeMedicalStaff(medicalStaffGrade));
         }
 
-
         /// <summary>
         /// Reads an existing dermatologist in the system that patietn can rate.
         /// </summary>
@@ -138,7 +137,6 @@ namespace Farmacio_API.Controllers
             return Ok(_medicineGradeService.Create(medicineGrade));
         }
 
-
         /// <summary>
         /// Reads medicines that patient can rate.
         /// </summary>
@@ -171,7 +169,6 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacyGradeService.ReadThatPatientCanRate(patientId));
         }
-
 
         /// <summary>
         /// Change medical staff's grade.
@@ -292,7 +289,8 @@ namespace Farmacio_API.Controllers
         [HttpGet("{patientId}/rated-pharmacists")]
         public IActionResult GetRatedPharmacists(Guid patientId)
         {
-            return Ok(_medicalStaffGradeService.ReadPharmacistsThatPatientRated(patientId).Select(pharmacist => {
+            return Ok(_medicalStaffGradeService.ReadPharmacistsThatPatientRated(patientId).Select(pharmacist =>
+            {
                 var grade = _medicalStaffGradeService.Read(patientId, pharmacist.UserId);
                 return new MedicalStafftWithGradeResponse
                 {

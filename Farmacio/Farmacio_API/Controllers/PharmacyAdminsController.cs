@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -27,6 +30,7 @@ namespace Farmacio_API.Controllers
         /// Returns all pharmacy admins from the system.
         /// </summary>
         /// <response code="200">Returns list of pharmacy admins.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet]
         public IEnumerable<Account> GetPharmacyAdmins()
         {
@@ -34,13 +38,30 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
+        /// Returns page of pharmacy admins from the system.
+        /// </summary>
+        /// <response code="200">Returns page of pharmacy admins.</response>
+        [Authorize(Roles = "SystemAdmin")]
+        [HttpGet("page")]
+        public IEnumerable<Account> GetPharmacyAdminsPage([FromQuery] PageDTO page)
+        {
+            return _pharmacyAdminService.ReadPageOf(Role.PharmacyAdmin, page);
+        }
+
+        /// <summary>
         /// Returns pharmacy admin specified by id.
         /// </summary>
         /// <response code="200">Returns pharmacy admin.</response>
         /// <response code="404">Unable to return pharmacy admin because it does not exist in the system.</response>
+        [Authorize(Roles = "SystemAdmin, PharmacyAdmin")]
         [HttpGet("{id}")]
         public IActionResult GetPharmacyAdmin(Guid id)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(AccountSpecific.For(id))
+                    .Or(AllDataAllowed.For(Role.SystemAdmin))
+                    .Authorize();
+
             return Ok(_pharmacyAdminService.TryToRead(id));
         }
 
@@ -50,6 +71,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns created pharmacy admin.</response>
         /// <response code="400">Unable to create pharmacy admin because username or email is already taken.</response>
         /// <response code="404">Unable to create pharmacy admin because pharmacy does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPost]
         public IActionResult CreatePharmacyAdmin(CreatePharmacyAdminRequest request)
         {
@@ -64,9 +86,15 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated pharmacist.</response>
         /// <response code="404">Unable to update pharmacy admin because pharmacy or admin does not exist.</response>
+        [Authorize(Roles = "SystemAdmin, PharmacyAdmin")]
         [HttpPut]
         public IActionResult UpdatePharmacyAdmin(UpdatePharmacyAdminRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(request.Account.Id))
+                                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                                .Authorize();
+
             var pharmacyAdmin = _mapper.Map<Account>(request);
             var updatedPharmacyAdmin = _pharmacyAdminService.Update(pharmacyAdmin);
 
@@ -78,6 +106,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted pharmacy admin.</response>
         /// <response code="404">Unable to delete pharmacy admin because he does not exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePharmacyAdmin(Guid id)
         {

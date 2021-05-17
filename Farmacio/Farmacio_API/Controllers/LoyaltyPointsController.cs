@@ -2,8 +2,8 @@
 using Farmacio_API.Contracts.Requests.LoyaltyPoints;
 using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Farmacio_API.Controllers
 {
@@ -27,6 +27,7 @@ namespace Farmacio_API.Controllers
         /// Returns loyalty points from the system.
         /// </summary>
         /// <response code="200">Returns loyalty points.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpGet]
         public IActionResult GetLoyaltyPoints()
         {
@@ -38,6 +39,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns updated loyalty points.</response>
         /// <response code="404">Given medicine doesn't exist.</response>
+        [Authorize(Roles = "SystemAdmin")]
         [HttpPut]
         public IActionResult UpdateLoyaltyPoints(UpdateLoyaltyPointsRequest request)
         {

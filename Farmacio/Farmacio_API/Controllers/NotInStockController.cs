@@ -1,9 +1,8 @@
-﻿using System;
-using AutoMapper;
-using Farmacio_API.Contracts.Requests.AbsenceRequests;
-using Farmacio_Models.DTO;
+﻿using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_API.Controllers
 {
@@ -27,7 +26,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_notInStockService.ReadFor(pharmacyId));
         }
-        
+
         /// <summary>
         /// Filters not in stock records page by seen status in a pharmacy.
         /// </summary>

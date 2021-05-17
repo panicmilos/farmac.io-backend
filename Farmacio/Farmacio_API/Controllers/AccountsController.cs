@@ -1,6 +1,5 @@
-﻿using AutoMapper;
+﻿using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Accounts;
-using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +12,11 @@ namespace Farmacio_API.Controllers
     [Produces("application/json")]
     public class AccountsController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
 
-        public AccountsController(IAccountService accountService, IMapper mapper)
+        public AccountsController(IAccountService accountService)
         {
             _accountService = accountService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -32,6 +29,10 @@ namespace Farmacio_API.Controllers
         [HttpPut("{id}/password")]
         public IActionResult ChangePassword(Guid id, ChangePasswordRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(id))
+                                .Authorize();
+
             return Ok(_accountService.ChangePasswordFor(id, request.CurrentPassword, request.NewPassword));
         }
     }

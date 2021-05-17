@@ -1,9 +1,11 @@
 ﻿using EmailService.Constracts;
 using EmailService.Models;
 using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -151,14 +153,14 @@ namespace Farmacio_Services.Implementation
                 throw new DuplicateOfferException("You cannot give offer for same order twice.");
             }
 
-            if (order.IsProcessed)
+            if (order.OffersDeadline < DateTime.Now)
             {
-                throw new OrderIsAlreadyProcessedException("You cannot give offer for the order that has already been processed.");
+                throw new BadLogicException("You cannot give offer after offers deadline.");
             }
 
-            if (offer.DeliveryDeadline > order.OffersDeadline)
+            if (offer.DeliveryDeadline <= 0)
             {
-                throw new DeliveryDateIsAfterDeadlineException("Delivery date must be before deadline.");
+                throw new BadLogicException("Delivery deadline time must be at least one hour after order is processed.");
             }
 
             ValidateSupplierStockForOffer(supplier.Id, order.OrderedMedicines);
@@ -171,14 +173,14 @@ namespace Farmacio_Services.Implementation
         {
             var existingOffer = TryToRead(offer.Id);
 
-            if (existingOffer.PharmacyOrder.IsProcessed)
+            if (existingOffer.PharmacyOrder.OffersDeadline < DateTime.Now)
             {
-                throw new OrderIsAlreadyProcessedException("You cannot change offer for the order that has already been processed.");
+                throw new BadLogicException("You cannot change offer after offers deadline.");
             }
 
-            if (offer.DeliveryDeadline > existingOffer.PharmacyOrder.OffersDeadline)
+            if (offer.DeliveryDeadline <= 0)
             {
-                throw new DeliveryDateIsAfterDeadlineException("Delivery date must be before deadline.");
+                throw new DeliveryDateIsAfterDeadlineException("Delivery deadline time must be at least one hour after order is processed.");
             }
 
             existingOffer.TotalPrice = offer.TotalPrice;
@@ -219,6 +221,11 @@ namespace Farmacio_Services.Implementation
             }
 
             return ReadFor(supplierId).Where(offer => offer.Status == status);
+        }
+
+        public IEnumerable<SupplierOffer> ReadPageOfOffersByStatusFor(Guid supplierId, OfferStatus? status, PageDTO page)
+        {
+            return PaginationUtils<SupplierOffer>.Page(ReadByStatusFor(supplierId, status), page);
         }
     }
 }
