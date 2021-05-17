@@ -6,7 +6,6 @@ using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
-using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
@@ -42,7 +41,7 @@ namespace Farmacio_Services.Implementation
                 });
         }
 
-        public IEnumerable<PatientDTO> ReadSortedPatientsForMedicalStaff(Guid medicalAccountId, string crit, bool isAsc)
+        private IEnumerable<PatientDTO> SortPatientDTOs(IEnumerable<PatientDTO> patients, string sortCriteria, bool isAscending)
         {
             var sortingCriteria = new Dictionary<string, Func<PatientDTO, object>>()
             {
@@ -50,9 +49,8 @@ namespace Farmacio_Services.Implementation
                 { "lastName", p => p.LastName },
                 { "appointmentDate", p => p.AppointmentDate }
             };
-            var patients = ReadPatientsForMedicalStaff(medicalAccountId);
-            if (sortingCriteria.TryGetValue(crit ?? "", out var sortCrit))
-                patients = isAsc ? patients.OrderBy(sortCrit) : patients.OrderByDescending(sortCrit);
+            if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortCrit))
+                patients = isAscending ? patients.OrderBy(sortCrit) : patients.OrderByDescending(sortCrit);
             return patients;
         }
 
@@ -73,13 +71,6 @@ namespace Farmacio_Services.Implementation
             return PaginationUtils<Account>.Page(ReadBy(filterParams), pageDto);
         }
 
-        public IEnumerable<PatientDTO> SearchPatientsForMedicalStaff(Guid medicalAccountId, string name)
-        {
-            return ReadPatientsForMedicalStaff(medicalAccountId).Where(p =>
-                name == null ||
-                $"{p.FirstName.ToLower()} {p.LastName.ToLower()}".Contains(name.ToLower()));
-        }
-
         public Account UpdateGrade(MedicalStaff medicalStaff)
         {
             var staffAccount = ReadByUserId(medicalStaff.Id);
@@ -88,6 +79,19 @@ namespace Farmacio_Services.Implementation
             staffUser.AverageGrade = medicalStaff.AverageGrade;
             staffAccount.User = staffUser;
             return base.Update(staffAccount);
+        }
+
+        public IEnumerable<PatientDTO> ReadPatientsForMedicalStaffBy(Guid medicalAccountId, PatientSearchParams searchParams)
+        {
+            var (name, sortCriteria, isAscending) = searchParams;
+            var patients = ReadPatientsForMedicalStaff(medicalAccountId).Where(p =>
+                string.IsNullOrEmpty(name) ||  $"{p.FirstName.ToLower()} {p.LastName.ToLower()}".Contains(name.ToLower()));
+            return SortPatientDTOs(patients, sortCriteria, isAscending);
+        }
+
+        public IEnumerable<PatientDTO> ReadPageOfPatientsForMedicalStaffBy(Guid medicalAccountId, PatientSearchParams searchParams, PageDTO pageDTO)
+        {
+            return PaginationUtils<PatientDTO>.Page(ReadPatientsForMedicalStaffBy(medicalAccountId, searchParams), pageDTO);
         }
     }
 }
