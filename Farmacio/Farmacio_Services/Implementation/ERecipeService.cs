@@ -198,5 +198,10 @@ namespace Farmacio_Services.Implementation
         {
             return Read().FirstOrDefault(reservation => reservation.UniqueId == id) == default;
         }
+
+        public IEnumerable<ERecipeDTO> SortForPageTo(Guid patientId, ERecipesSortFilterParams sortFilterParams, PageDTO pageDTO)
+        {
+            return PaginationUtils<ERecipeDTO>.Page(SortFor(patientId, sortFilterParams), pageDTO);
+        }
     }
 }

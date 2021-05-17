@@ -1,6 +1,8 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -129,6 +131,16 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<Account> ReadPharmacistsThatPatientRated(Guid patientId)
         {
             return _pharmacistService.Read().Where(pharmacist => DidPatientGradeMedicalStaff(patientId, pharmacist.UserId)).ToList();
+        }
+
+        public IEnumerable<Account> ReadPharmacistsThatPatientRatedPageTo(Guid patientId, PageDTO pageDTO)
+        {
+            return PaginationUtils<Account>.Page(ReadPharmacistsThatPatientRated(patientId), pageDTO);
+        }
+
+        public IEnumerable<Account> ReadDermatologistThatPatientRatedPageTo(Guid patientId, PageDTO pageDTO)
+        {
+            return PaginationUtils<Account>.Page(ReadDermatologistThatPatientRated(patientId), pageDTO);
         }
     }
 }

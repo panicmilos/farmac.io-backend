@@ -126,9 +126,13 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Added allergies.</response>
         /// <response code="404">Given medicine does not exist in the system.</response>
         /// <response code="400">Given allergy already exists in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpPost("add-allergies")]
         public IActionResult CreateAllergies(PatientAllergyDTO request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(AccountSpecific.For(request.patientId))
+                .Authorize();
             return Ok(_patientAllergyService.CreateAllergies(request));
         }
 
@@ -137,9 +141,13 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Patients allergies.</response>
         /// <response code="404">Given patient does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("patients-allergies/{patientId}")]
         public IActionResult GedPatientsAllergies(Guid patientId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(AccountSpecific.For(patientId))
+                .Authorize();
             return Ok(_patientAllergyService.GetPatientsAllergies(patientId));
         }
 
@@ -205,9 +213,13 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns deleted patient allergy object.</response>
         /// <response code="404">Given allergy does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpDelete("{patientId}/allergy/{medicineId}")]
         public IActionResult DeleteAllergy(Guid patientId, Guid medicineId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(AccountSpecific.For(patientId))
+                .Authorize();
             return Ok(_patientAllergyService.Delete(patientId, medicineId));
         }
 
@@ -216,10 +228,25 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns patient's eRecipes.</response>
         /// <response code="404">Given patient does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("{patientUserId}/eRecipes/sort")]
         public IActionResult SortERecipes(Guid patientUserId, [FromQuery] ERecipesSortFilterParams sortFilterParams)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientUserId))
+                .Authorize();
             return Ok(_eRecipeService.SortFor(patientUserId, sortFilterParams));
+        }
+
+        /// <summary>
+        /// Returns patient's eRecipes for n-th page.
+        /// </summary>
+        /// <response code="200">Returns patient's eRecipes.</response>
+        /// <response code="404">Given patient does not exist in the system.</response>
+        [HttpGet("{patientUserId}/eRecipes/sort/page")]
+        public IActionResult SortERecipesPageTo(Guid patientUserId, [FromQuery] ERecipesSortFilterParams sortFilterParams, [FromQuery] PageDTO pageDTO)
+        {
+            return Ok(_eRecipeService.SortForPageTo(patientUserId, sortFilterParams, pageDTO));
         }
     }
 }

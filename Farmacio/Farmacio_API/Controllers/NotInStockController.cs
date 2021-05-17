@@ -1,9 +1,10 @@
-﻿using Farmacio_Services.Contracts;
+﻿using Farmacio_Models.DTO;
+using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using Farmacio_API.Authorization;
-using Farmacio_Models.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_API.Controllers
 {

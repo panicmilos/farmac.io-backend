@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using Farmacio_Models.DTO;
-using Microsoft.AspNetCore.Authorization;
-using Farmacio_API.Authorization;
 
 namespace Farmacio_API.Controllers
 {
