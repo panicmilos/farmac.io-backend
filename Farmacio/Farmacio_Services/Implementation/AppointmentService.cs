@@ -305,6 +305,8 @@ namespace Farmacio_Services.Implementation
             if (patientAccount == null)
                 throw new MissingEntityException("The given patient does not exist in the system.");
 
+            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
+
             if (pharmacist.PharmacyId != appointmentDTO.PharmacyId)
                 throw new BadLogicException("Pharmacist must work in that pharmacy.");
 
@@ -312,8 +314,6 @@ namespace Farmacio_Services.Implementation
                 "Pharmacist already has an appointment defined on the given date-time.");
 
             ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
-
-            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
             var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
             var price = appointmentDTO.PatientId != null

@@ -241,6 +241,7 @@ public static class SeedDb
 
         var pharmacy2 = new Pharmacy
         {
+            Id = new Guid("08d8f514-577c-4a9f-8d0c-b863603902e4"),
             Name = "Viva Farm",
             Address = address2,
             Description = "Tu smo da zajedno sa vama uti�emo na o�uvanje dobog zdravlja i spre�avanje razvoja bolesti za koje postoji rizik ili predispozicija.",
@@ -524,6 +525,7 @@ public static class SeedDb
 
         var pharmacist2 = new Pharmacist
         {
+            Id = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd61"),
             FirstName = "Jelena",
             LastName = "Petrovic",
             DateOfBirth = DateTime.Now.AddYears(-27),
@@ -599,7 +601,7 @@ public static class SeedDb
 
         var appointment1 = new Appointment
         {
-            DateTime = DateTime.Now,
+            DateTime = new DateTime(2022, 6, 30, 9, 0, 0),
             Duration = 30,
             MedicalStaff = dermatologist1,
             IsReserved = true,
@@ -624,6 +626,17 @@ public static class SeedDb
             DateTime = DateTime.Now.AddDays(-2),
             Duration = 30,
             MedicalStaff = dermatologist1,
+            IsReserved = true,
+            Patient = patient3,
+            Pharmacy = pharmacy2,
+            Price = 1200,
+        };
+
+        var appointment4 = new Appointment
+        {
+            DateTime = new DateTime(2022, 7, 1, 9, 0, 0),
+            Duration = 30,
+            MedicalStaff = pharmacist2,
             IsReserved = true,
             Patient = patient3,
             Pharmacy = pharmacy2,
@@ -670,6 +683,7 @@ public static class SeedDb
         AddIFNotDuplicate(context, appointment1);
         AddIFNotDuplicate(context, appointment2);
         AddIFNotDuplicate(context, appointment3);
+        AddIFNotDuplicate(context, appointment4);
 
         AddIFNotDuplicate(context, notInStock1);
         AddIFNotDuplicate(context, notInStock2);
