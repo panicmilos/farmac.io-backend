@@ -305,6 +305,8 @@ namespace Farmacio_Services.Implementation
             if (patientAccount == null)
                 throw new MissingEntityException("The given patient does not exist in the system.");
 
+            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
+
             if (pharmacist.PharmacyId != appointmentDTO.PharmacyId)
                 throw new BadLogicException("Pharmacist must work in that pharmacy.");
 
@@ -312,8 +314,6 @@ namespace Farmacio_Services.Implementation
                 "Pharmacist already has an appointment defined on the given date-time.");
 
             ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
-
-            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
             var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
             var price = appointmentDTO.PatientId != null
@@ -443,6 +443,21 @@ namespace Farmacio_Services.Implementation
             }
             return ReadForPatient(patientId).Where(appointment =>
                 appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Pharmacist);
+        }
+
+        public IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDto)
+        {
+            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitingPharmacists(patientId), pageDto);
+        }
+
+        public IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO)
+        {
+            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitsToDermatologist(patientId), pageDTO);
+        }
+
+        public IEnumerable<Appointment> SortAppointmentsPageTo(IEnumerable<Appointment> appointments, string criteria, bool isAsc, PageDTO pageDTO)
+        {
+            return PaginationUtils<Appointment>.Page(SortAppointments(appointments, criteria, isAsc), pageDTO);
         }
     }
 }

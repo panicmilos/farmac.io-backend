@@ -2,6 +2,7 @@
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -122,6 +123,11 @@ namespace Farmacio_Services.Implementation
                 var medicineGrade = grade as MedicineGrade;
                 return medicineGrade?.PatientId == patientId && medicineGrade?.MedicineId == medicineId;
             }).FirstOrDefault() as MedicineGrade;
+        }
+
+        public IEnumerable<Medicine> ReadMedicinesThatPatientRatedPageTo(Guid patientId, PageDTO pageDTO)
+        {
+            return PaginationUtils<Medicine>.Page(ReadMedicinesThatPatientRated(patientId), pageDTO);
         }
     }
 }

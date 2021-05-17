@@ -2,6 +2,7 @@
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Farmacio_Models.DTO;
 
 namespace Farmacio_API.Controllers
 {

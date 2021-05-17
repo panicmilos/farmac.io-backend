@@ -247,5 +247,15 @@ namespace Farmacio_Services.Implementation
                 _pharmacyStockService.Update(medicineStock);
             }
         }
+
+        public IEnumerable<SmallPharmacyDTO> ReadPagesToBy(PharmacySearchParams searchParams, PageDTO pageDTO)
+        {
+            return PaginationUtils<SmallPharmacyDTO>.PagesTo(ReadBy(searchParams), pageDTO);
+        }
+
+        public IEnumerable<PharmacyDTO> GetPharmaciesOfPharmacistsPagesTo(IList<Account> pharmacists, SearhSortParamsForAppointments searchParams, PageDTO pageDTO)
+        {
+            return PaginationUtils<PharmacyDTO>.Page(GetPharmaciesOfPharmacists(pharmacists, searchParams), pageDTO);
+        }
     }
 }
