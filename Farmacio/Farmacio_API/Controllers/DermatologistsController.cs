@@ -67,6 +67,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing dermatologists in the system with their work places.
         /// </summary>
         /// <response code="200">Read dermatologists with their work places.</response>
+        [Authorize(Roles = "Patient, SystemAdmin, PharmacyAdmin")]
         [HttpGet("with-work-places")]
         public IActionResult GetDermatologistsWithWorkPlaces()
         {
@@ -81,6 +82,7 @@ namespace Farmacio_API.Controllers
         /// Search all existing dermatologists in the system with their work places.
         /// </summary>
         /// <response code="200">Searched dermatologists with their work places.</response>
+        [Authorize(Roles = "Patient, SystemAdmin, PharmacyAdmin")]
         [HttpGet("with-work-places/search")]
         public IActionResult SearchDermatologistsWithWorkPlaces(string name)
         {
@@ -95,6 +97,7 @@ namespace Farmacio_API.Controllers
         /// Filter all existing dermatologists in the system with their work places.
         /// </summary>
         /// <response code="200">Filtered dermatologists with their work places.</response>
+        [Authorize(Roles = "Patient, SystemAdmin, PharmacyAdmin")]
         [HttpGet("with-work-places/filter")]
         public IActionResult FilterDermatologistsWithWorkPlaces([FromQuery] MedicalStaffFilterParamsDTO filterParams)
         {

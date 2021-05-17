@@ -2,11 +2,13 @@
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.PharmacyOrders;
 using Farmacio_API.Contracts.Requests.Promotions;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Farmacio_API.Controllers
 {
@@ -84,9 +86,13 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created promotion.</response>
         /// <response code="400">Invalid time interval or discount.</response>
         /// <response code="404">Pharmacy not found.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPost("/pharmacy/{pharmacyId}/promotions")]
         public IActionResult CreatePharmacyPromotion(Guid pharmacyId, CreatePromotionRequest promotionRequest)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             var promotion = _mapper.Map<Promotion>(promotionRequest);
             promotion.PharmacyId = pharmacyId;
 
@@ -99,9 +105,18 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Updated promotion.</response>
         /// <response code="400">Invalid time interval or discount.</response>
         /// <response code="404">Pharmacy not found.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPut("/pharmacy/{pharmacyId}/promotions")]
         public IActionResult UpdatePharmacyPromotion(Guid pharmacyId, UpdatePromotionRequest promotionRequest)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
+            _pharmacyService.TryToRead(pharmacyId);
+            var existingPromotion = _promotionService.TryToRead(promotionRequest.Id);
+            if(existingPromotion.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("Promotion does not belong to the given pharmacy.");
+            
             var promotion = _mapper.Map<Promotion>(promotionRequest);
             promotion.PharmacyId = pharmacyId;
 
@@ -113,10 +128,18 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Deleted promotion.</response>
         /// <response code="404">Pharmacy not found.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpDelete("/pharmacy/{pharmacyId}/promotions/{promotionId}")]
         public IActionResult DeletePharmacyPromotion(Guid pharmacyId, Guid promotionId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
+            var existingPromotion = _promotionService.TryToRead(promotionId);
+            if(existingPromotion.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("Promotion does not belong to the given pharmacy.");
+            
             return Ok(_promotionService.Delete(promotionId));
         }
     }

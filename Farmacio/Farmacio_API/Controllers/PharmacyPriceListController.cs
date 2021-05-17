@@ -4,6 +4,8 @@ using Farmacio_Models.Domain;
 using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Farmacio_API.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Farmacio_API.Controllers
 {
@@ -56,9 +58,13 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created pharmacy price list.</response>
         /// <response code="404">Medicine or Pharmacy not found.</response>
         /// <response code="400">Pharmacy price list for the given pharmacy already exists.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPost("/pharmacy/{pharmacyId}/price-list")]
         public IActionResult CreatePharmacyPriceList(Guid pharmacyId, CreatePharmacyPriceListRequest pharmacyPriceListRequest)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             var pharmacyPriceList = _mapper.Map<PharmacyPriceList>(pharmacyPriceListRequest);
             _pharmacyService.TryToRead(pharmacyPriceList.PharmacyId);
             pharmacyPriceList.MedicinePriceList.ForEach(orderedMedicine =>
@@ -73,13 +79,20 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Updated pharmacy price list.</response>
         /// <response code="404">Medicine, PharmacyPriceList or Pharmacy not found.</response>
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPut("/pharmacy/{pharmacyId}/price-list")]
         public IActionResult UpdatePharmacyPriceList(Guid pharmacyId, UpdatePharmacyPriceListRequest pharmacyPriceListsRequest)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             var pharmacyPriceList = _mapper.Map<PharmacyPriceList>(pharmacyPriceListsRequest);
             _pharmacyService.TryToRead(pharmacyPriceList.PharmacyId);
             pharmacyPriceList.MedicinePriceList.ForEach(orderedMedicine =>
                 _medicineService.TryToRead(orderedMedicine.MedicineId));
+            var existingPharmacyPriceList = _pharmacyPriceListService.TryToRead(pharmacyPriceList.Id);
+            if(existingPharmacyPriceList.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("The given price list does not belong to the provided pharmacy.");
             pharmacyPriceList.PharmacyId = pharmacyId;
 
             return Ok(_pharmacyPriceListService.Update(pharmacyPriceList));
