@@ -5,10 +5,7 @@ using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using Farmacio_API.Authorization;
-using Farmacio_API.Contracts.Requests.PharmacyOrders;
-using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
-using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Farmacio_API.Controllers

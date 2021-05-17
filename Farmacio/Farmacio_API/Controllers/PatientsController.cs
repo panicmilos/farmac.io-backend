@@ -45,9 +45,13 @@ namespace Farmacio_API.Controllers
         /// Reads all medical staff's patients.
         /// </summary>
         /// <response code="200">Read patients.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpGet("my-patients/{medicalAccountId}")]
         public IActionResult GetPatientsForMedicalStaff(Guid medicalAccountId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(medicalAccountId))
+                                .Authorize();
             return Ok(_medicalStaffService.ReadPatientsForMedicalStaff(medicalAccountId));
         }
 
@@ -55,9 +59,13 @@ namespace Farmacio_API.Controllers
         /// Reads medical staff's patients for n-th page.
         /// </summary>
         /// <response code="200">Sort patients.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpGet("my-patients/{medicalAccountId}/page")]
         public IActionResult GetPatientsForMedicalStaffPageTo(Guid medicalAccountId, [FromQuery] PatientSearchParams searchParams, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(medicalAccountId))
+                                .Authorize();
             return Ok(_medicalStaffService.ReadPageOfPatientsForMedicalStaffBy(medicalAccountId, searchParams, pageDTO));
         }
 
@@ -65,9 +73,13 @@ namespace Farmacio_API.Controllers
         /// Searches medical staff's patients.
         /// </summary>
         /// <response code="200">Search patients.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpGet("my-patients/{medicalAccountId}/search")]
         public IActionResult SearchPatientsForMedicalStaff(Guid medicalAccountId, [FromQuery] PatientSearchParams searchParams)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(AccountSpecific.For(medicalAccountId))
+                                .Authorize();
             return Ok(_medicalStaffService.ReadPatientsForMedicalStaffBy(medicalAccountId, searchParams));
         }
 

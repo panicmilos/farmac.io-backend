@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Appointments;
 using Microsoft.AspNetCore.Authorization;
-using Farmacio_API.Authorization;
 
 namespace Farmacio_API.Controllers
 {
@@ -177,15 +176,21 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created report.</response>
         /// <response code="404">Appointment not found.</response>
         /// <response code="400">Unable to create report for not reserved appointment.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpPost("{appointmentId}/report")]
         public IActionResult CreateReport(Guid appointmentId, CreateReportRequest request)
         {
+            var appointment = _appointmentService.TryToRead(appointmentId);
+
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(appointment.MedicalStaffId))
+                                .Authorize();
+
             var reportDTO = _mapper.Map<CreateReportDTO>(request);
             reportDTO.AppointmentId = appointmentId;
 
             var createdReport = _appointmentService.CreateReport(reportDTO);
 
-            var appointment = _appointmentService.Read(appointmentId);
             _loyaltyPointsService.GivePointsFor(appointment);
 
             return Ok(createdReport);
@@ -195,9 +200,13 @@ namespace Farmacio_API.Controllers
         /// Returns medical staff's appointments that are reserved but not reported.
         /// </summary>
         /// <response code="200">Returns appointments.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpGet("my-appointments/{medicalStaffId}")]
         public IActionResult GetAppointmentsForMedicalStaff(Guid medicalStaffId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                               .Rule(UserSpecific.For(medicalStaffId))
+                               .Authorize();
             return Ok(_appointmentService.ReadReservedButUnreportedForMedicalStaff(medicalStaffId));
         }
 
@@ -207,9 +216,16 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created report.</response>
         /// <response code="404">Appointment not found.</response>
         /// <response code="400">Unable to create report for not reserved appointment.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpPost("{appointmentId}/not-show-up")]
         public IActionResult NotePatientDidNotShowUp(Guid appointmentId, CreateReportRequest request)
         {
+            var appointment = _appointmentService.TryToRead(appointmentId);
+
+            AuthorizationRuleSet.For(HttpContext)
+                                .Rule(UserSpecific.For(appointment.MedicalStaffId))
+                                .Authorize();
+
             var reportDTO = _mapper.Map<CreateReportDTO>(request);
             reportDTO.AppointmentId = appointmentId;
             return Ok(_appointmentService.NotePatientDidNotShowUp(reportDTO));
@@ -272,21 +288,29 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created appointment.</response>
         /// <response code="404">Something not found.</response>
         /// <response code="400">Invalid date-time and duration.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpPost("another")]
         public IActionResult CreateAnotherAppointment(CreateAppointmentRequest request)
         {
-            var appointment = _mapper.Map<CreateAppointmentDTO>(request);
-            _appointmentService.CreateAnotherAppointmentByMedicalStaff(appointment);
-            return Ok(appointment);
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(request.MedicalStaffId))
+                .Authorize();
+            var appointmentDTO = _mapper.Map<CreateAppointmentDTO>(request);
+            _appointmentService.CreateAnotherAppointmentByMedicalStaff(appointmentDTO);
+            return Ok(appointmentDTO);
         }
 
         /// <summary>
         /// Returns medical staff's appointments for work calendar.
         /// </summary>
         /// <response code="200">Returns appointments.</response>
+        [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpGet("for-calendar/{medicalStaffId}")]
         public IActionResult GetAppointmentsForCalendar(Guid medicalStaffId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(medicalStaffId))
+                .Authorize();
             return Ok(_appointmentService.ReadAppointmentsForCalendar(medicalStaffId));
         }
 
