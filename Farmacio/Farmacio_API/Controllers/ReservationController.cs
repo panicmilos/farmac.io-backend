@@ -1,8 +1,10 @@
 using AutoMapper;
+using Farmacio_API.Authorization;
 using Farmacio_API.Contracts.Requests.Reservations;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -25,18 +27,28 @@ namespace Farmacio_API.Controllers
             _mapper = mapper;
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpPost]
         public IActionResult CreateReservation(CreateReservationRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                    .Rule(UserSpecific.For(request.PatientId))
+                    .Authorize();
+
             var reservation = _mapper.Map<Reservation>(request);
             _reservationService.CreateReservation(reservation, false);
 
             return Ok();
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpGet("futureReservations/{patientId}")]
         public IEnumerable<SmallReservationDTO> GetPatientsFutureReservations(Guid patientId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
             return _reservationService.ReadPatientReservations(patientId);
         }
 
@@ -47,9 +59,16 @@ namespace Farmacio_API.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpGet("reservedMedicines/{reservationId}")]
         public IEnumerable<SmallReservedMedicineDTO> GetMedicinesForReservation(Guid reservationId)
         {
+            var reservation = _reservationService.TryToRead(reservationId);
+
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(reservation.PatientId))
+                .Authorize();
+
             return _reservationService.ReadMedicinesForReservation(reservationId);
         }
 
