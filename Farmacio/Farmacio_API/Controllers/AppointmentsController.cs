@@ -320,9 +320,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("history-visit-pharmacists/{patientId}/page-to")]
         public IActionResult ReadPatientsHistoryOfVisitngPharmacistsByPageTo(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
             return Ok(_appointmentService.ReadPagesOfPatientHistoryVisitingPharmacists(patientId, pageDTO));
         }
 
@@ -330,9 +335,14 @@ namespace Farmacio_API.Controllers
         /// Sort history of pharmacists visits for n-th page.
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("history-visit-pharmacists/{patientId}/sort/page-to")]
         public IActionResult SortHistoryOfVisitingPharmacistsByPageTo(Guid patientId, string criteria, bool isAsc, PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
             var appointments = _appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId);
             return Ok(_appointmentService.SortAppointmentsPageTo(appointments, criteria, isAsc, pageDTO));
         }
@@ -342,9 +352,14 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("history-with-dermatologists/{patientId}/page-to")]
         public IActionResult ReadPatientsHistoryOfDermatologistsVisitsByPageTo(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
             return Ok(_appointmentService.ReadPageOfPatientHistoryVisitingDermatologists(patientId, pageDTO));
         }
 
@@ -352,9 +367,14 @@ namespace Farmacio_API.Controllers
         /// Sort history of dermatology visits for n-th page.
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("history-with-dermatologists/{patientId}/sort/page-to")]
         public IActionResult SortHistoryOfVisitingDermatologistByPagesTo(Guid patientId, string criteria, bool isAsc, int number, int size)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
             var appointments = _appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId);
             return Ok(_appointmentService.SortAppointmentsPageTo(appointments, criteria, isAsc, new PageDTO
             {
