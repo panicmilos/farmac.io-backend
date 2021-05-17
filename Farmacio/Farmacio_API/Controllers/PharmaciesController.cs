@@ -357,6 +357,7 @@ namespace Farmacio_API.Controllers
         /// Returns pharmacies that have available pharmacists in chosen time.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("available")]
         public IActionResult SearchAvailableForConsultations([FromQuery] SearhSortParamsForAppointments searchParams)
         {
@@ -368,6 +369,7 @@ namespace Farmacio_API.Controllers
         /// Returns available pharmacist from pharmacy.
         /// </summary>
         /// <response code="200">Returns list of pharmacists.</response>
+        [Authorize(Roles = "Patient")]
         [HttpGet("available/{pharmacyId}/pharmacists")]
         public IActionResult GetFreePharmacist(Guid pharmacyId, [FromQuery] SearhSortParamsForAppointments searchParams)
         {
