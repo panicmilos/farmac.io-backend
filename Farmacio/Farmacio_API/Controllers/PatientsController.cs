@@ -45,30 +45,30 @@ namespace Farmacio_API.Controllers
         /// Reads all medical staff's patients.
         /// </summary>
         /// <response code="200">Read patients.</response>
-        [HttpGet("my-patients/{medicalId}")]
-        public IActionResult GetPatientsForMedicalStaff(Guid medicalId)
+        [HttpGet("my-patients/{medicalAccountId}")]
+        public IActionResult GetPatientsForMedicalStaff(Guid medicalAccountId)
         {
-            return Ok(_medicalStaffService.ReadPatientsForMedicalStaff(medicalId));
+            return Ok(_medicalStaffService.ReadPatientsForMedicalStaff(medicalAccountId));
         }
 
         /// <summary>
-        /// Reads and sorts all medical staff's patients.
+        /// Reads medical staff's patients for n-th page.
         /// </summary>
         /// <response code="200">Sort patients.</response>
-        [HttpGet("my-patients/{medicalId}/sort")]
-        public IActionResult GetSortedPatientsForMedicalStaff(Guid medicalId, string crit, bool isAsc)
+        [HttpGet("my-patients/{medicalAccountId}/page")]
+        public IActionResult GetPatientsForMedicalStaffPageTo(Guid medicalAccountId, [FromQuery] PatientSearchParams searchParams, [FromQuery] PageDTO pageDTO)
         {
-            return Ok(_medicalStaffService.ReadSortedPatientsForMedicalStaff(medicalId, crit, isAsc));
+            return Ok(_medicalStaffService.ReadPageOfPatientsForMedicalStaffBy(medicalAccountId, searchParams, pageDTO));
         }
 
         /// <summary>
         /// Searches medical staff's patients.
         /// </summary>
         /// <response code="200">Search patients.</response>
-        [HttpGet("my-patients/{medicalId}/search")]
-        public IActionResult SearchPatientsForMedicalStaff(Guid medicalId, string name)
+        [HttpGet("my-patients/{medicalAccountId}/search")]
+        public IActionResult SearchPatientsForMedicalStaff(Guid medicalAccountId, [FromQuery] PatientSearchParams searchParams)
         {
-            return Ok(_medicalStaffService.SearchPatientsForMedicalStaff(medicalId, name));
+            return Ok(_medicalStaffService.ReadPatientsForMedicalStaffBy(medicalAccountId, searchParams));
         }
 
         /// <summary>
