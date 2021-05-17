@@ -23,6 +23,7 @@ namespace Farmacio_API.Controllers
         private readonly ISupplierService _supplierService;
         private readonly ISupplierStockService _supplierStockService;
         private readonly ISupplierOfferService _supplierOfferService;
+        private readonly IPharmacyOrderService _pharmacyOrderService;
         private readonly ICrudService<SupplierMedicine> _supplierMedicineService;
         private readonly IMapper _mapper;
 
@@ -30,12 +31,14 @@ namespace Farmacio_API.Controllers
             ISupplierService supplierService,
             ISupplierStockService supplierStockService,
             ISupplierOfferService supplierOfferService,
+            IPharmacyOrderService pharmacyOrderService,
             ICrudService<SupplierMedicine> supplierMedicineService,
             IMapper mapper)
         {
             _supplierService = supplierService;
             _supplierStockService = supplierStockService;
             _supplierOfferService = supplierOfferService;
+            _pharmacyOrderService = pharmacyOrderService;
             _supplierMedicineService = supplierMedicineService;
             _mapper = mapper;
         }
@@ -240,6 +243,10 @@ namespace Farmacio_API.Controllers
         [HttpGet("offers/pharmacy-order/{pharmacyOrderId}")]
         public IActionResult GetSuppliersOffersForPharmacyOrder(Guid pharmacyOrderId)
         {
+            var pharmacyOrder = _pharmacyOrderService.TryToRead(pharmacyOrderId);
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyOrder.PharmacyId))
+                .Authorize();
             return Ok(_supplierOfferService.ReadForPharmacyOrder(pharmacyOrderId));
         }
 

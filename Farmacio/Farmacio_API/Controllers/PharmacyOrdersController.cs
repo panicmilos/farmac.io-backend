@@ -38,6 +38,9 @@ namespace Farmacio_API.Controllers
         [HttpGet("/pharmacy/{pharmacyId}/pharmacy-orders/{pharmacyOrderId}")]
         public IActionResult ReadPharmacyOrder(Guid pharmacyId, Guid pharmacyOrderId)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.TryToRead(pharmacyOrderId));
         }
@@ -51,6 +54,9 @@ namespace Farmacio_API.Controllers
         [HttpGet("/pharmacy/{pharmacyId}/pharmacy-orders/filter")]
         public IActionResult FilterPharmacyOrders(Guid pharmacyId, [FromQuery] bool? isProcessed)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.ReadFor(pharmacyId, isProcessed));
         }
@@ -64,6 +70,9 @@ namespace Farmacio_API.Controllers
         [HttpGet("/pharmacy/{pharmacyId}/pharmacy-orders/filter/page")]
         public IActionResult FilterPharmacyOrders(Guid pharmacyId, bool? isProcessed, int number, int size)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.ReadPageFor(pharmacyId, isProcessed, new PageDTO
             {
@@ -104,6 +113,9 @@ namespace Farmacio_API.Controllers
                 .Rule(IsPharmacyAdmin.Of(pharmacyId))
                 .Authorize();
             var pharmacyOrder = _mapper.Map<PharmacyOrder>(pharmacyOrderRequest);
+            var existingPharmacyOrder = _pharmacyOrderService.TryToRead(pharmacyOrder.Id);
+            if(existingPharmacyOrder.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("The given pharmacy order does not belong to the provided pharmacy.");
             pharmacyOrder.PharmacyId = pharmacyId;
 
             return Ok(_pharmacyOrderService.Update(pharmacyOrder));

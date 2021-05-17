@@ -35,7 +35,7 @@ namespace Farmacio_API.Controllers
         [HttpPost("absence-requests/{absenceRequestId}/accept")]
         public IActionResult CreateAbsenceResponse(Guid absenceRequestId)
         {
-            var absenceRequest = _absenceRequestService.Read(absenceRequestId);
+            var absenceRequest = _absenceRequestService.TryToRead(absenceRequestId);
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of(absenceRequest.PharmacyId))
                 .Authorize();
@@ -50,7 +50,7 @@ namespace Farmacio_API.Controllers
         [HttpPost("absence-requests/{absenceRequestId}/decline")]
         public IActionResult CreateAbsenceResponse(Guid absenceRequestId, DeclineAbsenceRequestRequest declineAbsenceRequest)
         {
-            var absenceRequest = _absenceRequestService.Read(absenceRequestId);
+            var absenceRequest = _absenceRequestService.TryToRead(absenceRequestId);
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of(absenceRequest.PharmacyId))
                 .Authorize();
@@ -67,6 +67,9 @@ namespace Farmacio_API.Controllers
         [HttpPost("absence-requests")]
         public IActionResult CreateAbsenceRequest(CreateAbsenceRequestRequest request)
         {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(request.RequesterId))
+                .Authorize();
             var absenceRequest = _mapper.Map<AbsenceRequestDTO>(request);
             return Ok(_absenceRequestService.CreateAbsenceRequest(absenceRequest));
         }

@@ -282,6 +282,9 @@ namespace Farmacio_API.Controllers
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of(pharmacyId))
                 .Authorize();
+            var existingPharmacyMedicine = _pharmacyStockService.TryToRead(pharmacyMedicineId);
+            if(existingPharmacyMedicine.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("The given pharmacy medicine does not belong to the provided pharmacy.");
             return Ok(_pharmacyStockService.Delete(pharmacyMedicineId));
         }
 

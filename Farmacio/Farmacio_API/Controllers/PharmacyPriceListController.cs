@@ -90,6 +90,9 @@ namespace Farmacio_API.Controllers
             _pharmacyService.TryToRead(pharmacyPriceList.PharmacyId);
             pharmacyPriceList.MedicinePriceList.ForEach(orderedMedicine =>
                 _medicineService.TryToRead(orderedMedicine.MedicineId));
+            var existingPharmacyPriceList = _pharmacyPriceListService.TryToRead(pharmacyPriceList.Id);
+            if(existingPharmacyPriceList.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("The given price list does not belong to the provided pharmacy.");
             pharmacyPriceList.PharmacyId = pharmacyId;
 
             return Ok(_pharmacyPriceListService.Update(pharmacyPriceList));

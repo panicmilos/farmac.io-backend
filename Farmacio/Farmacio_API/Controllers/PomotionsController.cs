@@ -112,6 +112,11 @@ namespace Farmacio_API.Controllers
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of(pharmacyId))
                 .Authorize();
+            _pharmacyService.TryToRead(pharmacyId);
+            var existingPromotion = _promotionService.TryToRead(promotionRequest.Id);
+            if(existingPromotion.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("Promotion does not belong to the given pharmacy.");
+            
             var promotion = _mapper.Map<Promotion>(promotionRequest);
             promotion.PharmacyId = pharmacyId;
 
@@ -131,6 +136,10 @@ namespace Farmacio_API.Controllers
                 .Rule(IsPharmacyAdmin.Of(pharmacyId))
                 .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
+            var existingPromotion = _promotionService.TryToRead(promotionId);
+            if(existingPromotion.PharmacyId != pharmacyId)
+                throw new UnauthorizedAccessException("Promotion does not belong to the given pharmacy.");
+            
             return Ok(_promotionService.Delete(promotionId));
         }
     }
