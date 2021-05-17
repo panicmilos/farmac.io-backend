@@ -93,7 +93,6 @@ namespace Farmacio_API.Controllers
         /// Sort an appointments with a dermatologist in pharmacy.
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
-        [Authorize(Roles = "Patient")]
         [HttpGet("sort")]
         public IActionResult SortAppointmentsForDermatologist(Guid pharmacyId, string criteria, bool isAsc)
         {
