@@ -601,7 +601,7 @@ public static class SeedDb
 
         var appointment1 = new Appointment
         {
-            DateTime = DateTime.Today.AddDays(2).AddHours(9),
+            DateTime = new DateTime(2022, 6, 30, 9, 0, 0),
             Duration = 30,
             MedicalStaff = dermatologist1,
             IsReserved = true,
@@ -634,7 +634,7 @@ public static class SeedDb
 
         var appointment4 = new Appointment
         {
-            DateTime = DateTime.Today.AddDays(2).AddHours(9),
+            DateTime = new DateTime(2022, 7, 1, 9, 0, 0),
             Duration = 30,
             MedicalStaff = pharmacist2,
             IsReserved = true,

@@ -120,7 +120,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
                 MedicalStaffId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd61"),
                 PatientId = new Guid("08d91521-5da2-43ab-8c3b-c16c102f0848"),
                 PharmacyId = new Guid("08d8f514-577c-4a9f-8d0c-b863603902e4"),
-                DateTime = DateTime.Today.AddDays(2).AddHours(9),   // 9:00
+                DateTime = new DateTime(2022, 7, 1, 9, 0, 0),   // 9:00
                 Duration = 20
             });
 
@@ -135,7 +135,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
                 MedicalStaffId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd61"),
                 PatientId = new Guid("08d91521-5da2-43ab-8c3b-c16c102f0848"),
                 PharmacyId = new Guid("08d8f514-577c-4a9f-8d0c-b863603902e4"),
-                DateTime = DateTime.Today.AddDays(2).AddHours(9),   // 9:00
+                DateTime = new DateTime(2022, 6, 30, 9, 0, 0),   // 9:00
                 Duration = 20,
             });
 
