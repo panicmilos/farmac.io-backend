@@ -294,7 +294,7 @@ public static class SeedDb
         {
             PharmacyId = pharmacy3.Id,
             MedicineId = medicine2.Id,
-            Quantity = 2
+            Quantity = 4
         };
 
         var pharmacyMedicine32 = new PharmacyMedicine

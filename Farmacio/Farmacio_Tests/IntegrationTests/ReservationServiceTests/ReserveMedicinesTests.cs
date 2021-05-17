@@ -37,7 +37,7 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
             _pharmacyService = new PharmacyService(pharmacyPriceListService, pharmacyStockService, new Repository<Pharmacy>(context));
             _patientService = new PatientService(new EmailVerificationService(null, _emailDispatcher.Object, _templatesProvider.Object), new AccountRepository(context));
             _medicineService = new MedicineService(null, null, _pharmacyService, pharmacyStockService, null, new Repository<Medicine>(context));
-            _discountService = new DiscountService(new LoyaltyProgramService(_patientService, new Repository<LoyaltyProgram>(context)), 
+            _discountService = new DiscountService(new LoyaltyProgramService(_patientService, new Repository<LoyaltyProgram>(context)),
                 new PromotionService(_pharmacyService, _emailDispatcher.Object, _templatesProvider.Object, new Repository<Promotion>(context), null));
 
             _reservationService = new ReservationService(_pharmacyService, _patientService, _discountService, _emailDispatcher.Object,
@@ -152,7 +152,6 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
 
             Action reserveMedicines = () => _reservationService.CreateReservation(reservation, checkIsERecipe);
 
-
             reserveMedicines.Should().Throw<BadLogicException>();
         }
 
@@ -192,11 +191,11 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
                 {
                     new ReservedMedicine
                     {
-                        MedicineId = new Guid("08d91521-5bdf-40d8-8cc1-7765ee950c8f"),
+                        MedicineId = new Guid("08d91521-5bf4-4a5e-8740-d68fcde43c58"),
                         Quantity = 3
                     }
                 },
-                PharmacyId = new Guid("08d91521-5c7d-4f06-85b3-85ce3c1ad6a3"),
+                PharmacyId = new Guid("08d91521-5ca1-4f12-841c-270f430cde13"),
                 PatientId = new Guid("08d91521-5da2-43ab-8c3b-c16c102f0848"),
                 PickupDeadline = DateTime.Now.AddHours(37)
             };
