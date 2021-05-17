@@ -274,9 +274,9 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
         [HttpGet("history-visit-pharmacists/{patientId}/page-to")]
-        public IActionResult ReadPatientsHistoryOfVisitngPharmacistsByPagesTo(Guid patientId, [FromQuery] PageDTO pageDTO)
+        public IActionResult ReadPatientsHistoryOfVisitngPharmacistsByPageTo(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
-            return Ok(_appointmentService.ReadPagesOfPatientHistoryVisitingPharmaccists(patientId, pageDTO));
+            return Ok(_appointmentService.ReadPagesOfPatientHistoryVisitingPharmacists(patientId, pageDTO));
         }
 
         /// <summary>
@@ -284,14 +284,10 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
         [HttpGet("history-visit-pharmacists/{patientId}/sort/page-to")]
-        public IActionResult SortHistoryOfVisitingPharmacistsByPagesTo(Guid patientId, string criteria, bool isAsc, int number, int size)
+        public IActionResult SortHistoryOfVisitingPharmacistsByPageTo(Guid patientId, string criteria, bool isAsc, PageDTO pageDTO)
         {
             var appointments = _appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId);
-            return Ok(_appointmentService.SortAppointmentsPageTo(appointments, criteria, isAsc, new PageDTO
-            {
-                Number = number,
-                Size = size
-            }));
+            return Ok(_appointmentService.SortAppointmentsPageTo(appointments, criteria, isAsc, pageDTO));
         }
 
         /// <summary>
@@ -300,13 +296,13 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns appointments.</response>
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
         [HttpGet("history-with-dermatologists/{patientId}/page-to")]
-        public IActionResult ReadPatientsHistoryOfDermatologistsVisitsByPagesTo(Guid patientId, [FromQuery] PageDTO pageDTO)
+        public IActionResult ReadPatientsHistoryOfDermatologistsVisitsByPageTo(Guid patientId, [FromQuery] PageDTO pageDTO)
         {
             return Ok(_appointmentService.ReadPageOfPatientHistoryVisitingDermatologists(patientId, pageDTO));
         }
 
         /// <summary>
-        /// Sort History of dermatology visits for n-th page.
+        /// Sort history of dermatology visits for n-th page.
         /// </summary>
         /// <response code="200">Sorted appointments.</response>
         [HttpGet("history-with-dermatologists/{patientId}/sort/page-to")]

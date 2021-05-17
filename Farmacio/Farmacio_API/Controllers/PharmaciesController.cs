@@ -389,10 +389,10 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns pharmacies that have available pharmacists in chosen time.
+        /// Returns pharmacies that have available pharmacists in chosen time for n-th page.
         /// </summary>
         /// <response code="200">Returns list of pharmacies.</response>
-        [HttpGet("available/pages-to")]
+        [HttpGet("available/page")]
         public IActionResult SearchAvailableForConsultationsPagesTo([FromQuery] SearhSortParamsForAppointments searchParams, [FromQuery] PageDTO pageDTO)
         {
             var pharmacists = _appointmentService.ReadPharmacistsForAppointment(_pharmacistService.Read(), searchParams);

@@ -50,7 +50,7 @@ namespace Farmacio_Services.Contracts
 
         IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId);
 
-        IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmaccists(Guid patientId, PageDTO pageDto);
+        IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDto);
 
         IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO);
 

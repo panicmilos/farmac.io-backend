@@ -454,7 +454,7 @@ namespace Farmacio_Services.Implementation
                 appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Pharmacist);
         }
 
-        public IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmaccists(Guid patientId, PageDTO pageDto)
+        public IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDto)
         {
             return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitingPharmacists(patientId), pageDto);
         }
