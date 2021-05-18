@@ -180,7 +180,7 @@ namespace Farmacio_Services.Implementation
                 {
                     try
                     {
-                        var m = _pharmacyService.ReadMedicine(pharmacyId, replacement.Id);
+                        var m = _pharmacyService.ReadMedicine(pharmacyId, replacement.ReplacementMedicineId);
                         replacements.Add(m);
                     }
                     catch (MissingEntityException)

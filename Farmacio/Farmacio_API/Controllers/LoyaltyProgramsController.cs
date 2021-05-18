@@ -51,7 +51,6 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Discount.</response>
         /// <response code="404">Given patient is not found.</response>
-        [Authorize(Roles = "Patient")]
         [HttpGet("discount-for/{patientId}")]
         public IActionResult ReadDiscountFor(Guid patientId)
         {
