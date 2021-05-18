@@ -1,6 +1,8 @@
 # farmac.io-backend
 Projekat za ISA + MRS.
 
+[![Build Status](https://jenkins.bjelicaluka.com/job/farmac.io-backend/badge/icon)](https://jenkins.bjelicaluka.com/job/farmac.io-backend/)
+
 Poslednja verzija projekta se može naći na: <a href="http://farmac-io.bjelicaluka.com/">Ovde</a>
 ## Članovi tima:
 <ul>
