@@ -16,6 +16,8 @@ RUN dotnet restore Farmacio.sln
 
 COPY . .
 
+RUN dotnet test Farmacio.sln
+
 RUN dotnet publish -c Release -o out Farmacio_API/
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
