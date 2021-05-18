@@ -26,7 +26,7 @@ namespace Farmacio_Tests.UnitTests.TimeIntervalUtilsTests
 
             var result = TimeIntervalUtils.TimeIntervalTimesOverlap(firstFrom, firstTo, secondFrom, secondTo);
             
-            Assert.False(result);
+            Assert.True(result);
         }
         
         [Fact]
