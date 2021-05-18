@@ -93,7 +93,6 @@ namespace Farmacio_API.Controllers
         /// Reads all existing pharmacists employed in the pharmacy.
         /// </summary>
         /// <response code="200">Read pharmacists from the pharmacy.</response>
-        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/pharmacists")]
         public IActionResult GetPharmacists(Guid pharmacyId)
         {
@@ -104,7 +103,6 @@ namespace Farmacio_API.Controllers
         /// Search all existing pharmacists in the pharmacy.
         /// </summary>
         /// <response code="200">Searched pharmacists.</response>
-        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/pharmacists/search")]
         public IActionResult SearchPharmacists(Guid pharmacyId, string name)
         {
@@ -126,7 +124,6 @@ namespace Farmacio_API.Controllers
         /// Reads all existing dermatologists employed in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologists from the pharmacy.</response>
-        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists")]
         public IActionResult GetDermatologists(Guid pharmacyId)
         {
@@ -137,7 +134,6 @@ namespace Farmacio_API.Controllers
         /// Search all existing dermatologists in the pharmacy.
         /// </summary>
         /// <response code="200">Searched dermatologists.</response>
-        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/search")]
         public IActionResult SearchDermatologists(Guid pharmacyId, string name)
         {
@@ -148,7 +144,6 @@ namespace Farmacio_API.Controllers
         /// Reads all existing dermatologists employed in the pharmacy with their work places.
         /// </summary>
         /// <response code="200">Read dermatologists with their work places from the pharmacy.</response>
-        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/with-work-places")]
         public IActionResult GetDermatologistsWithWorkPlaces(Guid pharmacyId)
         {
@@ -164,7 +159,6 @@ namespace Farmacio_API.Controllers
         /// Search all existing dermatologists in the pharmacy with their work places.
         /// </summary>
         /// <response code="200">Searched dermatologists with their work places.</response>
-        [Authorize(Roles = "PharmacyAdmin, SystemAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/with-work-places/search")]
         public IActionResult SearchDermatologistsWithWorkPlaces(Guid pharmacyId, string name)
         {
@@ -316,7 +310,6 @@ namespace Farmacio_API.Controllers
         /// Reads all existing appointments in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologists from the pharmacy.</response>
-        [Authorize(Roles = "PharmacyAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/appointments")]
         public IActionResult GetDermatologistAppointmentsForPharmacy(Guid pharmacyId)
         {
@@ -327,7 +320,6 @@ namespace Farmacio_API.Controllers
         /// Reads existing dermatologists appointments page in the pharmacy.
         /// </summary>
         /// <response code="200">Read dermatologists appointments page from the pharmacy.</response>
-        [Authorize(Roles = "PharmacyAdmin, Patient")]
         [HttpGet("{pharmacyId}/dermatologists/appointments/page")]
         public IActionResult GetDermatologistAppointmentsPageForPharmacy(Guid pharmacyId, int number, int size)
         {
