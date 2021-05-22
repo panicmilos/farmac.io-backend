@@ -392,7 +392,7 @@ namespace Farmacio_Services.Implementation
         {
             var patient = _patientService.TryToRead(patientId);
             return ReadForMedicalStaff(medicalStaffUserId).Where(appointment => appointment.IsReserved
-                             && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now).Count() != 0;
+                             && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now && appointment?.Report?.Notes != "Patient did not show up.").Count() != 0;
         }
 
         public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment)
