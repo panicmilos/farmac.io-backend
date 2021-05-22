@@ -104,7 +104,7 @@ namespace Farmacio_API.Controllers
         /// Deletes pharmacy admin from the system.
         /// </summary>
         /// <response code="200">Returns deleted pharmacy admin.</response>
-        /// <response code="404">Unable to delete pharmacy admin because he does not exist.</response>
+        /// <response code="404">Unable to delete pharmacy admin because he does not exist or is the last admin of the pharmacy.</response>
         [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePharmacyAdmin(Guid id)

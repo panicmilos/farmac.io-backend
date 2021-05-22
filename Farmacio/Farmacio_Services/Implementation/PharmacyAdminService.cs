@@ -66,6 +66,28 @@ namespace Farmacio_Services.Implementation
             return _repository.Update(existingAccount);
         }
 
+        public override Account Delete(Guid id)
+        {
+            var existingPharamcyAdmin = TryToRead(id);
+            var existingPharmacyUser = existingPharamcyAdmin.User as PharmacyAdmin;
+
+            var numberOfAdminsInPharmacy = Read().Where(pharmacyAdmin =>
+            {
+                if (pharmacyAdmin.User is PharmacyAdmin pharmacyAdminUser)
+                {
+                    return pharmacyAdminUser.PharmacyId == existingPharmacyUser.PharmacyId;
+                }
+                return false;
+            }).Count();
+
+            if (numberOfAdminsInPharmacy <= 1)
+            {
+                throw new BadLogicException("You cannot delete the last pharmacy admin.");
+            }
+
+            return base.Delete(id);
+        }
+
         private void ValidatePharmacyId(Account account)
         {
             _pharmacyService.TryToRead(((PharmacyAdmin)account.User).PharmacyId);

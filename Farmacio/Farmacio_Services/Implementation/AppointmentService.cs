@@ -24,7 +24,6 @@ namespace Farmacio_Services.Implementation
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
         private readonly IERecipeService _eRecipeService;
-        private readonly IPromotionService _promotionService;
 
         public AppointmentService(IRepository<Appointment> repository
             , IPharmacyService pharmacyService, IAccountService accountService
@@ -34,8 +33,7 @@ namespace Farmacio_Services.Implementation
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
             , IReportService reportService
-            , IERecipeService eRecipeService
-            , IPromotionService promotionService) : base(repository)
+            , IERecipeService eRecipeService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -47,7 +45,6 @@ namespace Farmacio_Services.Implementation
             _templatesProvider = templateProvider;
             _reportService = reportService;
             _eRecipeService = eRecipeService;
-            _promotionService = promotionService;
         }
 
         public IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDto)
@@ -322,7 +319,7 @@ namespace Farmacio_Services.Implementation
                 : originalPrice;
             if (price <= 0 || price > 999999)
                 throw new BadLogicException("Price must be a valid number between 0 and 999999.");
-            
+
             var appointmentWithPharmacist = Create(new Appointment
             {
                 PharmacyId = appointmentDTO.PharmacyId,

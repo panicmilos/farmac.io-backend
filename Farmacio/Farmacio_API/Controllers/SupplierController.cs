@@ -119,7 +119,7 @@ namespace Farmacio_API.Controllers
         /// Deletes supplier from the system.
         /// </summary>
         /// <response code="200">Returns deleted supplier.</response>
-        /// <response code="404">Unable to delete supplier because he does not exist.</response>
+        /// <response code="404">Unable to delete supplier because he does not exist or has active offers.</response>
         [Authorize(Roles = "SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteSupplier(Guid id)
@@ -203,7 +203,7 @@ namespace Farmacio_API.Controllers
         /// Deletes supplier's medicine from the stock.
         /// </summary>
         /// <response code="200">Returns deleted supplier's medicine.</response>
-        /// <response code="404">Given supplier's medicine doesn't exist.</response>
+        /// <response code="404">Given supplier's medicine doesn't exist or is in some active offer.</response>
         [Authorize(Roles = "Supplier")]
         [HttpDelete("{supplierId}/medicines-in-stock/{id}")]
         public IActionResult DeleteMedicineFromSupplierStock(Guid id)
@@ -267,7 +267,7 @@ namespace Farmacio_API.Controllers
                 .Rule(IsPharmacyAdmin.Of(offer.PharmacyOrder.PharmacyId))
                 .And(UserSpecific.For(offer.PharmacyOrder.PharmacyAdminId))
                 .Authorize();
-            
+
             return Ok(_supplierOfferService.AcceptOffer(offerId, offer.PharmacyOrder.PharmacyAdminId));
         }
 

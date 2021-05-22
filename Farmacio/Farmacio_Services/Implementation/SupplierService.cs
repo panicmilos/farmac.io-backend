@@ -10,9 +10,18 @@ namespace Farmacio_Services.Implementation
 {
     public class SupplierService : AccountService, ISupplierService
     {
-        public SupplierService(IEmailVerificationService emailVerificationService, IAccountRepository repository) :
+        private readonly ICrudService<SupplierOffer> _supplierOffersService;
+        private readonly ICrudService<SupplierMedicine> _supplierMedicineService;
+
+        public SupplierService(
+            IEmailVerificationService emailVerificationService,
+            ICrudService<SupplierOffer> supplierOffersService,
+            ICrudService<SupplierMedicine> supplierMedicineService,
+            IAccountRepository repository) :
             base(emailVerificationService, repository)
         {
+            _supplierOffersService = supplierOffersService;
+            _supplierMedicineService = supplierMedicineService;
         }
 
         public override IEnumerable<Account> Read()
@@ -33,6 +42,29 @@ namespace Farmacio_Services.Implementation
             if (existingAccount == null)
                 throw new MissingEntityException("Supplier account not found.");
             return existingAccount;
+        }
+
+        public override Account Delete(Guid id)
+        {
+            var existingSupplierAccount = TryToRead(id);
+            var existingSupplierUser = existingSupplierAccount.User as Supplier;
+
+            var numberOfActiveSupplierOffers = _supplierOffersService.Read().Where(offer =>
+                offer.SupplierId == existingSupplierAccount.Id &&
+                offer.Status == OfferStatus.WaitingForAnswer).Count();
+
+            if (numberOfActiveSupplierOffers > 0)
+            {
+                throw new BadLogicException("You cannot delete supplier because he has active offers.");
+            }
+
+            var supplierMedicinesIds = _supplierMedicineService.Read()
+                .Where(supplierMedicine => supplierMedicine.SupplierId == existingSupplierAccount.Id)
+                .Select(supplierMedicine => supplierMedicine.Id).ToList();
+
+            _supplierMedicineService.Delete(supplierMedicinesIds);
+
+            return base.Delete(id);
         }
     }
 }
