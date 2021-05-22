@@ -17,16 +17,6 @@
     },
     {
       "type": "Email",
-      "name": "Email3",
-      "template": {
-        "Subject": "Test email",
-        "From": "panic.milos99@gmail.com",
-        "Recipients": [ "{{to}}" ],
-        "Body": "Samo testiram da li ovo radi, {{name}}"
-      }
-    },
-    {
-      "type": "Email",
       "name": "EmailVerification",
       "template": {
         "Subject": "Email verification for Farmac.io",
@@ -41,7 +31,7 @@
       "template": {
         "Subject": "Successful reservation on Farmac.io",
         "From": "panic.milos99@gmail.com",
-        "Recipients": [ "panic.milos99@gmail.com" ],
+        "Recipients": [ "{{to}}" ],
         "Body": "<p>Dear {{name}},</p><p>Your reservation with id {{id}} is successfully created. Please pickup your reservation until: {{deadline}}.</p>"
       }
     },
@@ -51,7 +41,7 @@
       "template": {
         "Subject": "Successful reserving appointment with dermatologist on Farmac.io",
         "From": "panic.milos99@gmail.com",
-        "Recipients": [ "panic.milos99@gmail.com" ],
+        "Recipients": [ "{{to}}" ],
         "Body": "<p>Dear {{name}},</p><p>Your appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
       }
     },
@@ -61,7 +51,7 @@
       "template": {
         "Subject": "Successful reserving consultation with pharmacist on Farmac.io",
         "From": "panic.milos99@gmail.com",
-        "Recipients": [ "panic.milos99@gmail.com" ],
+        "Recipients": [ "{{to}}" ],
         "Body": "<p>Dear {{name}},</p><p>Your appointment is successfully reserved. The date and time of the appointment are: {{date}}.</p>"
       }
     },
@@ -121,7 +111,7 @@
       "template": {
         "Subject": "Farmac.io reservation issued",
         "From": "panic.milos99@gmail.com",
-        "Recipients": [ "makanalbert@gmail.com" ],
+        "Recipients": [ "{{to}}" ],
         "Body": "<p>Dear {{name}},</p><p>You have picked up your reservation with id {{id}}.</p>"
       }
     }
