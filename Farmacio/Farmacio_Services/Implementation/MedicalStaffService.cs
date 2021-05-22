@@ -6,6 +6,7 @@ using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
+using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
@@ -75,10 +76,21 @@ namespace Farmacio_Services.Implementation
         {
             var staffAccount = ReadByUserId(medicalStaff.Id);
             var staffUser = staffAccount.User as MedicalStaff;
+            if (staffUser == null) return base.Update(staffAccount);
             staffUser.NumberOfGrades = medicalStaff.NumberOfGrades;
             staffUser.AverageGrade = medicalStaff.AverageGrade;
             staffAccount.User = staffUser;
+
             return base.Update(staffAccount);
+        }
+
+        public override Account Delete(Guid id)
+        {
+            var existingAccount = TryToRead(id);
+            if(_appointmentService.ReadForMedicalStaff(existingAccount.UserId)
+                .Any(appointment => appointment.IsReserved))
+                throw new BadLogicException("The medical staff can't be deleted because it has upcoming appointments.");
+            return base.Delete(id);
         }
 
         public IEnumerable<PatientDTO> ReadPatientsForMedicalStaffBy(Guid medicalAccountId, PatientSearchParams searchParams)

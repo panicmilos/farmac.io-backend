@@ -16,12 +16,13 @@ namespace Farmacio_Services.Implementation
         private readonly IMedicineIngredientService _ingredientService;
         private readonly IPharmacyStockService _pharmacyStockService;
         private readonly IPharmacyService _pharmacyService;
+        private readonly ICrudService<Reservation> _reservationService;
         private readonly ICrudService<NotInStock> _notInStockService;
 
         public MedicineService(IMedicineReplacementService replacementService, IMedicineIngredientService ingredientService,
             IPharmacyService pharmacyService, IPharmacyStockService pharmacyStockService,
-            ICrudService<NotInStock> notInStockService,
-            IRepository<Medicine> repository) :
+            ICrudService<NotInStock> notInStockService, ICrudService<Reservation> reservationService
+            , IRepository<Medicine> repository) :
             base(repository)
         {
             _replacementService = replacementService;
@@ -29,6 +30,7 @@ namespace Farmacio_Services.Implementation
             _pharmacyStockService = pharmacyStockService;
             _pharmacyService = pharmacyService;
             _notInStockService = notInStockService;
+            _reservationService = reservationService;
         }
 
         public FullMedicineDTO ReadFullMedicine(Guid id)
@@ -106,12 +108,13 @@ namespace Farmacio_Services.Implementation
 
         public override Medicine Delete(Guid id)
         {
-            var medicine = Read(id);
-            if (medicine == null)
-            {
-                throw new MissingEntityException();
-            }
+            var medicine = TryToRead(id);
 
+            if(_reservationService.Read().Any(reservation => reservation.State == ReservationState.Reserved &&
+                reservation.Medicines.FirstOrDefault(reservedMedicine => 
+                    reservedMedicine.MedicineId == medicine.Id) != null))
+                throw new BadLogicException("Medicine has been reserved and can't be deleted.");
+            
             medicine.Active = false;
             medicine.Type.Active = false;
             base.Update(medicine);

@@ -36,7 +36,7 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
             _reservationRepository = new Repository<Reservation>(context);
             _pharmacyService = new PharmacyService(pharmacyPriceListService, pharmacyStockService, new Repository<Pharmacy>(context));
             _patientService = new PatientService(new EmailVerificationService(null, _emailDispatcher.Object, _templatesProvider.Object), new AccountRepository(context));
-            _medicineService = new MedicineService(null, null, _pharmacyService, pharmacyStockService, null, new Repository<Medicine>(context));
+            _medicineService = new MedicineService(null, null, _pharmacyService, pharmacyStockService, null, null, new Repository<Medicine>(context));
             _discountService = new DiscountService(new LoyaltyProgramService(_patientService, new Repository<LoyaltyProgram>(context)),
                 new PromotionService(_pharmacyService, _emailDispatcher.Object, _templatesProvider.Object, new Repository<Promotion>(context), null));
 

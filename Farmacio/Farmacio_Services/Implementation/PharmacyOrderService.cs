@@ -15,15 +15,18 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyService _pharmacyService;
         private readonly IPharmacyAdminService _pharmacyAdminService;
         private readonly IMedicineService _medicineService;
+        private readonly ISupplierOfferService _supplierOfferService;
         private readonly ICrudService<OrderedMedicine> _orderedMedicineService;
         public PharmacyOrderService(IPharmacyService pharmacyService, IPharmacyAdminService pharmacyAdminService
-            , IMedicineService medicineService, ICrudService<OrderedMedicine> orderedMedicineService
+            , IMedicineService medicineService, ISupplierOfferService supplierOfferService
+            , ICrudService<OrderedMedicine> orderedMedicineService
             , IRepository<PharmacyOrder> repository) : base(repository)
         {
             _pharmacyService = pharmacyService;
             _pharmacyAdminService = pharmacyAdminService;
             _medicineService = medicineService;
             _orderedMedicineService = orderedMedicineService;
+            _supplierOfferService = supplierOfferService;
         }
 
         public override PharmacyOrder Create(PharmacyOrder pharmacyOrder)
@@ -48,6 +51,12 @@ namespace Farmacio_Services.Implementation
             return base.Update(existingPharmacyOrder);
         }
 
+        public override PharmacyOrder Delete(Guid id)
+        {
+            CheckIfSupplierOfferExists(id);
+            return base.Delete(id);
+        }
+
         public IEnumerable<PharmacyOrder> ReadFor(Guid pharmacyId, bool? isProcessed)
         {
             return Read().Where(pharmacyOrder => pharmacyOrder.PharmacyId == pharmacyId &&
@@ -67,7 +76,7 @@ namespace Farmacio_Services.Implementation
             if (pharmacyOrder.OffersDeadline < DateTime.Now)
                 throw new BadLogicException("Offer deadline is in the past.");
 
-            // TODO: Check if supplier offer is created.
+            CheckIfSupplierOfferExists(pharmacyOrder.Id);
 
             if (_pharmacyAdminService.ReadByUserId(pharmacyAdminId) == null)
                 throw new MissingEntityException("Pharmacy admin user not found.");
@@ -77,6 +86,12 @@ namespace Farmacio_Services.Implementation
                 if (orderedMedicine.Quantity <= 0)
                     throw new BadLogicException("Invalid quantity for medicine order.");
             });
+        }
+
+        private void CheckIfSupplierOfferExists(Guid pharmacyOrderId)
+        {
+            if (_supplierOfferService.ReadForPharmacyOrder(pharmacyOrderId).Any())
+                throw new BadLogicException("Supplier offer has been created for the provided pharmacy order.");
         }
     }
 }
