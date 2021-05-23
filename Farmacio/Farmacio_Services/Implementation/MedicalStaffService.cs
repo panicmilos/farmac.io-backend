@@ -12,7 +12,7 @@ namespace Farmacio_Services.Implementation
 {
     public class MedicalStaffService : AccountService, IMedicalStaffService
     {
-        private readonly IAppointmentService _appointmentService;
+        protected readonly IAppointmentService _appointmentService;
 
         public MedicalStaffService(IEmailVerificationService emailVerificationService, IAppointmentService appointmentService,
             IAccountRepository repository)
@@ -87,9 +87,10 @@ namespace Farmacio_Services.Implementation
         public override Account Delete(Guid id)
         {
             var existingAccount = TryToRead(id);
-            if(_appointmentService.ReadForMedicalStaff(existingAccount.UserId)
+            if (_appointmentService.ReadForMedicalStaff(existingAccount.UserId)
                 .Any(appointment => appointment.IsReserved))
                 throw new BadLogicException("The medical staff can't be deleted because it has upcoming appointments.");
+
             return base.Delete(id);
         }
 
@@ -97,7 +98,7 @@ namespace Farmacio_Services.Implementation
         {
             var (name, sortCriteria, isAscending) = searchParams;
             var patients = ReadPatientsForMedicalStaff(medicalAccountId).Where(p =>
-                string.IsNullOrEmpty(name) ||  $"{p.FirstName.ToLower()} {p.LastName.ToLower()}".Contains(name.ToLower()));
+                string.IsNullOrEmpty(name) || $"{p.FirstName.ToLower()} {p.LastName.ToLower()}".Contains(name.ToLower()));
             return SortPatientDTOs(patients, sortCriteria, isAscending);
         }
 

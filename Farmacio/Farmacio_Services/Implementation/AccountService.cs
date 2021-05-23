@@ -127,5 +127,15 @@ namespace Farmacio_Services.Implementation
         {
             return (_repository as IAccountRepository).ReadPageOf(role, page).ToList();
         }
+
+        public override Account Delete(Guid id)
+        {
+            var existingAccount = TryToRead(id);
+
+            existingAccount.Active = false;
+            existingAccount.User.Active = false;
+
+            return _repository.Update(existingAccount);
+        }
     }
 }

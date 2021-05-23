@@ -64,7 +64,7 @@ namespace Farmacio_Services.Implementation
 
         public MedicineInPharmacyDTO ReadMedicine(Guid pharmacyId, Guid medicineId)
         {
-            var pharmacy = TryToRead(pharmacyId);
+            TryToRead(pharmacyId);
 
             var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock == null)
@@ -112,7 +112,7 @@ namespace Farmacio_Services.Implementation
 
             return base.Update(existingPharmacy);
         }
-        
+
         private MedicinePrice GetMedicinePriceInPharmacy(Guid medicineId, Guid pharmacyId)
         {
             return _pharmacyPriceListService.ReadForPharmacy(pharmacyId)?
@@ -129,19 +129,16 @@ namespace Farmacio_Services.Implementation
                 .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()))
                 .Where(pharmacy => pharmacy.AverageGrade >= gradeFrom && pharmacy.AverageGrade <= gradeTo);
 
-
-            if(distanceFrom != 0 && distanceTo != 0 && LatLngUtils.IsLatValid(userLat) && LatLngUtils.IsLngValid(userLon))
+            if (distanceFrom != 0 && distanceTo != 0 && LatLngUtils.IsLatValid(userLat) && LatLngUtils.IsLngValid(userLon))
             {
                 pharmacies = pharmacies.Where(pharmacy =>
                 {
-                    var distance = LatLngUtils.GetDistanceFromLatLngInKm(new CoordinatesDTO 
-                    { Lat = pharmacy.Address.Lat, Lng = pharmacy.Address.Lng }, 
+                    var distance = LatLngUtils.GetDistanceFromLatLngInKm(new CoordinatesDTO
+                    { Lat = pharmacy.Address.Lat, Lng = pharmacy.Address.Lng },
                     new CoordinatesDTO { Lat = userLat, Lng = userLon });
                     return distance >= distanceFrom && distance <= distanceTo;
                 });
             }
-
-            
 
             return SortSmallPharmacyDTO(pharmacies, sortCriteria, isAscending);
         }
@@ -198,7 +195,6 @@ namespace Farmacio_Services.Implementation
                 { "grade", p => p.AverageGrade }
             };
 
-
             if (sortingCriteria.TryGetValue(sortCriteria ?? "", out var sortingCriterion))
             {
                 pharmacies = isAscending ? pharmacies.OrderBy(sortingCriterion).ToList() : pharmacies.OrderByDescending(sortingCriterion).ToList();
@@ -237,7 +233,7 @@ namespace Farmacio_Services.Implementation
 
         public void ReturnMedicinesInStock(Guid pharmacyId, Guid medicineId, int quantity)
         {
-            var pharmacy = TryToRead(pharmacyId);
+            TryToRead(pharmacyId);
 
             var medicineStock = _pharmacyStockService.ReadForPharmacy(pharmacyId, medicineId);
             if (medicineStock != null)

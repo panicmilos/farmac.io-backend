@@ -110,6 +110,15 @@ namespace Farmacio_Services.Implementation
             if (workPlace == null)
                 throw new NotEmployedInPharmacyException("Dermatologist is not employed in the given pharmacy.");
 
+            var hasFutureAppointments = _appointmentService.ReadForMedicalStaffInPharmacy(dermatologistAccount.UserId, pharmacyId)
+                .Where(appointment => appointment.DateTime > DateTime.Now)
+                .Any();
+
+            if (hasFutureAppointments)
+            {
+                throw new BadLogicException("You cannot remove the dermatologist from the pharmacy because he has appointments in the future.");
+            }
+
             _dermatologistWorkPlaceService.Delete(workPlace.Id);
             return dermatologistAccount;
         }

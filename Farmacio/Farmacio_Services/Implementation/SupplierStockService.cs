@@ -4,6 +4,7 @@ using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;
+using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +15,18 @@ namespace Farmacio_Services.Implementation
     {
         private readonly ISupplierService _supplierService;
         private readonly IMedicineService _medicineService;
+        private readonly ICrudService<SupplierOffer> _supplierOfferService;
 
         public SupplierStockService(
             ISupplierService supplierService,
             IMedicineService medicineService,
+            ICrudService<SupplierOffer> supplierOfferService,
             IRepository<SupplierMedicine> repository) :
             base(repository)
         {
             _supplierService = supplierService;
             _medicineService = medicineService;
+            _supplierOfferService = supplierOfferService;
         }
 
         public override SupplierMedicine Create(SupplierMedicine supplierMedicine)
@@ -49,8 +53,18 @@ namespace Farmacio_Services.Implementation
 
         public override SupplierMedicine Delete(Guid id)
         {
-            // TODO: Ovde treba cela logika da ne moze da se brise u slucaju
-            // da postoji lekova u npr aktivnom oferu
+            var existingSupplierMedicine = TryToRead(id);
+
+            var isSupplierMedicineInAnyActiveOffer = _supplierOfferService.Read()
+                .Where(offer => offer.SupplierId == existingSupplierMedicine.SupplierId && offer.Status == OfferStatus.WaitingForAnswer)
+                .ToList()
+                .Any(offer => offer.PharmacyOrder.OrderedMedicines.FirstOrDefault(orderedMedicine => orderedMedicine.MedicineId == existingSupplierMedicine.MedicineId) != null);
+
+            if (isSupplierMedicineInAnyActiveOffer)
+            {
+                throw new BadLogicException("Cannot delete medicine from the stock because it is in some active offer.");
+            }
+
             return base.Delete(id);
         }
 

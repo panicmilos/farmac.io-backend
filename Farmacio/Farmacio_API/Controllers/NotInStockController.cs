@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using Farmacio_API.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using Farmacio_Models.DTO;
 
 namespace Farmacio_API.Controllers
 {
