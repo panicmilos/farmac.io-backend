@@ -12,13 +12,21 @@ namespace Farmacio_Services.Implementation
 {
     public class MedicalStaffService : AccountService, IMedicalStaffService
     {
+        private readonly IDermatologistWorkPlaceService _dermatologistWorkPlaceService;
+        private readonly ICrudService<WorkTime> _workTimeService;
         protected readonly IAppointmentService _appointmentService;
 
-        public MedicalStaffService(IEmailVerificationService emailVerificationService, IAppointmentService appointmentService,
-            IAccountRepository repository)
+        public MedicalStaffService(
+            IEmailVerificationService emailVerificationService 
+            , IAppointmentService appointmentService
+            , IDermatologistWorkPlaceService dermatologistWorkPlaceService
+            , ICrudService<WorkTime> workTimeService
+            , IAccountRepository repository)
             : base(emailVerificationService, repository)
         {
             _appointmentService = appointmentService;
+            _dermatologistWorkPlaceService = dermatologistWorkPlaceService;
+            _workTimeService = workTimeService;
         }
 
         public IEnumerable<PatientDTO> ReadPatientsForMedicalStaff(Guid medicalAccountId)
@@ -90,7 +98,19 @@ namespace Farmacio_Services.Implementation
             if (_appointmentService.ReadForMedicalStaff(existingAccount.UserId)
                 .Any(appointment => appointment.IsReserved))
                 throw new BadLogicException("The medical staff can't be deleted because it has upcoming appointments.");
-
+            if (existingAccount.Role == Role.Dermatologist)
+            {
+                _dermatologistWorkPlaceService
+                    .GetWorkPlacesFor(existingAccount.UserId)
+                    .ToList().ForEach(dermatologistWorkPlace =>
+                    {
+                        _dermatologistWorkPlaceService.Delete(dermatologistWorkPlace.Id);
+                        _workTimeService.Delete(dermatologistWorkPlace.WorkTimeId);
+                    });
+            } else if (existingAccount.Role == Role.Pharmacist)
+            {
+                _workTimeService.Delete(((Pharmacist) existingAccount.User).WorkTimeId);
+            }
             return base.Delete(id);
         }
 

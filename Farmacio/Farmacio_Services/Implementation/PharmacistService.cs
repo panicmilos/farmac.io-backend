@@ -14,9 +14,14 @@ namespace Farmacio_Services.Implementation
     {
         private readonly IPharmacyService _pharmacyService;
 
-        public PharmacistService(IEmailVerificationService emailVerificationService, IPharmacyService pharmacyService,
-            IAppointmentService appointmentService, IAccountRepository repository) :
-            base(emailVerificationService, appointmentService, repository)
+        public PharmacistService(
+            IEmailVerificationService emailVerificationService
+            , IPharmacyService pharmacyService
+            , IAppointmentService appointmentService
+            , IDermatologistWorkPlaceService dermatologistWorkPlaceService
+            , ICrudService<WorkTime> workTimeService
+            , IAccountRepository repository) :
+            base(emailVerificationService, appointmentService, dermatologistWorkPlaceService, workTimeService, repository)
         {
             _pharmacyService = pharmacyService;
         }
