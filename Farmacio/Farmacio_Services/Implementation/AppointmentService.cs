@@ -116,7 +116,7 @@ namespace Farmacio_Services.Implementation
             {
                 var patient = _patientService.ReadByUserId(appointmentDTO.PatientId.Value);
 
-                var email = _templatesProvider.FromTemplate<Email>("Appointment", new { Name = patient.User.FirstName, Date = newAppointment.DateTime.ToString("dd-MM-yyyy HH:mm") });
+                var email = _templatesProvider.FromTemplate<Email>("Appointment", new { To = patient.Email, Name = patient.User.FirstName, Date = newAppointment.DateTime.ToString("dd-MM-yyyy HH:mm") });
                 _emailDispatcher.Dispatch(email);
             }
             return newAppointment;
@@ -164,7 +164,8 @@ namespace Farmacio_Services.Implementation
                 _discountService.ReadDiscountFor(appointmentWithDermatologist.PharmacyId,
                     appointmentWithDermatologist.PatientId.Value));
 
-            var email = _templatesProvider.FromTemplate<Email>("Appointment", new { Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
+            var patientAccount = _patientService.ReadByUserId(appointmentRequest.PatientId);
+            var email = _templatesProvider.FromTemplate<Email>("Appointment", new { To = patientAccount.Email, Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
             return base.Update(appointmentWithDermatologist);
         }
@@ -332,7 +333,7 @@ namespace Farmacio_Services.Implementation
                 IsReserved = true
             });
 
-            var email = _templatesProvider.FromTemplate<Email>("Consultation", new { Name = patientAccount.User.FirstName, Date = appointmentWithPharmacist.DateTime.ToString("dd-MM-yyyy HH:mm") });
+            var email = _templatesProvider.FromTemplate<Email>("Consultation", new { To = patientAccount.Email, Name = patientAccount.User.FirstName, Date = appointmentWithPharmacist.DateTime.ToString("dd-MM-yyyy HH:mm") });
             _emailDispatcher.Dispatch(email);
 
             return appointmentWithPharmacist;

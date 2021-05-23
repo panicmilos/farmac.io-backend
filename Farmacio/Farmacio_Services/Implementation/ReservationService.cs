@@ -120,6 +120,7 @@ namespace Farmacio_Services.Implementation
             var createdReservation = base.Create(reservation);
             var email = _templatesProvider.FromTemplate<Email>("Reservation", new
             {
+                To = patientAccount.Email,
                 Name = patient.FirstName,
                 Id = reservation.UniqueId,
                 Deadline = reservation.PickupDeadline.ToString("dd-MM-yyyy HH:mm")
@@ -241,8 +242,10 @@ namespace Farmacio_Services.Implementation
             reservation.State = ReservationState.Done;
             base.Update(reservation);
 
+            var patientAccount = _patientService.TryToRead(reservation.PatientId);
             var email = _templatesProvider.FromTemplate<Email>("ReservationIssued", new
             {
+                To = patientAccount.Email,
                 Name = reservation.Patient.FirstName,
                 Id = reservation.UniqueId
             });
