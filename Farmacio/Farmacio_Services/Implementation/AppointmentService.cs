@@ -10,6 +10,7 @@ using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Farmacio_Services.Implementation
 {
@@ -25,7 +26,7 @@ namespace Farmacio_Services.Implementation
         private readonly IReportService _reportService;
         private readonly IERecipeService _eRecipeService;
 
-        public AppointmentService(IRepository<Appointment> repository
+        public AppointmentService(IAppointmentRepository repository
             , IPharmacyService pharmacyService, IAccountService accountService
             , IDermatologistWorkPlaceService dermatologistWorkPlaceService
             , IPatientService patientService
@@ -54,7 +55,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
-            return Read().Where(a => a.MedicalStaffId == medicalStaffId).ToList();
+            return ((IAppointmentRepository) _repository).ReadForMedicalStaff(medicalStaffId);
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaffInPharmacy(Guid medicalStaffId, Guid pharmacyId)
@@ -76,50 +77,71 @@ namespace Farmacio_Services.Implementation
 
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO)
         {
-            if (appointmentDTO.DateTime < DateTime.Now)
-                throw new BadLogicException("The given date and time are in the past.");
-
-            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
-
-            var workPlace = _dermatologistWorkPlaceService
-                .GetWorkPlaceInPharmacyFor(appointmentDTO.MedicalStaffId, pharmacy.Id);
-            if (workPlace == null)
-                throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
-
-            ValidateAppointmentDateTime(appointmentDTO, workPlace.WorkTime, "The given date-time and duration do not overlap with dermatologist's work time.",
-                "Dermatologist already has an appointment defined on the given date-time.");
-
-            bool withPatient = appointmentDTO.PatientId != null;
-
-            if (withPatient)
-                ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
-
-            var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfDermatologistExamination(pharmacy.Id);
-            var price = appointmentDTO.PatientId != null ? DiscountUtils.ApplyDiscount(originalPrice, _discountService
-                .ReadDiscountFor(appointmentDTO.PharmacyId, appointmentDTO.PatientId.Value)) : originalPrice;
-            if (price <= 0 || price > 999999)
-                throw new BadLogicException("Price must be a valid number between 0 and 999999.");
-
-            var newAppointment = Create(new Appointment
+            var transaction = _repository.OpenTransaction();
+            try
             {
-                PharmacyId = appointmentDTO.PharmacyId,
-                MedicalStaffId = appointmentDTO.MedicalStaffId,
-                DateTime = appointmentDTO.DateTime,
-                Duration = appointmentDTO.Duration,
-                Price = price,
-                OriginalPrice = originalPrice,
-                PatientId = appointmentDTO.PatientId,
-                IsReserved = withPatient
-            });
+                if (appointmentDTO.DateTime < DateTime.Now)
+                    throw new BadLogicException("The given date and time are in the past.");
 
-            if (withPatient)
-            {
-                var patient = _patientService.ReadByUserId(appointmentDTO.PatientId.Value);
+                var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
-                var email = _templatesProvider.FromTemplate<Email>("Appointment", new { To = patient.Email, Name = patient.User.FirstName, Date = newAppointment.DateTime.ToString("dd-MM-yyyy HH:mm") });
-                _emailDispatcher.Dispatch(email);
+                var workPlace = _dermatologistWorkPlaceService
+                    .GetWorkPlaceInPharmacyFor(appointmentDTO.MedicalStaffId, pharmacy.Id);
+                if (workPlace == null)
+                    throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
+
+                ValidateAppointmentDateTime(appointmentDTO, workPlace.WorkTime,
+                    "The given date-time and duration do not overlap with dermatologist's work time.",
+                    "Dermatologist already has an appointment defined on the given date-time.");
+
+                bool withPatient = appointmentDTO.PatientId != null;
+
+                if (withPatient)
+                    ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime,
+                        appointmentDTO.Duration);
+
+                var originalPrice = appointmentDTO.Price ??
+                                    _pharmacyService.GetPriceOfDermatologistExamination(pharmacy.Id);
+                var price = appointmentDTO.PatientId != null
+                    ? DiscountUtils.ApplyDiscount(originalPrice, _discountService
+                        .ReadDiscountFor(appointmentDTO.PharmacyId, appointmentDTO.PatientId.Value))
+                    : originalPrice;
+                if (price <= 0 || price > 999999)
+                    throw new BadLogicException("Price must be a valid number between 0 and 999999.");
+
+                var newAppointment = Create(new Appointment
+                {
+                    PharmacyId = appointmentDTO.PharmacyId,
+                    MedicalStaffId = appointmentDTO.MedicalStaffId,
+                    DateTime = appointmentDTO.DateTime,
+                    Duration = appointmentDTO.Duration,
+                    Price = price,
+                    OriginalPrice = originalPrice,
+                    PatientId = appointmentDTO.PatientId,
+                    IsReserved = withPatient
+                });
+                transaction.Commit();
+
+                if (withPatient)
+                {
+                    var patient = _patientService.ReadByUserId(appointmentDTO.PatientId.Value);
+
+                    var email = _templatesProvider.FromTemplate<Email>("Appointment",
+                        new
+                        {
+                            To = patient.Email, Name = patient.User.FirstName,
+                            Date = newAppointment.DateTime.ToString("dd-MM-yyyy HH:mm")
+                        });
+                    _emailDispatcher.Dispatch(email);
+                }
+            
+                return newAppointment;
             }
-            return newAppointment;
+            catch (DbUpdateConcurrencyException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happened. Please try again.");
+            }
         }
 
         private void ValidateAppointmentDateTime(CreateAppointmentDTO appointment, WorkTime workTime, string medicalStaffDontWorkMessage, string medicalStaffIsBusyMessage)
@@ -188,12 +210,14 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadForPatients(Guid patientId)
         {
-            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
+            if (_patientService.ReadByUserId(patientId) == null)
             {
                 throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return Read().ToList().Where(appointment =>
-                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now && appointment.MedicalStaff is Dermatologist);
+
+            return ((IAppointmentRepository) _repository).ReadForPatient(patientId).Where(appointment =>
+                appointment.IsReserved && appointment.DateTime > DateTime.Now &&
+                appointment.MedicalStaff is Dermatologist);
         }
 
         public Appointment CancelAppointmentWithDermatologist(Guid appointmentId)
@@ -430,7 +454,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadForPatient(Guid patientId)
         {
-            return Read().Where(appointment => appointment.PatientId == patientId).ToList();
+            return ((IAppointmentRepository) _repository).ReadForPatient(patientId);
         }
 
         public IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId)

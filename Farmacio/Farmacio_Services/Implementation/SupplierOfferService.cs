@@ -58,53 +58,65 @@ namespace Farmacio_Services.Implementation
 
         public SupplierOffer AcceptOffer(Guid offerId, Guid pharmacyAdminId)
         {
-            var offer = TryToRead(offerId);
-            var order = _pharmacyOrderService.TryToRead(offer.PharmacyOrderId);
-
-            if (order.PharmacyAdminId != pharmacyAdminId)
-                throw new BadLogicException(
-                    "Only the pharmacy admin who has created the offer can accept an offer for it.");
-            if (order.IsProcessed)
-                throw new BadLogicException("The order has already been processed.");
-            if (offer.Status != OfferStatus.WaitingForAnswer)
-                throw new BadLogicException("The offer has already been handled.");
-            if (order.OffersDeadline > DateTime.Now)
-                throw new BadLogicException("The offer deadline has not expired.");
-
-            ReadForPharmacyOrder(offer.PharmacyOrderId)
-                .Where(readOffer => readOffer.Id != offerId)
-                .ToList()
-                .ForEach(RefuseOffer);
-
-            order.OrderedMedicines.ForEach(orderedMedicine =>
+            var transaction = _repository.OpenTransaction();
+            try
             {
-                var pharmacyMedicine =
-                    _pharmacyStockService.ReadForPharmacy(order.PharmacyId, orderedMedicine.MedicineId);
-                if (pharmacyMedicine == null)
+                var offer = TryToRead(offerId);
+                var order = _pharmacyOrderService.TryToRead(offer.PharmacyOrderId);
+
+                if (order.PharmacyAdminId != pharmacyAdminId)
+                    throw new BadLogicException(
+                        "Only the pharmacy admin who has created the offer can accept an offer for it.");
+                if (order.IsProcessed)
+                    throw new BadLogicException("The order has already been processed.");
+                if (offer.Status != OfferStatus.WaitingForAnswer)
+                    throw new BadLogicException("The offer has already been handled.");
+                if (order.OffersDeadline > DateTime.Now)
+                    throw new BadLogicException("The offer deadline has not expired.");
+
+                ReadForPharmacyOrder(offer.PharmacyOrderId)
+                    .Where(readOffer => readOffer.Id != offerId)
+                    .ToList()
+                    .ForEach(RefuseOffer);
+
+                order.OrderedMedicines.ForEach(orderedMedicine =>
                 {
-                    _pharmacyStockService.Create(new PharmacyMedicine
+                    var pharmacyMedicine =
+                        _pharmacyStockService.ReadForPharmacy(order.PharmacyId, orderedMedicine.MedicineId);
+                    if (pharmacyMedicine == null)
                     {
-                        MedicineId = orderedMedicine.MedicineId,
-                        PharmacyId = order.PharmacyId,
-                        Quantity = orderedMedicine.Quantity
-                    });
-                    return;
-                }
-                pharmacyMedicine.Quantity += orderedMedicine.Quantity;
-                _pharmacyStockService.Update(pharmacyMedicine);
-            });
+                        _pharmacyStockService.Create(new PharmacyMedicine
+                        {
+                            MedicineId = orderedMedicine.MedicineId,
+                            PharmacyId = order.PharmacyId,
+                            Quantity = orderedMedicine.Quantity
+                        });
+                        return;
+                    }
 
-            offer.Status = OfferStatus.Accepted;
-            var updatedOffer = Update(offer);
-            order.IsProcessed = true;
-            _pharmacyOrderService.Update(order);
+                    pharmacyMedicine.Quantity += orderedMedicine.Quantity;
+                    _pharmacyStockService.Update(pharmacyMedicine);
+                });
 
-            var supplier = _supplierService.TryToRead(offer.SupplierId);
-            var offerAcceptedEmail = _templatesProvider.FromTemplate<Email>("OfferAccepted",
-                new { To = supplier.Email, Name = supplier.User.FirstName });
-            _emailDispatcher.Dispatch(offerAcceptedEmail);
+                offer.Status = OfferStatus.Accepted;
+                var updatedOffer = Update(offer);
+                order.IsProcessed = true;
+                _pharmacyOrderService.Update(order);
+                
+                transaction.Commit();
 
-            return updatedOffer;
+                var supplier = _supplierService.TryToRead(offer.SupplierId);
+                var offerAcceptedEmail = _templatesProvider.FromTemplate<Email>("OfferAccepted",
+                    new {To = supplier.Email, Name = supplier.User.FirstName});
+                _emailDispatcher.Dispatch(offerAcceptedEmail);
+
+                return updatedOffer;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happened. Please try again.");
+            }
         }
 
         private void RefuseOffer(SupplierOffer otherOffer)

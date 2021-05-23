@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Farmacio_Models.Domain
 {
@@ -10,6 +11,7 @@ namespace Farmacio_Models.Domain
         public Guid PharmacyAdminId { get; set; }
         public virtual PharmacyAdmin PharmacyAdmin { get; set; }
         public DateTime OffersDeadline { get; set; }
+        [ConcurrencyCheck]
         public bool IsProcessed { get; set; }
         public virtual List<OrderedMedicine> OrderedMedicines { get; set; }
     }

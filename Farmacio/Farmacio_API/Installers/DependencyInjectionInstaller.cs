@@ -26,6 +26,8 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             _services.AddScoped(typeof(IAccountRepository), typeof(AccountRepository));
             _services.AddScoped(typeof(IComplaintAnswerRepository), typeof(ComplaintAnswerRepository));
+            _services.AddScoped(typeof(IAppointmentRepository), typeof(AppointmentRepository));
+            _services.AddScoped(typeof(IDermatologistWorkPlacesRepository), typeof(DermatologistWorkPlacesRepository));
         }
 
         private void AddServices()
