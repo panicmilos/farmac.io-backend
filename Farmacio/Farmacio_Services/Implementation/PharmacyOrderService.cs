@@ -54,6 +54,9 @@ namespace Farmacio_Services.Implementation
         public override PharmacyOrder Delete(Guid id)
         {
             CheckIfSupplierOfferExists(id);
+            var existingPharmacyOrder = TryToRead(id);
+            existingPharmacyOrder.OrderedMedicines.ForEach(orderedMedicine =>
+                _orderedMedicineService.Delete(orderedMedicine.Id));
             return base.Delete(id);
         }
 
