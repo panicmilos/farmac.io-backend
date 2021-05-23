@@ -7,6 +7,7 @@ using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -145,28 +146,40 @@ namespace Farmacio_Services.Implementation
 
         public override SupplierOffer Create(SupplierOffer offer)
         {
-            var supplier = _supplierService.TryToRead(offer.SupplierId);
-            var order = _pharmacyOrderService.TryToRead(offer.PharmacyOrderId);
-
-            if (ReadOfferFor(supplier.Id, order.Id) != null)
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                throw new DuplicateOfferException("You cannot give offer for same order twice.");
-            }
+                var supplier = _supplierService.TryToRead(offer.SupplierId);
+                var order = _pharmacyOrderService.TryToRead(offer.PharmacyOrderId);
 
-            if (order.OffersDeadline < DateTime.Now)
+                if (ReadOfferFor(supplier.Id, order.Id) != null)
+                {
+                    throw new DuplicateOfferException("You cannot give offer for same order twice.");
+                }
+
+                if (order.OffersDeadline < DateTime.Now)
+                {
+                    throw new BadLogicException("You cannot give offer after offers deadline.");
+                }
+
+                if (offer.DeliveryDeadline <= 0)
+                {
+                    throw new BadLogicException("Delivery deadline time must be at least one hour after order is processed.");
+                }
+
+                ValidateSupplierStockForOffer(supplier.Id, order.OrderedMedicines);
+                UpdateSupplierStock(supplier.Id, order.OrderedMedicines);
+
+                var createdOffer = base.Create(offer);
+                transaction.Commit();
+
+                return createdOffer;
+            }
+            catch (DbUpdateConcurrencyException)
             {
-                throw new BadLogicException("You cannot give offer after offers deadline.");
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happend. Please try again.");
             }
-
-            if (offer.DeliveryDeadline <= 0)
-            {
-                throw new BadLogicException("Delivery deadline time must be at least one hour after order is processed.");
-            }
-
-            ValidateSupplierStockForOffer(supplier.Id, order.OrderedMedicines);
-            UpdateSupplierStock(supplier.Id, order.OrderedMedicines);
-
-            return base.Create(offer);
         }
 
         public override SupplierOffer Update(SupplierOffer offer)

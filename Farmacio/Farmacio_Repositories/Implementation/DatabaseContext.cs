@@ -45,6 +45,8 @@ namespace Farmacio_Repositories.Implementation
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<NotInStock> NotInStocks { get; set; }
 
+        public bool IsTransactionOpened { get; set; } = false;
+
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
         }

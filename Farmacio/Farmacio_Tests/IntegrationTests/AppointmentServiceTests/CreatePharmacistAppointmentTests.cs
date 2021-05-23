@@ -12,7 +12,6 @@ using Moq;
 using System;
 using Xunit;
 
-
 namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
 {
     public class CreatePharmacistAppointmentTests : FarmacioTestBase
@@ -40,8 +39,8 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
             _patientService = new PatientService(emailVerificationService, accountRepository);
             var loyaltyProgramService = new LoyaltyProgramService(_patientService, new Repository<LoyaltyProgram>(context));
             _discountService = new DiscountService(loyaltyProgramService, promotionService);
-            _appointmentService = new AppointmentService(_appointmentRepository, _pharmacyService, _accountService, null, 
-                _patientService, _discountService, _emailDispatcher.Object, _templatesProvider.Object, null, null, null);
+            _appointmentService = new AppointmentService(_appointmentRepository, _pharmacyService, _accountService, null,
+                _patientService, _discountService, _emailDispatcher.Object, _templatesProvider.Object, null, null);
         }
 
         [Fact]
@@ -82,7 +81,6 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
             createAppointment.Should().Throw<MissingEntityException>();
         }
 
-
         [Fact]
         public void CreatePharmacistAppointment_ThrowsBadLogicException_BecausePharmacistDoesntWorkInThatPharmacy()
         {
@@ -96,8 +94,8 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
 
             createAppointment.Should().Throw<BadLogicException>();
         }
-        
-       [Fact]
+
+        [Fact]
         public void CreatePharmacistAppointment_ThrowsInvalidAppointmentDateTimeException_BecauseOfWorkTime()
         {
             Action createAppointment = () => _appointmentService.CreatePharmacistAppointment(new CreateAppointmentDTO
@@ -141,7 +139,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
 
             createAppointment.Should().Throw<InvalidAppointmentDateTimeException>();
         }
-        
+
         [Fact]
         public void CreatePharmacistAppointment_ThrowsBadLogicException_BecauseInvalidPrice()
         {
@@ -161,7 +159,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
         [Fact]
         public void CreatePharmacistAppointment_ReturnsNewAppointment()
         {
-            using var transaction = context.Database.BeginTransaction();
+            using var transaction = _appointmentRepository.OpenTransaction();
 
             var createdAppointment = _appointmentService.CreatePharmacistAppointment(new CreateAppointmentDTO
             {

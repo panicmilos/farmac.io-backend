@@ -12,13 +12,14 @@ namespace Farmacio_Services.Implementation
 {
     public class ComplaintAnswerService : CrudService<ComplaintAnswer>, IComplaintAnswerService
     {
+        private IComplaintAnswerRepository complaintAnswerRepository { get => _repository as IComplaintAnswerRepository; }
         private readonly IComplaintService<Complaint> _complaintService;
         private readonly ISystemAdminService _systemAdminService;
 
         public ComplaintAnswerService(
             IComplaintService<Complaint> complaintService,
             ISystemAdminService systemAdminService,
-            IRepository<ComplaintAnswer> repository
+            IComplaintAnswerRepository repository
         ) :
             base(repository)
         {
@@ -28,18 +29,30 @@ namespace Farmacio_Services.Implementation
 
         public override ComplaintAnswer Create(ComplaintAnswer answer)
         {
-            _complaintService.TryToRead(answer.ComplaintId);
-            if (_systemAdminService.ReadByUserId(answer.WriterId) == null)
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                throw new MissingEntityException("Given system admin doesn't exist in the system.");
-            }
+                _complaintService.TryToRead(answer.ComplaintId);
+                if (_systemAdminService.ReadByUserId(answer.WriterId) == null)
+                {
+                    throw new MissingEntityException("Given system admin doesn't exist in the system.");
+                }
 
-            if (HasSystemAdminAnsweredComplaint(answer.WriterId, answer.ComplaintId))
+                if (complaintAnswerRepository.ReadAnswersFor(answer.ComplaintId).Any())
+                {
+                    throw new BadLogicException("Only one system admin can give an answer to complaint.");
+                }
+
+                var createdAnswer = base.Create(answer);
+                transaction.Commit();
+
+                return createdAnswer;
+            }
+            catch (InvalidOperationException)
             {
-                throw new BadLogicException("System admin already answered given complaint.");
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happend. Please try again.");
             }
-
-            return base.Create(answer);
         }
 
         public IEnumerable<ComplaintAnswer> ReadBy(Guid writerId)
@@ -50,12 +63,6 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<ComplaintAnswer> ReadPagesToOfAnswersBy(Guid writerId, PageDTO page)
         {
             return PaginationUtils<ComplaintAnswer>.PagesTo(ReadBy(writerId), page);
-        }
-
-        private bool HasSystemAdminAnsweredComplaint(Guid systemAdminId, Guid complaintId)
-        {
-            return Read().FirstOrDefault(answer => answer.WriterId == systemAdminId &&
-                                                   answer.ComplaintId == complaintId) != null;
         }
     }
 }

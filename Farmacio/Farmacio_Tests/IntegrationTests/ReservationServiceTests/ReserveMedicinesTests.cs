@@ -28,8 +28,9 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
 
         public ReserveMedicinesTests()
         {
+            var pharmacyOrderService = new CrudService<PharmacyOrder>(new Repository<PharmacyOrder>(context));
             var pharmacyPriceListService = new PharmacyPriceListService(new Repository<PharmacyPriceList>(context));
-            var pharmacyStockService = new PharmacyStockService(pharmacyPriceListService, new Repository<PharmacyMedicine>(context));
+            var pharmacyStockService = new PharmacyStockService(pharmacyPriceListService, pharmacyOrderService, new Repository<PharmacyMedicine>(context));
 
             _templatesProvider = new Mock<ITemplatesProvider>();
             _emailDispatcher = new Mock<IEmailDispatcher>();
@@ -211,7 +212,7 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
         [Fact]
         public void ReserveMedicines_ReturnNewReservation_IsRecipeOnlyTrue()
         {
-            using var transaction = context.Database.BeginTransaction();
+            using var transaction = _reservationRepository.OpenTransaction();
 
             bool checkIsERecipe = true;
             Reservation reservation = new Reservation
