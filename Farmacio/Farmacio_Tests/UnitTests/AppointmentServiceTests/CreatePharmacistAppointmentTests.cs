@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-
 namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
 {
     public class CreatePharmacistAppointmentTests
@@ -36,8 +35,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _templatesProvider = new Mock<ITemplatesProvider>();
             _emailDispatcher = new Mock<IEmailDispatcher>();
 
-            _appointmentService = new AppointmentService(_appointmentRepository.Object, _pharmacyService.Object, _accountService.Object, null, 
-                _patientService.Object, _discountService.Object, _emailDispatcher.Object, _templatesProvider.Object, null, null, null);
+            _appointmentService = new AppointmentService(_appointmentRepository.Object, _pharmacyService.Object, _accountService.Object, null,
+                _patientService.Object, _discountService.Object, _emailDispatcher.Object, _templatesProvider.Object, null, null);
         }
 
         [Fact]
@@ -138,8 +137,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
             _appointmentRepository.Verify(repository => repository.Read(), Times.Never);
         }
-        
-       [Fact]
+
+        [Fact]
         public void CreatePharmacistAppointment_ThrowsInvalidAppointmentDateTimeException_BecauseOfWorkTime()
         {
             _accountService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
@@ -308,7 +307,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
             _appointmentRepository.Verify(repository => repository.Read(), Times.Exactly(2));
         }
-        
+
         [Fact]
         public void CreatePharmacistAppointment_ThrowsBadLogicException_BecauseInvalidPrice()
         {
@@ -392,6 +391,5 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Read(), Times.Exactly(2));
         }
-
     }
 }

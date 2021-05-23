@@ -1,7 +1,7 @@
 ﻿using Farmacio_Models.Contracts;
+using Farmacio_Models.DTO;
 using System;
 using System.Collections.Generic;
-using Farmacio_Models.DTO;
 
 namespace Farmacio_Repositories.Contracts
 {
@@ -30,5 +30,7 @@ namespace Farmacio_Repositories.Contracts
         IEnumerable<T> OrderBy<TKey>(Func<T, TKey> keySelector);
 
         IEnumerable<T> OrderByDescending<TKey>(Func<T, TKey> keySelector);
+
+        ITransaction OpenTransaction();
     }
 }

@@ -20,7 +20,7 @@ namespace Farmacio_Tests.IntegrationTests.SupplierOfferServiceTests
         public CancelOfferTests()
         {
             _supplierOfferRepository = new Repository<SupplierOffer>(context);
-            _supplierStockService = new SupplierStockService(null, null, new Repository<SupplierMedicine>(context));
+            _supplierStockService = new SupplierStockService(null, null, null, new Repository<SupplierMedicine>(context));
 
             _supplierOfferService = new SupplierOfferService(null, null, _supplierStockService, null, null, null, _supplierOfferRepository);
         }
@@ -58,7 +58,7 @@ namespace Farmacio_Tests.IntegrationTests.SupplierOfferServiceTests
         [Fact]
         public void CancelOffer_ReturnsCanceledOffer()
         {
-            using var transaction = context.Database.BeginTransaction();
+            using var transaction = _supplierOfferRepository.OpenTransaction();
             var existingOffer = new Guid("771ae913-8707-45e6-a4e6-3e71c21067f6");
 
             var canceledOffer = _supplierOfferService.CancelOffer(existingOffer);

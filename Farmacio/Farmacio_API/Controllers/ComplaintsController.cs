@@ -243,7 +243,7 @@ namespace Farmacio_API.Controllers
         /// Creates a new answer for complaint in the system.
         /// </summary>
         /// <response code="200">Returns created answer.</response>
-        /// <response code="400">Given system admin has already answered to given complaint.</response>
+        /// <response code="400">Some system admin has already answered to given complaint.</response>
         /// <response code="404">Given system admin or complaint doesn't exist in the system.</response>
         [Authorize(Roles = "SystemAdmin")]
         [HttpPost("{complaintId}/answers")]

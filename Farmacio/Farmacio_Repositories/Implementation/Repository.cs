@@ -1,10 +1,10 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Farmacio_Models.DTO;
 
 namespace Farmacio_Repositories.Implementation
 {
@@ -110,6 +110,16 @@ namespace Farmacio_Repositories.Implementation
         public virtual IEnumerable<T> OrderByDescending<TKey>(Func<T, TKey> keySelector)
         {
             return _entities.OrderByDescending(keySelector);
+        }
+
+        public ITransaction OpenTransaction()
+        {
+            if (_context.IsTransactionOpened)
+            {
+                return new DummyTransaction();
+            }
+
+            return new Transaction(_context);
         }
     }
 }

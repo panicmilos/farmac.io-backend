@@ -5,6 +5,7 @@ using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,28 +45,54 @@ namespace Farmacio_Services.Implementation
 
         public override SupplierMedicine Update(SupplierMedicine supplierMedicine)
         {
-            var existingMedicine = TryToRead(supplierMedicine.Id);
+            using var transaction = _repository.OpenTransaction();
+            try
+            {
+                var existingMedicine = TryToRead(supplierMedicine.Id);
 
-            existingMedicine.Quantity = supplierMedicine.Quantity;
+                existingMedicine.Quantity = supplierMedicine.Quantity;
 
-            return base.Update(existingMedicine);
+                var updatedExistingMedicine = base.Update(existingMedicine);
+                transaction.Commit();
+
+                return updatedExistingMedicine;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happend. Please try again.");
+            }
         }
 
         public override SupplierMedicine Delete(Guid id)
         {
-            var existingSupplierMedicine = TryToRead(id);
-
-            var isSupplierMedicineInAnyActiveOffer = _supplierOfferService.Read()
-                .Where(offer => offer.SupplierId == existingSupplierMedicine.SupplierId && offer.Status == OfferStatus.WaitingForAnswer)
-                .ToList()
-                .Any(offer => offer.PharmacyOrder.OrderedMedicines.FirstOrDefault(orderedMedicine => orderedMedicine.MedicineId == existingSupplierMedicine.MedicineId) != null);
-
-            if (isSupplierMedicineInAnyActiveOffer)
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                throw new BadLogicException("Cannot delete medicine from the stock because it is in some active offer.");
-            }
+                var existingSupplierMedicine = TryToRead(id);
 
-            return base.Delete(id);
+                var isSupplierMedicineInAnyActiveOffer = _supplierOfferService.Read()
+                    .Where(offer => offer.SupplierId == existingSupplierMedicine.SupplierId && offer.Status == OfferStatus.WaitingForAnswer)
+                    .ToList()
+                    .Any(offer => offer.PharmacyOrder.OrderedMedicines.FirstOrDefault(orderedMedicine => orderedMedicine.MedicineId == existingSupplierMedicine.MedicineId) != null);
+
+                if (isSupplierMedicineInAnyActiveOffer)
+                {
+                    throw new BadLogicException("Cannot delete medicine from the stock because it is in some active offer.");
+                }
+
+                existingSupplierMedicine.Quantity = 0;
+                existingSupplierMedicine.Active = false;
+                var deletedSupplierMedicine = base.Update(existingSupplierMedicine);
+                transaction.Commit();
+
+                return deletedSupplierMedicine;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happend. Please try again.");
+            }
         }
 
         public SupplierMedicine ReadMedicineFor(Guid supplierId, Guid medicineId)
