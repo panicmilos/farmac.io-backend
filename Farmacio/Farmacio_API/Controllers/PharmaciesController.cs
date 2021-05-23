@@ -260,7 +260,7 @@ namespace Farmacio_API.Controllers
         /// Remove an existing medicine from the pharmacy.
         /// </summary>
         /// <response code="200">Removed pharmacy medicine.</response>
-        /// <response code="404">Pharmacy-Medicine not found.</response>
+        /// <response code="404">Pharmacy-Medicine not found or is in some active order.</response>
         [Authorize(Roles = "PharmacyAdmin")]
         [HttpDelete("{pharmacyId}/medicines/{pharmacyMedicineId}")]
         public IActionResult RemoveMedicineFromPharmacy(Guid pharmacyId, Guid pharmacyMedicineId)

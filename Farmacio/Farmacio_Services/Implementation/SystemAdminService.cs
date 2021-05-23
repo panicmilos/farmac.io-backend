@@ -34,5 +34,18 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("System Admin account not found.");
             return existingAccount;
         }
+
+        public override Account Delete(Guid id)
+        {
+            TryToRead(id);
+
+            var numberOfSystemAdmins = Read().Count();
+            if (numberOfSystemAdmins <= 1)
+            {
+                throw new BadLogicException("You cannot delete the last system admin.");
+            }
+
+            return base.Delete(id);
+        }
     }
 }

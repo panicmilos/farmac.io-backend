@@ -28,7 +28,7 @@ namespace Farmacio_API.Controllers
         /// Reads all existing pharmacists in the system.
         /// </summary>
         /// <response code="200">Read pharmacists.</response>
-        [Authorize(Roles = "Patient, SystemAdmin")]
+        [Authorize(Roles = "Patient, SystemAdmin, PharmacyAdmin")]
         [HttpGet]
         public IActionResult GetPharmacists()
         {
@@ -56,7 +56,7 @@ namespace Farmacio_API.Controllers
         {
             return Ok(_pharmacistService.ReadBy(filterParams));
         }
-        
+
         /// <summary>
         /// Returns pharmacists page that match the given params from the system.
         /// </summary>
@@ -128,10 +128,17 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Deleted pharmacist.</response>
         /// <response code="404">Pharmacist not found.</response>
-        [Authorize(Roles = "SystemAdmin")]
+        [Authorize(Roles = "PharmacyAdmin, SystemAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePharmacist(Guid id)
         {
+            var existingPharmacist = _pharmacistService.TryToRead(id);
+
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(IsPharmacyAdmin.Of((existingPharmacist.User as Pharmacist).PharmacyId))
+                .Or(AllDataAllowed.For(Role.SystemAdmin))
+                .Authorize();
+
             return Ok(_pharmacistService.Delete(id));
         }
 

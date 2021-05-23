@@ -1,19 +1,18 @@
 ﻿using Farmacio_Models.Domain;
+using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
+using Farmacio_Services.Implementation.Validation;
+using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Farmacio_Models.DTO;
-using Farmacio_Services.Implementation.Validation;
-using GlobalExceptionHandler.Exceptions;
 
 namespace Farmacio_Services.Implementation
 {
     public class PharmacistService : MedicalStaffService, IPharmacistService
     {
         private readonly IPharmacyService _pharmacyService;
-        private readonly IAppointmentService _appointmentService;
 
         public PharmacistService(
             IEmailVerificationService emailVerificationService
@@ -25,7 +24,6 @@ namespace Farmacio_Services.Implementation
             base(emailVerificationService, appointmentService, dermatologistWorkPlaceService, workTimeService, repository)
         {
             _pharmacyService = pharmacyService;
-            _appointmentService = appointmentService;
         }
 
         public override IEnumerable<Account> Read()
