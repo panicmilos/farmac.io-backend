@@ -4,6 +4,7 @@ using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,62 +31,84 @@ namespace Farmacio_Services.Implementation
 
         public MedicineGrade ChangeGrade(Guid medicineGradeId, int value)
         {
-            var medicineGrade = TryToRead(medicineGradeId) as MedicineGrade;
-
-            var medicine = _medicineService.TryToRead(medicineGrade.MedicineId);
-
-            if (value < 1 || value > 5)
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                throw new BadLogicException("The grade can be between 0 and 5.");
-            }
+                var medicineGrade = TryToRead(medicineGradeId) as MedicineGrade;
 
-            if (medicineGrade.Value == value)
+                var medicine = _medicineService.TryToRead(medicineGrade.MedicineId);
+
+                if (value < 1 || value > 5)
+                {
+                    throw new BadLogicException("The grade can be between 0 and 5.");
+                }
+
+                if (medicineGrade.Value == value)
+                {
+                    return medicineGrade;
+                }
+
+                medicine.AverageGrade = (medicine.AverageGrade * medicine.NumberOfGrades - medicineGrade.Value + value) / medicine.NumberOfGrades;
+                _medicineService.UpdateGrade(medicine);
+
+                medicineGrade.Value = value;
+
+                var updatedGrade = base.Update(medicineGrade) as MedicineGrade;
+
+                transaction.Commit();
+                return updatedGrade;
+            }
+            catch (DbUpdateConcurrencyException)
             {
-                return medicineGrade;
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happend. Please try again.");
             }
-
-            medicine.AverageGrade = (medicine.AverageGrade * medicine.NumberOfGrades - medicineGrade.Value + value) / medicine.NumberOfGrades;
-            _medicineService.UpdateGrade(medicine);
-
-            medicineGrade.Value = value;
-
-            return base.Update(medicineGrade) as MedicineGrade;
         }
 
         public override Grade Create(Grade grade)
         {
-            var medicineGrade = grade as MedicineGrade;
-
-            var medicine = _medicineService.TryToRead(medicineGrade.MedicineId);
-
-            var patient =_patientService.ReadByUserId(medicineGrade.PatientId);
-
-            if(patient == null)
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                throw new MissingEntityException("The given patient does not exist in the system.");
-            }
+                var medicineGrade = grade as MedicineGrade;
 
-            if(!_reservationService.DidPatientReserveMedicine(medicineGrade.MedicineId, medicineGrade.PatientId) &&
-                !_eRecipeService.WasMedicinePrescribedToPatient(medicineGrade.PatientId, medicineGrade.MedicineId))
+                var medicine = _medicineService.TryToRead(medicineGrade.MedicineId);
+
+                var patient = _patientService.ReadByUserId(medicineGrade.PatientId);
+
+                if (patient == null)
+                {
+                    throw new MissingEntityException("The given patient does not exist in the system.");
+                }
+
+                if (!_reservationService.DidPatientReserveMedicine(medicineGrade.MedicineId, medicineGrade.PatientId) &&
+                    !_eRecipeService.WasMedicinePrescribedToPatient(medicineGrade.PatientId, medicineGrade.MedicineId))
+                {
+                    throw new BadLogicException("The patient can rate the medicine if he has reserved and taken the medicine or if it has been prescribed to him.");
+                }
+
+                if (grade.Value < 1 || grade.Value > 5)
+                {
+                    throw new BadLogicException("The grade can have a value between 1 and 5.");
+                }
+
+                if (DidPatientRateMedicine(medicineGrade.MedicineId, medicineGrade.PatientId))
+                {
+                    throw new BadLogicException("The patient has already rated the medicine.");
+                }
+
+                medicine.AverageGrade = (medicine.AverageGrade * medicine.NumberOfGrades + medicineGrade.Value) / ++medicine.NumberOfGrades;
+                base.Create(medicineGrade);
+                _medicineService.UpdateGrade(medicine);
+
+                transaction.Commit();
+                return medicineGrade;
+            }
+            catch (DbUpdateConcurrencyException)
             {
-                throw new BadLogicException("The patient can rate the medicine if he has reserved and taken the medicine or if it has been prescribed to him.");
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happend. Please try again.");
             }
-
-            if(grade.Value < 1 || grade.Value > 5)
-            {
-                throw new BadLogicException("The grade can have a value between 1 and 5.");
-            }
-
-            if(DidPatientRateMedicine(medicineGrade.MedicineId, medicineGrade.PatientId))
-            {
-                throw new BadLogicException("The patient has already rated the medicine.");
-            }
-
-            medicine.AverageGrade = (medicine.AverageGrade * medicine.NumberOfGrades + medicineGrade.Value) / ++medicine.NumberOfGrades;
-            base.Create(medicineGrade);
-            _medicineService.UpdateGrade(medicine);
-
-            return medicineGrade;
         }
 
         public IEnumerable<Medicine> ReadThatPatientCanRate(Guid patientId)

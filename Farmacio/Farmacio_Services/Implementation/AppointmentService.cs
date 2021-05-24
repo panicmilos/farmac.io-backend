@@ -10,6 +10,7 @@ using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation.Utils;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Farmacio_Services.Implementation
 {
@@ -140,34 +141,46 @@ namespace Farmacio_Services.Implementation
 
         public Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointmentRequest)
         {
-            var appointmentWithDermatologist = base.Read(appointmentRequest.AppointmentId);
-            if (appointmentWithDermatologist == null)
-                throw new MissingEntityException("The given appointment does not exist in the system.");
+            using var transaction = _repository.OpenTransaction();
+            try
+            {
+                var appointmentWithDermatologist = base.Read(appointmentRequest.AppointmentId);
+                if (appointmentWithDermatologist == null)
+                    throw new MissingEntityException("The given appointment does not exist in the system.");
 
-            if (_patientService.ReadByUserId(appointmentRequest.PatientId) == null)
-                throw new MissingEntityException("The given patient does not exist in the system.");
+                if (_patientService.ReadByUserId(appointmentRequest.PatientId) == null)
+                    throw new MissingEntityException("The given patient does not exist in the system.");
 
-            if (appointmentWithDermatologist.IsReserved)
-                throw new BadLogicException("The given appointment is already reserved.");
+                if (appointmentWithDermatologist.IsReserved)
+                    throw new BadLogicException("The given appointment is already reserved.");
 
-            if (_patientService.HasExceededLimitOfNegativePoints(appointmentRequest.PatientId))
-                throw new BadLogicException("The given patient has 3 or more negative points.");
+                if (_patientService.HasExceededLimitOfNegativePoints(appointmentRequest.PatientId))
+                    throw new BadLogicException("The given patient has 3 or more negative points.");
 
-            if (appointmentWithDermatologist.DateTime < DateTime.Now)
-                throw new BadLogicException("The given appointment is in the past.");
+                if (appointmentWithDermatologist.DateTime < DateTime.Now)
+                    throw new BadLogicException("The given appointment is in the past.");
 
-            ValidateTimeForPatient(appointmentRequest.PatientId, appointmentWithDermatologist.DateTime, appointmentWithDermatologist.Duration);
+                ValidateTimeForPatient(appointmentRequest.PatientId, appointmentWithDermatologist.DateTime, appointmentWithDermatologist.Duration);
 
-            appointmentWithDermatologist.IsReserved = true;
-            appointmentWithDermatologist.PatientId = appointmentRequest.PatientId;
-            appointmentWithDermatologist.Price = DiscountUtils.ApplyDiscount(appointmentWithDermatologist.OriginalPrice,
-                _discountService.ReadDiscountFor(appointmentWithDermatologist.PharmacyId,
-                    appointmentWithDermatologist.PatientId.Value));
+                appointmentWithDermatologist.IsReserved = true;
+                appointmentWithDermatologist.PatientId = appointmentRequest.PatientId;
+                appointmentWithDermatologist.Price = DiscountUtils.ApplyDiscount(appointmentWithDermatologist.OriginalPrice,
+                    _discountService.ReadDiscountFor(appointmentWithDermatologist.PharmacyId,
+                        appointmentWithDermatologist.PatientId.Value));
 
-            var patientAccount = _patientService.ReadByUserId(appointmentRequest.PatientId);
-            var email = _templatesProvider.FromTemplate<Email>("Appointment", new { To = patientAccount.Email, Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
-            _emailDispatcher.Dispatch(email);
-            return base.Update(appointmentWithDermatologist);
+                var patientAccount = _patientService.ReadByUserId(appointmentRequest.PatientId);
+                var email = _templatesProvider.FromTemplate<Email>("Appointment", new { To = patientAccount.Email, Name = appointmentWithDermatologist.Patient.FirstName, Date = appointmentWithDermatologist.DateTime.ToString("dd-MM-yyyy HH:mm") });
+                _emailDispatcher.Dispatch(email);
+
+                var updatedAppointment = base.Update(appointmentWithDermatologist);
+                transaction.Commit();
+                return updatedAppointment;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happend. Please try again.");
+            }
         }
 
         public IEnumerable<Appointment> SortAppointments(IEnumerable<Appointment> appointments, string criteria, bool isAsc)
