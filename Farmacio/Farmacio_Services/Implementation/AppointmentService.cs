@@ -392,7 +392,7 @@ namespace Farmacio_Services.Implementation
         {
             var patient = _patientService.TryToRead(patientId);
             return ReadForMedicalStaff(medicalStaffUserId).Where(appointment => appointment.IsReserved
-                             && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now && appointment?.Report?.Notes != "Patient did not show up.").Count() != 0;
+                             && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now && DidPatientShowUpForAppointment(appointment.Id)).Count() != 0;
         }
 
         public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment)
@@ -458,6 +458,12 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<Appointment> SortAppointmentsPageTo(IEnumerable<Appointment> appointments, string criteria, bool isAsc, PageDTO pageDTO)
         {
             return PaginationUtils<Appointment>.Page(SortAppointments(appointments, criteria, isAsc), pageDTO);
+        }
+
+        public bool DidPatientShowUpForAppointment(Guid appointmentId)
+        {
+            var appointment = TryToRead(appointmentId);
+            return appointment?.Report?.Notes != "Patient did not show up.";
         }
     }
 }
