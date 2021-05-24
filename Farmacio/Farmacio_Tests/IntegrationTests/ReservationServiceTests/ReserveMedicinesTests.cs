@@ -183,7 +183,7 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
         [Fact]
         public void ReserveMedicines_ReturnNewReservation_IsRecipeOnlyFalse()
         {
-            using var transaction = context.Database.BeginTransaction();
+            using var transaction = _reservationRepository.OpenTransaction();
 
             bool checkIsERecipe = false;
             Reservation reservation = new Reservation

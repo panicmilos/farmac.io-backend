@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Farmacio_Models.Domain
 {
     public class Reservation : BaseEntity
     {
         public string UniqueId { get; set; }
+        [ConcurrencyCheck]
         public ReservationState State { get; set; }
         public DateTime PickupDeadline { get; set; }
         public Guid PharmacyId { get; set; }

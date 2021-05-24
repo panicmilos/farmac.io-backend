@@ -2,6 +2,7 @@
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
+using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Exceptions;
 using Farmacio_Services.Implementation;
@@ -364,6 +365,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
         [Fact]
         public void CreatePharmacistAppointment_ReturnsNewAppointment()
         {
+            _appointmentRepository.Setup(repository => repository.OpenTransaction()).Returns(new DummyTransaction());
             _accountService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
             {
                 User = new Pharmacist
