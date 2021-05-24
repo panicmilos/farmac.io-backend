@@ -95,7 +95,8 @@ namespace Farmacio_Services.Implementation
             var appointmentsForPharmacyInTimePeriod =
                 (dermatologistsOnly ? _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId)
                     : _appointmentService.ReadForPharmacy(pharmacyId))
-                .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To)
+                .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To &&
+                _appointmentService.DidPatientShowUpForAppointment(appointment.Id))
                 .ToList();
 
             // Fill empty days or months

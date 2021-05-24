@@ -31,7 +31,7 @@ namespace Farmacio_Services.Implementation
             return _appointmentService.ReadForPatient(patientId)
                 .Where(appointment => appointment.DateTime < DateTime.Now &&
                                       appointment.IsReserved &&
-                                      dermatologistIds.Contains(appointment.MedicalStaffId))
+                                      dermatologistIds.Contains(appointment.MedicalStaffId) && _appointmentService.DidPatientShowUpForAppointment(appointment.Id))
                 .Select(appointment => appointment.MedicalStaff as Dermatologist).ToHashSet();
         }
 
@@ -53,7 +53,8 @@ namespace Farmacio_Services.Implementation
                 .FirstOrDefault(appointment => appointment.DateTime < DateTime.Now &&
                                                appointment.IsReserved &&
                                                appointment.MedicalStaffId == dermatologistId &&
-                                               dermatologistIds.Contains(appointment.MedicalStaffId)) != null;
+                                               dermatologistIds.Contains(appointment.MedicalStaffId) && 
+                                               _appointmentService.DidPatientShowUpForAppointment(appointment.Id)) != null;
         }
     }
 }
