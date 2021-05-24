@@ -78,7 +78,7 @@ namespace Farmacio_Services.Implementation
             catch (DbUpdateConcurrencyException)
             {
                 transaction.Rollback();
-                throw new BadLogicException("Something bad happend. Please try again.");
+                throw new BadLogicException("Something bad happened. Please try again.");
             }
         }
 
