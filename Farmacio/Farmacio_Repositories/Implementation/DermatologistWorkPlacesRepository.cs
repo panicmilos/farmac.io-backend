@@ -18,7 +18,7 @@ namespace Farmacio_Repositories.Implementation
         {
             return _context.DermatologistWorkPlaces
                 .FromSqlRaw(
-                    $"SELECT * FROM DermatologistWorkPlaces WHERE DermatologistId = \"{dermatologistId}\" FOR UPDATE;")
+                    $"SELECT * FROM DermatologistWorkPlaces WHERE DermatologistId = \"{dermatologistId}\" AND Active = 1 FOR UPDATE;")
                 .ToList();
         }
 
@@ -26,7 +26,7 @@ namespace Farmacio_Repositories.Implementation
         {
             return _context.DermatologistWorkPlaces
                 .FromSqlRaw(
-                    $"SELECT * FROM DermatologistWorkPlaces WHERE DermatologistId = \"{dermatologistId}\" AND PharmacyId = \"{pharmacyId}\" FOR UPDATE")
+                    $"SELECT * FROM DermatologistWorkPlaces WHERE DermatologistId = \"{dermatologistId}\" AND PharmacyId = \"{pharmacyId}\" AND Active = 1 FOR UPDATE")
                 .FirstOrDefault();
         }
     }

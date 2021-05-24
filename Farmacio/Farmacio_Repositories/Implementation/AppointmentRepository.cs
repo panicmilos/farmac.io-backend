@@ -17,13 +17,13 @@ namespace Farmacio_Repositories.Implementation
         public IEnumerable<Appointment> ReadForPatient(Guid patientId)
         {
             return _context.Appointments
-                .FromSqlRaw($"SELECT * FROM Appointments WHERE PatientId = \"{patientId}\" FOR UPDATE;").ToList();
+                .FromSqlRaw($"SELECT * FROM Appointments WHERE PatientId = \"{patientId}\" AND Active = 1 FOR UPDATE;").ToList();
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
             return _context.Appointments
-                .FromSqlRaw($"SELECT * FROM Appointments WHERE MedicalStaffId = \"{medicalStaffId}\" FOR UPDATE;")
+                .FromSqlRaw($"SELECT * FROM Appointments WHERE MedicalStaffId = \"{medicalStaffId}\" AND Active = 1 FOR UPDATE;")
                 .ToList();
         }
     }
