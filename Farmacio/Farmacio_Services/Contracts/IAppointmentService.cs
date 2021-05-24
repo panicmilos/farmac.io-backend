@@ -55,5 +55,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO);
 
         IEnumerable<Appointment> SortAppointmentsPageTo(IEnumerable<Appointment> appointments, string criteria, bool isAsc, PageDTO pageDTO);
+
+        bool DidPatientShowUpForAppointment(Guid appointmentId);
     }
 }

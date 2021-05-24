@@ -17,7 +17,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
     public class CreatePharmacistAppointmentTests
     {
         private readonly IAppointmentService _appointmentService;
-        private readonly Mock<IRepository<Appointment>> _appointmentRepository;
+        private readonly Mock<IAppointmentRepository> _appointmentRepository;
         private readonly Mock<IPharmacyService> _pharmacyService;
         private readonly Mock<IAccountService> _accountService;
         private readonly Mock<IPatientService> _patientService;
@@ -27,7 +27,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
 
         public CreatePharmacistAppointmentTests()
         {
-            _appointmentRepository = new Mock<IRepository<Appointment>>();
+            _appointmentRepository = new Mock<IAppointmentRepository>();
             _pharmacyService = new Mock<IPharmacyService>();
             _accountService = new Mock<IAccountService>();
             _patientService = new Mock<IPatientService>();
@@ -55,7 +55,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Never);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -78,7 +79,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -104,7 +106,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -135,7 +138,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -172,7 +176,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Never);
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -191,7 +196,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
                 }
             });
             _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account { User = new Patient() });
-            _appointmentRepository.Setup(repository => repository.Read()).Returns(() => new List<Appointment>()
+            _appointmentRepository.Setup(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>())).Returns(() => new List<Appointment>
             {
                 new Appointment
                 {
@@ -218,7 +223,7 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Once);
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Once);
         }
 
         [Fact]
@@ -237,15 +242,19 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
                 }
             });
             _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account { User = new Patient() });
-            _appointmentRepository.Setup(repository => repository.Read()).Returns(() => new List<Appointment>()
-            {
-                new Appointment
+            _appointmentRepository.Setup(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>())).Returns(() =>
+                new List<Appointment>());
+
+            _appointmentRepository.Setup(repository => repository.ReadForPatient(It.IsAny<Guid>())).Returns(() =>
+                new List<Appointment>
                 {
-                    PatientId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd60"),
-                    DateTime = DateTime.Today.AddDays(2).AddHours(10),   // 10:00
-                    Duration = 10
-                }
-            });
+                    new Appointment
+                    {
+                        PatientId = new Guid("08d8f513-58cc-41e9-810e-0a83d243cd60"),
+                        DateTime = DateTime.Today.AddDays(2).AddHours(10), // 10:00
+                        Duration = 10
+                    }
+                });
 
             Action createAppointment = () => _appointmentService.CreatePharmacistAppointment(new CreateAppointmentDTO
             {
@@ -264,7 +273,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Exactly(2));
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Exactly(1));
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Exactly(1));
         }
 
         [Fact]
@@ -305,7 +315,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Exactly(2));
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Exactly(1));
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Exactly(1));
         }
 
         [Fact]
@@ -346,7 +357,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Never);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Exactly(2));
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Exactly(1));
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Exactly(1));
         }
 
         [Fact]
@@ -389,7 +401,8 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService.Verify(service => service.ReadDiscountFor(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
             _patientService.Verify(service => service.ReadByUserId(It.IsAny<Guid>()), Times.Once);
             _appointmentRepository.Verify(repository => repository.Create(It.IsAny<Appointment>()), Times.Once);
-            _appointmentRepository.Verify(repository => repository.Read(), Times.Exactly(2));
+            _appointmentRepository.Verify(repository => repository.ReadForPatient(It.IsAny<Guid>()), Times.Exactly(1));
+            _appointmentRepository.Verify(repository => repository.ReadForMedicalStaff(It.IsAny<Guid>()), Times.Exactly(1));
         }
     }
 }

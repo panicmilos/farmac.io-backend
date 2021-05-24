@@ -31,7 +31,7 @@ namespace Farmacio_Services.Implementation
             return _appointmentService.ReadForPatient(patientId)
                 .Where(appointment => appointment.DateTime < DateTime.Now &&
                                       appointment.IsReserved &&
-                                      pharmacistsIds.Contains(appointment.MedicalStaffId))
+                                      pharmacistsIds.Contains(appointment.MedicalStaffId) && _appointmentService.DidPatientShowUpForAppointment(appointment.Id))
                 .Select(appointment => appointment.MedicalStaff as Pharmacist).ToHashSet();
         }
 
@@ -53,7 +53,8 @@ namespace Farmacio_Services.Implementation
                 .FirstOrDefault(appointment => appointment.DateTime < DateTime.Now &&
                                                appointment.IsReserved &&
                                                appointment.MedicalStaffId == pharmacistId &&
-                                               pharmacistsIds.Contains(appointment.MedicalStaffId)) != null;
+                                               pharmacistsIds.Contains(appointment.MedicalStaffId) && 
+                                               _appointmentService.DidPatientShowUpForAppointment(appointment.Id)) != null;
         }
     }
 }
