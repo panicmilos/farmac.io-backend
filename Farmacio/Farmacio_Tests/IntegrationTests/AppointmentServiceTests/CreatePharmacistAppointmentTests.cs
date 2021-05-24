@@ -17,7 +17,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
     public class CreatePharmacistAppointmentTests : FarmacioTestBase
     {
         private readonly IAppointmentService _appointmentService;
-        private readonly IRepository<Appointment> _appointmentRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
         private readonly IPharmacyService _pharmacyService;
         private readonly IAccountService _accountService;
         private readonly IPatientService _patientService;
@@ -32,7 +32,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
             _templatesProvider = new Mock<ITemplatesProvider>();
             _emailDispatcher = new Mock<IEmailDispatcher>();
             var emailVerificationService = new EmailVerificationService(null, _emailDispatcher.Object, _templatesProvider.Object);
-            _appointmentRepository = new Repository<Appointment>(context);
+            _appointmentRepository = new AppointmentRepository(context);
             _pharmacyService = new PharmacyService(pharmacyPriceListService, null, new Repository<Pharmacy>(context));
             var promotionService = new PromotionService(_pharmacyService, _emailDispatcher.Object, _templatesProvider.Object, new Repository<Promotion>(context), null);
             _accountService = new AccountService(emailVerificationService, accountRepository);

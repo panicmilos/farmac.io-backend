@@ -48,9 +48,6 @@ namespace Farmacio_Services.Implementation
         {
             if (ReadForPharmacy(pharmacyMedicine.PharmacyId, pharmacyMedicine.MedicineId) != null)
                 throw new PharmacyMedicineAlreadyExistsException("Pharmacy medicine already exists.");
-            if (!_pharmacyPriceListService.TryToReadFor(pharmacyMedicine.PharmacyId).MedicinePriceList.Exists(
-                medicinePrice => medicinePrice.MedicineId == pharmacyMedicine.MedicineId))
-                throw new MissingEntityException("Medicine is not defined in pharmacy price list.");
             return base.Create(pharmacyMedicine);
         }
 
