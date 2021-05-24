@@ -201,7 +201,7 @@ namespace Farmacio_Services.Implementation
             catch (DbUpdateConcurrencyException)
             {
                 transaction.Rollback();
-                throw new BadLogicException("Something bad happend. Please try again.");
+                throw new BadLogicException("Something bad happened. Please try again.");
             }
         }
 
@@ -329,51 +329,61 @@ namespace Farmacio_Services.Implementation
 
         public Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointmentDTO)
         {
-            if (appointmentDTO.DateTime < DateTime.Now)
-                throw new BadLogicException("The given date and time are in the past.");
-
-            var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
-
-            var pharmacist = (Pharmacist)medicalAccount.User;
-
-            var patientAccount = _patientService.ReadByUserId(appointmentDTO.PatientId.Value);
-            if (patientAccount == null)
-                throw new MissingEntityException("The given patient does not exist in the system.");
-
-            var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
-
-            if (pharmacist.PharmacyId != appointmentDTO.PharmacyId)
-                throw new BadLogicException("Pharmacist must work in that pharmacy.");
-
-            ValidateAppointmentDateTime(appointmentDTO, pharmacist.WorkTime, "The given date-time and duration do not overlap with pharmacist's work time.",
-                "Pharmacist already has an appointment defined on the given date-time.");
-
-            ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
-
-            var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
-            var price = appointmentDTO.PatientId != null
-                ? DiscountUtils.ApplyDiscount(originalPrice,
-                    _discountService.ReadDiscountFor(appointmentDTO.PharmacyId, appointmentDTO.PatientId.Value))
-                : originalPrice;
-            if (price <= 0 || price > 999999)
-                throw new BadLogicException("Price must be a valid number between 0 and 999999.");
-
-            var appointmentWithPharmacist = Create(new Appointment
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                PharmacyId = appointmentDTO.PharmacyId,
-                MedicalStaffId = appointmentDTO.MedicalStaffId,
-                DateTime = appointmentDTO.DateTime,
-                Duration = appointmentDTO.Duration,
-                Price = price,
-                OriginalPrice = originalPrice,
-                PatientId = appointmentDTO.PatientId,
-                IsReserved = true
-            });
+                if (appointmentDTO.DateTime < DateTime.Now)
+                    throw new BadLogicException("The given date and time are in the past.");
 
-            var email = _templatesProvider.FromTemplate<Email>("Consultation", new { To = patientAccount.Email, Name = patientAccount.User.FirstName, Date = appointmentWithPharmacist.DateTime.ToString("dd-MM-yyyy HH:mm") });
-            _emailDispatcher.Dispatch(email);
+                var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
 
-            return appointmentWithPharmacist;
+                var pharmacist = (Pharmacist)medicalAccount.User;
+
+                var patientAccount = _patientService.ReadByUserId(appointmentDTO.PatientId.Value);
+                if (patientAccount == null)
+                    throw new MissingEntityException("The given patient does not exist in the system.");
+
+                var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
+
+                if (pharmacist.PharmacyId != appointmentDTO.PharmacyId)
+                    throw new BadLogicException("Pharmacist must work in that pharmacy.");
+
+                ValidateAppointmentDateTime(appointmentDTO, pharmacist.WorkTime, "The given date-time and duration do not overlap with pharmacist's work time.",
+                    "Pharmacist already has an appointment defined on the given date-time.");
+
+                ValidateTimeForPatient(appointmentDTO.PatientId.Value, appointmentDTO.DateTime, appointmentDTO.Duration);
+
+                var originalPrice = appointmentDTO.Price ?? _pharmacyService.GetPriceOfPharmacistConsultation(pharmacy.Id);
+                var price = appointmentDTO.PatientId != null
+                    ? DiscountUtils.ApplyDiscount(originalPrice,
+                        _discountService.ReadDiscountFor(appointmentDTO.PharmacyId, appointmentDTO.PatientId.Value))
+                    : originalPrice;
+                if (price <= 0 || price > 999999)
+                    throw new BadLogicException("Price must be a valid number between 0 and 999999.");
+
+                var appointmentWithPharmacist = Create(new Appointment
+                {
+                    PharmacyId = appointmentDTO.PharmacyId,
+                    MedicalStaffId = appointmentDTO.MedicalStaffId,
+                    DateTime = appointmentDTO.DateTime,
+                    Duration = appointmentDTO.Duration,
+                    Price = price,
+                    OriginalPrice = originalPrice,
+                    PatientId = appointmentDTO.PatientId,
+                    IsReserved = true
+                });
+                transaction.Commit();
+
+                var email = _templatesProvider.FromTemplate<Email>("Consultation", new { To = patientAccount.Email, Name = patientAccount.User.FirstName, Date = appointmentWithPharmacist.DateTime.ToString("dd-MM-yyyy HH:mm") });
+                _emailDispatcher.Dispatch(email);
+
+                return appointmentWithPharmacist;
+            }
+            catch (InvalidOperationException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happened. Please try again.");
+            }
         }
 
         public IEnumerable<Account> ReadPharmacistsForAppointment(IEnumerable<Account> pharmacists, SearhSortParamsForAppointments searchParams)

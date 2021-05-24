@@ -2,6 +2,7 @@
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
+using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation;
 using FluentAssertions;
@@ -299,6 +300,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
         [Fact]
         public void ReserveMedicines_ReturnNewReservation_IsRecipeOnlyFalse()
         {
+            _reservationRepository.Setup(repository => repository.OpenTransaction()).Returns(new DummyTransaction());
             _pharmacyService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Pharmacy());
             _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
             {
@@ -358,6 +360,7 @@ namespace Farmacio_Tests.UnitTests.ReservationServiceTests
         [Fact]
         public void ReserveMedicines_ReturnNewReservation_IsRecipeOnlyTrue()
         {
+            _reservationRepository.Setup(repository => repository.OpenTransaction()).Returns(new DummyTransaction());
             _pharmacyService.Setup(service => service.TryToRead(It.IsAny<Guid>())).Returns((Guid id) => new Pharmacy());
             _patientService.Setup(service => service.ReadByUserId(It.IsAny<Guid>())).Returns((Guid id) => new Account
             {

@@ -74,7 +74,7 @@ namespace Farmacio_Services.Implementation
                     _pharmacyService.ChangeStockFor(reservation.PharmacyId, reservedMedicine.MedicineId, reservedMedicine.Quantity);
                 }
 
-                
+
                 var updatedReservation = base.Update(reservation);
 
                 transaction.Commit();
@@ -256,26 +256,36 @@ namespace Farmacio_Services.Implementation
 
         public Reservation MarkReservationAsDone(Guid reservationId)
         {
-            var reservation = TryToRead(reservationId);
-            if (reservation.State == ReservationState.Cancelled)
-                throw new BadLogicException("The reservation has already been canceled.");
-            if (reservation.State == ReservationState.Done)
-                throw new BadLogicException("The reservation has already been picked up.");
-            if (reservation.PickupDeadline.AddHours(-24) < DateTime.Now)
-                throw new BadLogicException("The reservation is overdue, or less than 24h remained until the pickup deadline.");
-            reservation.State = ReservationState.Done;
-            base.Update(reservation);
-
-            var patientAccount = _patientService.TryToRead(reservation.PatientId);
-            var email = _templatesProvider.FromTemplate<Email>("ReservationIssued", new
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                To = patientAccount.Email,
-                Name = reservation.Patient.FirstName,
-                Id = reservation.UniqueId
-            });
-            _emailDispatcher.Dispatch(email);
+                var reservation = TryToRead(reservationId);
+                if (reservation.State == ReservationState.Cancelled)
+                    throw new BadLogicException("The reservation has already been canceled.");
+                if (reservation.State == ReservationState.Done)
+                    throw new BadLogicException("The reservation has already been picked up.");
+                if (reservation.PickupDeadline.AddHours(-24) < DateTime.Now)
+                    throw new BadLogicException("The reservation is overdue, or less than 24h remained until the pickup deadline.");
+                reservation.State = ReservationState.Done;
+                base.Update(reservation);
+                transaction.Commit();
 
-            return reservation;
+                var patientAccount = _patientService.TryToRead(reservation.PatientId);
+                var email = _templatesProvider.FromTemplate<Email>("ReservationIssued", new
+                {
+                    To = patientAccount.Email,
+                    Name = reservation.Patient.FirstName,
+                    Id = reservation.UniqueId
+                });
+                _emailDispatcher.Dispatch(email);
+
+                return reservation;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happened. Please try again.");
+            }
         }
     }
 }
