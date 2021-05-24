@@ -55,7 +55,7 @@ namespace Farmacio_API.Controllers
 
             var medicalStaffGrade = _mapper.Map<MedicalStaffGrade>(request);
 
-            return Ok(_medicalStaffGradeService.GradeMedicalStaff(medicalStaffGrade));
+            return Ok(_medicalStaffGradeService.Create(medicalStaffGrade));
         }
 
         /// <summary>

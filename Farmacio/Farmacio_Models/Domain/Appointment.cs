@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Farmacio_Models.Domain
 {
@@ -8,6 +9,7 @@ namespace Farmacio_Models.Domain
         public int Duration { get; set; }
         public float Price { get; set; }
         public float OriginalPrice { get; set; }
+        [ConcurrencyCheck]
         public bool IsReserved { get; set; }
         public Guid? PatientId { get; set; }
         public virtual Patient Patient { get; set; }
