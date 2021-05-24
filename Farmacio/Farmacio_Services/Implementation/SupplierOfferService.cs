@@ -58,7 +58,7 @@ namespace Farmacio_Services.Implementation
 
         public SupplierOffer AcceptOffer(Guid offerId, Guid pharmacyAdminId)
         {
-            var transaction = _repository.OpenTransaction();
+            using var transaction = _repository.OpenTransaction();
             try
             {
                 var offer = TryToRead(offerId);

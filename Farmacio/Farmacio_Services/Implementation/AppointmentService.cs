@@ -77,7 +77,7 @@ namespace Farmacio_Services.Implementation
 
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO)
         {
-            var transaction = _repository.OpenTransaction();
+            using var transaction = _repository.OpenTransaction();
             try
             {
                 if (appointmentDTO.DateTime < DateTime.Now)
@@ -88,7 +88,8 @@ namespace Farmacio_Services.Implementation
                 var workPlace = _dermatologistWorkPlaceService
                     .GetWorkPlaceInPharmacyFor(appointmentDTO.MedicalStaffId, pharmacy.Id);
                 if (workPlace == null)
-                    throw new MissingEntityException("Dermatologist work place for the given pharmacy id not found.");
+                    throw new MissingEntityException(
+                        "Dermatologist work place for the given pharmacy id not found.");
 
                 ValidateAppointmentDateTime(appointmentDTO, workPlace.WorkTime,
                     "The given date-time and duration do not overlap with dermatologist's work time.",
@@ -134,10 +135,10 @@ namespace Farmacio_Services.Implementation
                         });
                     _emailDispatcher.Dispatch(email);
                 }
-            
+
                 return newAppointment;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (InvalidOperationException)
             {
                 transaction.Rollback();
                 throw new BadLogicException("Something bad happened. Please try again.");

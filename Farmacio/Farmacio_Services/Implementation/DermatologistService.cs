@@ -78,30 +78,40 @@ namespace Farmacio_Services.Implementation
 
         public Account AddToPharmacy(Guid pharmacyId, Guid dermatologistAccountId, WorkTime workTime)
         {
-            var dermatologistAccount = TryToRead(dermatologistAccountId);
-            var pharmacy = _pharmacyService.TryToRead(pharmacyId);
-
-            var workPlace =
-                _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(dermatologistAccount.UserId, pharmacyId);
-
-            if (workPlace != null)
-                throw new AlreadyEmployedInPharmacyException("Dermatologist already employed in pharmacy.");
-
-            WorkTimeValidation.ValidateWorkHours(workTime);
-
-            if (!IsWorkTimeForDermatologistValid(workTime, dermatologistAccount.UserId))
-                throw new WorkTimesOverlapException("Work time overlaps with another.");
-
-            var newWorkPlace = new DermatologistWorkPlace
+            using var transaction = _repository.OpenTransaction();
+            try
             {
-                DermatologistId = dermatologistAccount.UserId,
-                Pharmacy = pharmacy,
-                WorkTime = workTime
-            };
+                var dermatologistAccount = TryToRead(dermatologistAccountId);
+                var pharmacy = _pharmacyService.TryToRead(pharmacyId);
 
-            _dermatologistWorkPlaceService.Create(newWorkPlace);
+                var workPlace =
+                    _dermatologistWorkPlaceService.GetWorkPlaceInPharmacyFor(dermatologistAccount.UserId, pharmacyId);
 
-            return Update(dermatologistAccount);
+                if (workPlace != null)
+                    throw new AlreadyEmployedInPharmacyException("Dermatologist already employed in pharmacy.");
+
+                WorkTimeValidation.ValidateWorkHours(workTime);
+
+                if (!IsWorkTimeForDermatologistValid(workTime, dermatologistAccount.UserId))
+                    throw new WorkTimesOverlapException("Work time overlaps with another.");
+
+                var newWorkPlace = new DermatologistWorkPlace
+                {
+                    DermatologistId = dermatologistAccount.UserId,
+                    Pharmacy = pharmacy,
+                    WorkTime = workTime
+                };
+
+                _dermatologistWorkPlaceService.Create(newWorkPlace);
+                var updatedDermatologistAccount = Update(dermatologistAccount);
+                transaction.Commit();
+                return updatedDermatologistAccount;
+            }
+            catch (InvalidOperationException)
+            {
+                transaction.Rollback();
+                throw new BadLogicException("Something bad happened. Please try again.");
+            }
         }
 
         public Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistAccountId)
