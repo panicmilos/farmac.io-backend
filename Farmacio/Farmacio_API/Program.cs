@@ -6,10 +6,11 @@ using Microsoft.Extensions.Hosting;
 
 namespace Farmacio_API
 {
-    public class Program
+    public static class Program
     {
         private static readonly bool RunMigrations = Environment.GetEnvironmentVariable("RunMigrations") == "true";
         private static readonly bool SeedDatabase = Environment.GetEnvironmentVariable("SeedDatabase") == "true";
+
         public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();

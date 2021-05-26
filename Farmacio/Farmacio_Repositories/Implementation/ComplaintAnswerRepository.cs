@@ -16,7 +16,7 @@ namespace Farmacio_Repositories.Implementation
 
         public IEnumerable<ComplaintAnswer> ReadAnswersFor(Guid complaintId)
         {
-            return _entities.FromSqlRaw($"SELECT * FROM ComplaintAnswers WHERE ComplaintId = \"{complaintId}\" AND Active = 1 FOR UPDATE;").ToList(); ;
+            return _entities.FromSqlRaw($"SELECT * FROM ComplaintAnswers WHERE ComplaintId = \"{complaintId}\" AND Active = 1 FOR UPDATE;").ToList();
         }
     }
 }

@@ -5,21 +5,19 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Farmacio_API.Attributes
 {
-    public class EmailSecretAuthorization : Attribute, IAsyncActionFilter
+    public class EmailSecretAuthorizationAttribute : Attribute, IAsyncActionFilter
     {
-        private readonly string _emailSecret;
         private readonly JwtSecurityTokenHandler _tokenHandler;
         private readonly TokenValidationParameters _tokenValidationParamethers;
 
-        public EmailSecretAuthorization()
+        public EmailSecretAuthorizationAttribute()
         {
-            _emailSecret = Environment.GetEnvironmentVariable("EmailSecret");
+            var _emailSecret = Environment.GetEnvironmentVariable("EmailSecret");
             _tokenHandler = new JwtSecurityTokenHandler();
             _tokenValidationParamethers = new TokenValidationParameters
             {

@@ -6,7 +6,7 @@ namespace EmailService.Constracts
 {
     public interface ITemplateProviderOptionsBuilder : IBuilder<TemplateProviderOptions>
     {
-        ITemplateProviderOptionsBuilder SetAssemblyType(Type assmeblyType);
+        ITemplateProviderOptionsBuilder SetAssemblyType(Type assemblyType);
 
         ITemplateProviderOptionsBuilder AddFileWithTemplates(string filePath);
     }

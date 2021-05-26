@@ -1,5 +1,7 @@
-﻿<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
+    <title>Medicine informations</title>
 </head>
 
 <body>
@@ -9,16 +11,16 @@
     <br />
 
     <ol>
-        <li><h3><b>MEDICINE NAME</b></h3></li>
-        <b>{{medicine.medicine.name}} By &#169; {{medicine.medicine.manufacturer}}</b>
+        <li><h3><strong>MEDICINE NAME</strong></h3></li>
+        <strong>{{medicine.medicine.name}} By &#169; {{medicine.medicine.manufacturer}}</strong>
 
         <li><h3><b>Ingridients</b></h3></li>
         <p>{{medicine.medicine.name}} is made of:</p>
 
         <table border="1">
             <thead>
-            <th>Ingridient name</th>
-            <th>Ingridient mass</th>
+            <th scope="col">Ingridient name</th>
+            <th scope="col">Ingridient mass</th>
             </thead>
             <tbody>
                 {{for ingridient in medicine.ingredients}}
@@ -34,22 +36,22 @@
             </tbody>
         </table>
 
-        <li><h3><b>PHARMACEUTICAL FORM</b></h3></li>
+        <li><h3><strong>PHARMACEUTICAL FORM</strong></h3></li>
         <p>Form: {{medicine.medicine.form}}</p>
 
         <li>
-            <h3><b>CLINICAL PARTICULARS</b></h3>
+            <h3><strong>CLINICAL PARTICULARS</strong></h3>
             <ol>
-                <li><b>Reccomended dose</b></li>
+                <li><strong>Reccomended dose</strong></li>
                 <p>{{ medicine.medicine.recommended_dose }}</p>
 
-                <li><b>Contraindications</b></li>
+                <li><strong>Contraindications</strong></li>
                 <p>{{ medicine.medicine.contraindications }}</p>
 
-                <li><b>Additional info</b></li>
+                <li><strong>Additional info</strong></li>
                 <p>{{ medicine.medicine.additional_info }}</p>
 
-                <li><b>Replacements</b></li>
+                <li><strong>Replacements</strong></li>
                 <ol>
                     {{for replacement in medicine.replacements}}
                     <li>{{replacement.replacement_medicine.name}}</li>
@@ -58,10 +60,10 @@
             </ol>
         </li>
 
-        <li><h3><b>PHARMACOLOGICAL INFORMATION</b></h3></li>
+        <li><h3><strong>PHARMACOLOGICAL INFORMATION</strong></h3></li>
         <p>Type: {{medicine.medicine.type.type_name}}</p>
 
-        <li><h3><b>AVAILABILITY INFO</b></h3></li>
+        <li><h3><strong>AVAILABILITY INFO</strong></h3></li>
         {{if medicine.medicine.is_recipe_only}}
         <p>{{medicine.medicine.name}} can be purchased only with recipe.</p>
         {{else}}

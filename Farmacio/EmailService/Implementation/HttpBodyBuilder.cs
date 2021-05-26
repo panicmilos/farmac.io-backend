@@ -15,7 +15,7 @@ namespace EmailService.Implementation
             _bodyBuilder = new StringBuilder();
         }
 
-        public IBodyBuilder AddText(string text, TextOptions options)
+        public IBodyBuilder AddText(string text, TextOptions options = null)
         {
             if (options == null)
             {
