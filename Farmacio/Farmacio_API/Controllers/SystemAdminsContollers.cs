@@ -3,7 +3,6 @@ using Farmacio_API.Contracts.Requests.Accounts;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
-using GlobalExceptionHandler.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

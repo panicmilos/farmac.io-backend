@@ -1,8 +1,9 @@
-﻿using System.Net;
-using GlobalExceptionHandler.Exceptions;
+﻿using GlobalExceptionHandler.Exceptions;
+using System;
 
 namespace Farmacio_Services.Exceptions
 {
+    [Serializable]
     public class InvalidWorkTimeException : BadLogicException
     {
         public InvalidWorkTimeException()

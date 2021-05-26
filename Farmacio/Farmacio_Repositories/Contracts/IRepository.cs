@@ -13,11 +13,11 @@ namespace Farmacio_Repositories.Contracts
 
         IEnumerable<T> Read();
 
+        IEnumerable<T> Read(Predicate<T> predicate);
+
         IEnumerable<T> ReadPage(PageDTO pageDto);
 
         IEnumerable<T> ReadAllPagesTo(PageDTO pageDto);
-
-        IEnumerable<T> Read(Predicate<T> predicate);
 
         T Read(Guid id);
 

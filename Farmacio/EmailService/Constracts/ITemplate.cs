@@ -1,6 +1,6 @@
 ﻿namespace EmailService.Constracts
 {
-    public interface ITemplate<T>
+    public interface ITemplate<out T>
     {
         string Name { get; }
 

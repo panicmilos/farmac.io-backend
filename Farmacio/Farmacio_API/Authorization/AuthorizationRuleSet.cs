@@ -8,7 +8,7 @@ namespace Farmacio_API.Authorization
     public class AuthorizationRuleSet : IAuthorizationRuleSet
     {
         public HttpContext HttpContext { get; set; }
-        public IList<IList<IAuthorizationRule>> _rules;
+        private IList<IList<IAuthorizationRule>> _rules;
 
         public AuthorizationRuleSet()
         {

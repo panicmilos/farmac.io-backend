@@ -1,6 +1,6 @@
 ﻿namespace EmailService.Contracts
 {
-    public interface IBuilder<T>
+    public interface IBuilder<out T>
     {
         T Build();
     }
