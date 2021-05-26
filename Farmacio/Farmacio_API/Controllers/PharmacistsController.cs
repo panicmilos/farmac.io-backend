@@ -91,13 +91,12 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Created pharmacist.</response>
         /// <response code="404">Pharmacy not found.</response>
         /// <response code="401">Username or email is already taken.</response>
-        [Authorize(Roles = "SystemAdmin, PharmacyAdmin")]
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpPost]
         public IActionResult CreatePharmacist(CreatePharmacistRequest request)
         {
             AuthorizationRuleSet.For(HttpContext)
                                 .Rule(IsPharmacyAdmin.Of(request.User.PharmacyId))
-                                .Or(AllDataAllowed.For(Role.SystemAdmin))
                                 .Authorize();
 
             var pharmacist = _mapper.Map<Account>(request);
@@ -110,13 +109,15 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Updated pharmacist.</response>
         /// <response code="404">Pharmacy or Pharmacist not found.</response>
         /// <response code="401">Username or email is already taken.</response>
-        [Authorize(Roles = "Pharmacist, SystemAdmin")]
+        [Authorize(Roles = "Pharmacist, PharmacyAdmin")]
         [HttpPut]
         public IActionResult UpdatePharmacist(UpdatePharmacistRequest request)
         {
+            var existingPharmacist = _pharmacistService.TryToRead(request.Account.Id);
+
             AuthorizationRuleSet.For(HttpContext)
                     .Rule(AccountSpecific.For(request.Account.Id))
-                    .Or(AllDataAllowed.For(Role.SystemAdmin))
+                    .Or(IsPharmacyAdmin.Of((existingPharmacist.User as Pharmacist).PharmacyId))
                     .Authorize();
 
             var pharmacist = _mapper.Map<Account>(request);
@@ -128,7 +129,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Deleted pharmacist.</response>
         /// <response code="404">Pharmacist not found.</response>
-        [Authorize(Roles = "PharmacyAdmin, SystemAdmin")]
+        [Authorize(Roles = "PharmacyAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePharmacist(Guid id)
         {
@@ -136,7 +137,6 @@ namespace Farmacio_API.Controllers
 
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of((existingPharmacist.User as Pharmacist).PharmacyId))
-                .Or(AllDataAllowed.For(Role.SystemAdmin))
                 .Authorize();
 
             return Ok(_pharmacistService.Delete(id));
