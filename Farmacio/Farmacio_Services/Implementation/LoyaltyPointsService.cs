@@ -28,10 +28,8 @@ namespace Farmacio_Services.Implementation
         public LoyaltyPoints ReadOrCreate()
         {
             var loyaltyPoints = Read();
-            if (loyaltyPoints.Count() == 0)
-            {
+            if (!loyaltyPoints.Any())
                 Create(new LoyaltyPoints());
-            }
 
             return Read().ToList().First();
         }

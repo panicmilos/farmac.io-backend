@@ -8,12 +8,12 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<Account> ReadForPharmacy(Guid pharmacyId);
 
-        Account ReadForPharmacy(Guid pharmacyId, Guid dermatologistId);
+        Account ReadForPharmacy(Guid pharmacyId, Guid dermatologistAccountId);
 
         IEnumerable<Account> SearchByNameForPharmacy(Guid pharmacyId, string name);
 
-        Account AddToPharmacy(Guid pharmacyId, Guid dermatologistId, WorkTime workTime);
+        Account AddToPharmacy(Guid pharmacyId, Guid dermatologistAccountId, WorkTime workTime);
 
-        Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistId);
+        Account RemoveFromPharmacy(Guid pharmacyId, Guid dermatologistAccountId);
     }
 }

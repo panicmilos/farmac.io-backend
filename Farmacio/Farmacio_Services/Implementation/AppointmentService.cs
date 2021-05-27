@@ -48,14 +48,14 @@ namespace Farmacio_Services.Implementation
             _eRecipeService = eRecipeService;
         }
 
-        public IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDto)
+        public IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDTO)
         {
-            return PaginationUtils<Appointment>.Page(ReadForDermatologistsInPharmacy(pharmacyId), pageDto);
+            return PaginationUtils<Appointment>.Page(ReadForDermatologistsInPharmacy(pharmacyId), pageDTO);
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId)
         {
-            return ((IAppointmentRepository) _repository).ReadForMedicalStaff(medicalStaffId);
+            return Read().Where(appointment => appointment.MedicalStaffId == medicalStaffId).ToList();
         }
 
         public IEnumerable<Appointment> ReadForMedicalStaffInPharmacy(Guid medicalStaffId, Guid pharmacyId)
@@ -70,9 +70,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId)
         {
-            return ReadForPharmacy(pharmacyId)
-                .Where(appointment =>
-                    _accountService.ReadByUserId(appointment.MedicalStaffId)?.Role == Role.Dermatologist);
+            return ReadForPharmacy(pharmacyId).Where(appointment => appointment.MedicalStaff is Dermatologist).ToList();
         }
 
         public Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO)
@@ -152,12 +150,12 @@ namespace Farmacio_Services.Implementation
             if (!TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, workTime.From, workTime.To))
                 throw new InvalidAppointmentDateTimeException(medicalStaffDontWorkMessage);
 
-            var overlap = ReadForMedicalStaff(appointment.MedicalStaffId).FirstOrDefault(a =>
+            var overlap = ReadForMedicalStaffForUpdate(appointment.MedicalStaffId).Any(a =>
             {
                 return a.DateTime.Date == @from.Date &&
                     TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, a.DateTime, a.DateTime.AddMinutes(a.Duration));
             });
-            if (overlap != null)
+            if (overlap)
                 throw new InvalidAppointmentDateTimeException(medicalStaffIsBusyMessage);
         }
 
@@ -221,14 +219,12 @@ namespace Farmacio_Services.Implementation
             return appointments;
         }
 
-        public IEnumerable<Appointment> ReadForPatients(Guid patientId)
+        public IEnumerable<Appointment> ReadFutureExaminationAppointmentsFor(Guid patientId)
         {
             if (_patientService.ReadByUserId(patientId) == null)
-            {
                 throw new MissingEntityException("The given patient does not exist in the system.");
-            }
 
-            return ((IAppointmentRepository) _repository).ReadForPatient(patientId).Where(appointment =>
+            return ReadForPatient(patientId).Where(appointment =>
                 appointment.IsReserved && appointment.DateTime > DateTime.Now &&
                 appointment.MedicalStaff is Dermatologist);
         }
@@ -251,14 +247,14 @@ namespace Farmacio_Services.Implementation
             return appointment;
         }
 
-        public IEnumerable<Appointment> ReadPatientsHistoryOfVisitsToDermatologist(Guid patientId)
+        public IEnumerable<Appointment> ReadPatientsHistoryOfVisitingDermatologists(Guid patientId)
         {
-            if (_patientService.Read().Where(account => account.UserId == patientId) == null)
-            {
+            if (_patientService.ReadByUserId(patientId) == null)
                 throw new MissingEntityException("The given patient does not exist in the system.");
-            }
-            return Read().ToList().Where(appointment =>
-                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Dermatologist);
+            
+            return ReadForPatient(patientId).Where(appointment =>
+                appointment.IsReserved && appointment.DateTime < DateTime.Now && 
+                appointment.MedicalStaff is Dermatologist);
         }
 
         public Report CreateReport(CreateReportDTO reportDTO)
@@ -393,29 +389,27 @@ namespace Farmacio_Services.Implementation
             {
                 var pharmacist = pharmacistAccount.User as Pharmacist;
                 return pharmacist.WorkTime.From.TimeOfDay <= searchParams.ConsultationDateTime.TimeOfDay &&
-                searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration).TimeOfDay <= pharmacist.WorkTime.To.TimeOfDay;
+                    searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration).TimeOfDay <= pharmacist.WorkTime.To.TimeOfDay;
             })
             .Where(pharmacistAccount =>
             {
                 var pharmacist = pharmacistAccount.User as Pharmacist;
-                var overlapingAppointments = ReadForMedicalStaff(pharmacist.Id)
-                .Where(appointment =>
-                    appointment.MedicalStaffId == pharmacist.Id &&
+                var overlap = ReadForMedicalStaff(pharmacist.Id).Any(appointment =>
                     appointment.DateTime.Date == searchParams.ConsultationDateTime.Date &&
                     TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration),
-                    appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
-                return overlapingAppointments.Count() == 0;
+                                                                appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
+                return !overlap;
             });
         }
 
-        public IEnumerable<Appointment> ReadFuturePharmacistsAppointmentsFor(Guid patientId)
+        public IEnumerable<Appointment> ReadFutureConsultationAppointmentsFor(Guid patientId)
         {
             if (_patientService.ReadByUserId(patientId) == null)
-            {
                 throw new MissingEntityException("The given patient does not exist in the system.");
-            }
-            return Read().ToList().Where(appointment =>
-                                appointment.PatientId == patientId && appointment.IsReserved && appointment.DateTime > DateTime.Now && appointment.MedicalStaff is Pharmacist);
+
+            return ReadForPatient(patientId).Where(appointment =>
+                appointment.IsReserved && appointment.DateTime > DateTime.Now &&
+                appointment.MedicalStaff is Pharmacist);
         }
 
         public Appointment CancelAppointmentWithPharmacist(Guid appointmentId)
@@ -433,11 +427,12 @@ namespace Farmacio_Services.Implementation
             return appointment;
         }
 
-        public bool DidPatientHaveAppointmentWithMedicalStaff(Guid patientId, Guid medicalStaffUserId)
+        public bool DidPatientHaveAppointmentWithMedicalStaff(Guid patientId, Guid medicalStaffId)
         {
             var patient = _patientService.TryToRead(patientId);
-            return ReadForMedicalStaff(medicalStaffUserId).Where(appointment => appointment.IsReserved
-                             && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now && DidPatientShowUpForAppointment(appointment.Id)).Count() != 0;
+            return ReadForMedicalStaff(medicalStaffId).Count(appointment => appointment.IsReserved
+                && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now && 
+                DidPatientShowUpForAppointment(appointment.Id)) > 0;
         }
 
         public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment)
@@ -452,13 +447,13 @@ namespace Farmacio_Services.Implementation
 
         private void ValidateTimeForPatient(Guid patientId, DateTime dateTime, int duration)
         {
-            var overlap = ReadForPatient(patientId).FirstOrDefault(a =>
+            var overlap = ReadForPatientForUpdate(patientId).Any(a =>
             {
                 return a.DateTime.Date == dateTime.Date &&
                     TimeIntervalUtils.TimeIntervalTimesOverlap(dateTime, dateTime.AddMinutes(duration),
                                                                 a.DateTime, a.DateTime.AddMinutes(a.Duration));
             });
-            if (overlap != null)
+            if (overlap)
                 throw new InvalidAppointmentDateTimeException("The given appointment overlaps with the already reserved appointment of the patient.");
         }
 
@@ -477,27 +472,27 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<Appointment> ReadForPatient(Guid patientId)
         {
-            return ((IAppointmentRepository) _repository).ReadForPatient(patientId);
+            return Read().Where(appointment => appointment.PatientId == patientId).ToList();
         }
 
         public IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId)
         {
             if (_patientService.ReadByUserId(patientId) == null)
-            {
                 throw new MissingEntityException("The given patient does not exist in the system.");
-            }
+            
             return ReadForPatient(patientId).Where(appointment =>
-                appointment.IsReserved && appointment.DateTime < DateTime.Now && appointment.MedicalStaff is Pharmacist);
+                appointment.IsReserved && appointment.DateTime < DateTime.Now && 
+                appointment.MedicalStaff is Pharmacist);
         }
 
-        public IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDto)
+        public IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDTO)
         {
-            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitingPharmacists(patientId), pageDto);
+            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitingPharmacists(patientId), pageDTO);
         }
 
         public IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO)
         {
-            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitsToDermatologist(patientId), pageDTO);
+            return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitingDermatologists(patientId), pageDTO);
         }
 
         public IEnumerable<Appointment> SortAppointmentsPageTo(IEnumerable<Appointment> appointments, string criteria, bool isAsc, PageDTO pageDTO)
@@ -509,6 +504,16 @@ namespace Farmacio_Services.Implementation
         {
             var appointment = TryToRead(appointmentId);
             return appointment?.Report?.Notes != "Patient did not show up.";
+        }
+
+        public IEnumerable<Appointment> ReadForPatientForUpdate(Guid patientId)
+        {
+            return ((IAppointmentRepository)_repository).ReadForPatient(patientId);
+        }
+
+        public IEnumerable<Appointment> ReadForMedicalStaffForUpdate(Guid medicalStaffId)
+        {
+            return ((IAppointmentRepository)_repository).ReadForMedicalStaff(medicalStaffId);
         }
     }
 }

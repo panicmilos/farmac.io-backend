@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Repositories.Implementation;

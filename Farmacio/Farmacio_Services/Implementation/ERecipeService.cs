@@ -185,13 +185,8 @@ namespace Farmacio_Services.Implementation
 
         public bool WasMedicinePrescribedToPatient(Guid patientId, Guid medicineId)
         {
-            var eRecipes = ReadFor(patientId);
-            eRecipes = eRecipes.Where(eRecipe =>
-            {
-                var medicines = eRecipe.Medicines;
-                return medicines.Where(medicine => medicine.MedicineId == medicineId).FirstOrDefault() != null;
-            }).ToList();
-            return eRecipes.Count() > 0;
+            return ReadFor(patientId).Any(eRecipe =>
+                eRecipe.Medicines.FirstOrDefault(medicine => medicine.MedicineId == medicineId) != null);
         }
 
         private string GetUniqueId()

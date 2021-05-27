@@ -7,7 +7,6 @@ using GlobalExceptionHandler.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Farmacio_Services.Implementation
 {
@@ -73,22 +72,14 @@ namespace Farmacio_Services.Implementation
                 .FirstOrDefault(reservation => reservation.State == ReservationState.Done &&
                                                reservation.PharmacyId == pharmacyId) != null;
 
-            if (hasDoneReservation)
-            {
-                return true;
-            }
+            if (hasDoneReservation) return true;
 
             var hasConsultationOrExaminationInPast = _appointmentService.ReadForPatient(patientId)
                 .FirstOrDefault(appointment => appointment.PharmacyId == pharmacyId &&
                                                appointment.DateTime < DateTime.Now &&
                                                appointment.IsReserved) != null;
 
-            if (hasConsultationOrExaminationInPast)
-            {
-                return true;
-            }
-
-            return false;
+            return hasConsultationOrExaminationInPast;
         }
 
         private bool DidPatientRatePharmacy(Guid patientId, Guid pharmacyId)
@@ -151,11 +142,11 @@ namespace Farmacio_Services.Implementation
 
         public PharmacyGrade Read(Guid patientId, Guid pharmacyId)
         {
-            return Read().Where(grade =>
+            return Read().FirstOrDefault(grade =>
             {
                 var pharmacyGrade = grade as PharmacyGrade;
                 return pharmacyGrade?.PatientId == patientId && pharmacyGrade?.PharmacyId == pharmacyId;
-            }).FirstOrDefault() as PharmacyGrade;
+            }) as PharmacyGrade;
         }
 
         public IEnumerable<Pharmacy> ReadPharmaciesThatPatientRatedPageTo(Guid patientId, PageDTO pageDTO)

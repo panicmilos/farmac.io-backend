@@ -7,7 +7,7 @@ namespace Farmacio_Services.Contracts
 {
     public interface IERecipeService : ICrudService<ERecipe>
     {
-        bool WasMedicinePrescribedToPatient(Guid patienrtId, Guid medicineId);
+        bool WasMedicinePrescribedToPatient(Guid patientId, Guid medicineId);
 
         IEnumerable<ERecipe> ReadFor(Guid patientId);
 

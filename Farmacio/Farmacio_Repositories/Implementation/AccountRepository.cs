@@ -13,12 +13,12 @@ namespace Farmacio_Repositories.Implementation
         {
         }
 
-        public IEnumerable<Account> ReadPageOf(Role role, PageDTO pageDto)
+        public IEnumerable<Account> ReadPageOf(Role role, PageDTO page)
         {
-            var numberOfEntitiesToSkip = (pageDto.Number - 1) * pageDto.Size;
+            var numberOfEntitiesToSkip = (page.Number - 1) * page.Size;
             return _entities.Where(e => e.Active && e.Role == role)
                 .Skip(numberOfEntitiesToSkip)
-                .Take(pageDto.Size);
+                .Take(page.Size);
         }
     }
 }

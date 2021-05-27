@@ -167,7 +167,7 @@ namespace Farmacio_Services.Implementation
 
             {
                 var pharmacist = (Pharmacist)pharmacistAccount.User;
-                if (pharmacies.Where(pharmacy => pharmacy.Id == pharmacist.PharmacyId).FirstOrDefault() == null)
+                if (pharmacies.FirstOrDefault(pharmacy => pharmacy.Id == pharmacist.PharmacyId) == null)
                 {
                     pharmacies.Add(new PharmacyDTO
                     {

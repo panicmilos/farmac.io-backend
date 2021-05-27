@@ -9,7 +9,7 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<SmallPharmacyDTO> ReadForHomePage();
 
-        IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid Id);
+        IEnumerable<PharmaciesOfMedicineDTO> MedicineInPharmacies(Guid medicineId);
 
         MedicineInPharmacyDTO ReadMedicine(Guid pharmacyId, Guid medicineId);
 

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Farmacio_Models.Domain
+﻿namespace Farmacio_Models.Domain
 {
     public abstract class MedicalStaff : User
     {

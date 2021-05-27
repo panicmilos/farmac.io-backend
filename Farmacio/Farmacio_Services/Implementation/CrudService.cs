@@ -38,6 +38,11 @@ namespace Farmacio_Services.Implementation
             return _repository.Read(predicate);
         }
 
+        public virtual T Read(Guid id)
+        {
+            return _repository.Read(id);
+        }
+
         public IEnumerable<T> ReadPage(PageDTO pageDto)
         {
             return _repository.ReadPage(pageDto);
@@ -46,11 +51,6 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<T> ReadAllPagesTo(PageDTO pageDto)
         {
             return _repository.ReadAllPagesTo(pageDto).ToList();
-        }
-
-        public virtual T Read(Guid id)
-        {
-            return _repository.Read(id);
         }
 
         public virtual T TryToRead(Guid id)
