@@ -89,8 +89,6 @@ namespace Farmacio_API.Extensions
                 MassInMilligrams = 500
             };
 
-            var ingredients1 = new List<MedicineIngredient> { medicineIngridient1, medicineIngridient2 };
-
             var medicineIngridient3 = new MedicineIngredient
             {
                 Name = "ibuprofena",
@@ -102,20 +100,6 @@ namespace Farmacio_API.Extensions
                 Name = "laktoza",
                 MassInMilligrams = 10
             };
-
-            var ingredients2 = new List<MedicineIngredient>
-        {
-            medicineIngridient1,
-            medicineIngridient3,
-            medicineIngridient4
-        };
-
-            var ingredients3 = new List<MedicineIngredient>
-        {
-            medicineIngridient2,
-            medicineIngridient3,
-            medicineIngridient4
-        };
 
             AddIFNotDuplicate(context, medicineIngridient1);
             AddIFNotDuplicate(context, medicineIngridient2);

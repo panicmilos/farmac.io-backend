@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
-using Farmacio_Services.Contracts;
-using Microsoft.AspNetCore.Mvc;
-using System;
 using Farmacio_API.Authorization;
-using Farmacio_API.Contracts.Requests.PharmacyOrders;
 using Farmacio_API.Contracts.Requests.Promotions;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
-using GlobalExceptionHandler.Exceptions;
+using Farmacio_Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Farmacio_API.Controllers
 {

@@ -1,6 +1,5 @@
 ﻿using Farmacio_API.Contracts.Requests.SupplierOffers;
 using FluentValidation;
-using System;
 
 namespace Farmacio_API.Validations.SupplierOffers
 {

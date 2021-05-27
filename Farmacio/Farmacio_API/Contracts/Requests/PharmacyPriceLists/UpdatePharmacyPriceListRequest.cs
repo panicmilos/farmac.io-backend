@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Farmacio_API.Contracts.Requests.PharmacyMedicines;
 
 namespace Farmacio_API.Contracts.Requests.PharmacyPriceLists
 {

@@ -443,7 +443,7 @@ namespace Farmacio_API.Controllers
         /// </summary>
         /// <response code="200">Returns list of small pharmacy objects.</response>
         [HttpGet("page-to")]
-        public IEnumerable<SmallPharmacyDTO> ReadForHomePage([FromQuery] PageDTO pageDTO)
+        public IEnumerable<SmallPharmacyDTO> ReadForHomePageForPage([FromQuery] PageDTO pageDTO)
         {
             return _pharmacyService.ReadAllPagesTo(pageDTO).Select(pharmacy => new SmallPharmacyDTO
             {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Farmacio_API.Contracts.Requests.Addresses
+﻿namespace Farmacio_API.Contracts.Requests.Addresses
 {
     public class UpdateAddressRequest : CreateAddressRequest
     {
