@@ -268,6 +268,8 @@ namespace Farmacio_Services.Implementation
                 throw new BadLogicException("Given appointment is not reserved.");
             if (appointment.ReportId != null)
                 throw new BadLogicException("Given appointment is already reported.");
+            if (appointment.DateTime > DateTime.Now.AddMinutes(15))
+                throw new EarlyWrittenReportException("Report is written more than 15 minutes before the appointment.");
             var report = new Report
             {
                 Notes = reportDTO.Notes,
@@ -312,6 +314,13 @@ namespace Farmacio_Services.Implementation
             return ReadForMedicalStaff(medicalStaffId).Where(appointment => appointment.IsReserved
                                                                 && appointment.ReportId == null
                                                                 && appointment.PatientId != null).ToList();
+        }
+
+        public IEnumerable<Appointment> ReadForReportPage(Guid medicalStaffId)
+        {
+            return ReadReservedButUnreportedForMedicalStaff(medicalStaffId)
+                .Where(appointment => appointment.DateTime < DateTime.Today.AddDays(1))
+                .OrderBy(appointment => appointment.DateTime);
         }
 
         public Report NotePatientDidNotShowUp(CreateReportDTO reportDTO)
