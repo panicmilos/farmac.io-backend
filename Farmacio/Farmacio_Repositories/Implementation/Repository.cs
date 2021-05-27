@@ -45,6 +45,11 @@ namespace Farmacio_Repositories.Implementation
             return _entities.Where(entity => entity.Active && predicate(entity));
         }
 
+        public virtual T Read(Guid id)
+        {
+            return _entities.FirstOrDefault(e => e.Id == id && e.Active);
+        }
+
         public IEnumerable<T> ReadPage(PageDTO pageDto)
         {
             var numberOfEntitiesToSkip = (pageDto.Number - 1) * pageDto.Size;
@@ -58,11 +63,6 @@ namespace Farmacio_Repositories.Implementation
             var numberOfEntitiesToTake = pageDto.Number * pageDto.Size;
             return Read()
                 .Take(numberOfEntitiesToTake);
-        }
-
-        public virtual T Read(Guid id)
-        {
-            return _entities.FirstOrDefault(e => e.Id == id && e.Active);
         }
 
         public virtual T Update(T entity)

@@ -117,7 +117,7 @@ namespace Farmacio_API.Controllers
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(UserSpecific.For(patientId))
                 .Authorize();
-            return Ok(_appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId));
+            return Ok(_appointmentService.ReadPatientsHistoryOfVisitingDermatologists(patientId));
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Farmacio_API.Controllers
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(UserSpecific.For(patientId))
                 .Authorize();
-            var appointments = _appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId);
+            var appointments = _appointmentService.ReadPatientsHistoryOfVisitingDermatologists(patientId);
             return Ok(_appointmentService.SortAppointments(appointments, criteria, isAsc));
         }
 
@@ -142,12 +142,12 @@ namespace Farmacio_API.Controllers
         /// <response code="404">Unable to return appointments because given patient does not exist in the system.</response>
         [Authorize(Roles = "Patient")]
         [HttpGet("future-appointments/{patientId}")]
-        public IEnumerable<Appointment> ReadPatientsFutureAppointments(Guid patientId)
+        public IEnumerable<Appointment> GetFutureAppointmentsWithDermatologists(Guid patientId)
         {
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(UserSpecific.For(patientId))
                 .Authorize();
-            return _appointmentService.ReadForPatients(patientId);
+            return _appointmentService.ReadFutureExaminationAppointmentsFor(patientId);
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace Farmacio_API.Controllers
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(UserSpecific.For(patientId))
                 .Authorize();
-            return Ok(_appointmentService.ReadFuturePharmacistsAppointmentsFor(patientId));
+            return Ok(_appointmentService.ReadFutureConsultationAppointmentsFor(patientId));
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace Farmacio_API.Controllers
                 .Rule(UserSpecific.For(patientId))
                 .Authorize();
 
-            var appointments = _appointmentService.ReadPatientsHistoryOfVisitsToDermatologist(patientId);
+            var appointments = _appointmentService.ReadPatientsHistoryOfVisitingDermatologists(patientId);
             return Ok(_appointmentService.SortAppointmentsPageTo(appointments, criteria, isAsc, new PageDTO
             {
                 Number = number,

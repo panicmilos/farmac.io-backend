@@ -18,7 +18,7 @@ namespace Farmacio_Services.Implementation
 
         public bool HasExceededLimitOfNegativePoints(Guid patientId)
         {
-            var account = base.Read().Where(account => account.UserId == patientId).FirstOrDefault();
+            var account = base.Read().FirstOrDefault(account => account.UserId == patientId);
             if (account == null)
             {
                 throw new BadLogicException("The given patient does not exist in the system.");

@@ -50,7 +50,7 @@ namespace Farmacio_Services.Implementation
 
         private bool DoesPatientFollowPharmacy(Guid patientId, Guid pharmacyId)
         {
-            return _followingsService.Read().Where(follow => follow.PatientId == patientId && follow.PharmacyId == pharmacyId).FirstOrDefault() != null;
+            return _followingsService.Read().FirstOrDefault(follow => follow.PatientId == patientId && follow.PharmacyId == pharmacyId) != null;
         }
 
         public IEnumerable<PatientPharmacyFollow> ReadFollowingsOf(Guid patientAccountId)

@@ -124,8 +124,7 @@ namespace Farmacio_Services.Implementation
                 throw new NotEmployedInPharmacyException("Dermatologist is not employed in the given pharmacy.");
 
             var hasFutureAppointments = _appointmentService.ReadForMedicalStaffInPharmacy(dermatologistAccount.UserId, pharmacyId)
-                .Where(appointment => appointment.DateTime > DateTime.Now)
-                .Any();
+                .Any(appointment => appointment.DateTime > DateTime.Now);
 
             if (hasFutureAppointments)
             {

@@ -9,53 +9,43 @@ namespace Farmacio_Services.Contracts
     {
         IEnumerable<Appointment> ReadForPharmacy(Guid pharmacyId);
         IEnumerable<Appointment> ReadForDermatologistsInPharmacy(Guid pharmacyId);
-        IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDto);
+        IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDTO);
 
         IEnumerable<Appointment> ReadForMedicalStaff(Guid medicalStaffId);
+        IEnumerable<Appointment> ReadForMedicalStaffForUpdate(Guid medicalStaffId);
         IEnumerable<Appointment> ReadForMedicalStaffInPharmacy(Guid medicalStaffId, Guid pharmacyId);
-
         IEnumerable<Appointment> ReadReservedButUnreportedForMedicalStaff(Guid medicalStaffId);
 
-        Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointment);
+        IEnumerable<Appointment> ReadForPatient(Guid patientId);
+        IEnumerable<Appointment> ReadForPatientForUpdate(Guid patientId);
 
-        Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointment);
+        IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId);
 
-        Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointment);
-
-        IEnumerable<Appointment> SortAppointments(IEnumerable<Appointment> appointments, string criteria, bool isAsc);
-
-        IEnumerable<Appointment> ReadForPatients(Guid patientId);
+        Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO);
+        Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointmentDTO);
+        Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointmentDTO);
+        Appointment MakeAppointmentWithDermatologist(MakeAppointmentWithDermatologistDTO appointmentRequest);
 
         Appointment CancelAppointmentWithDermatologist(Guid appointmentId);
+        Appointment CancelAppointmentWithPharmacist(Guid appointmentId);
 
-        IEnumerable<Appointment> ReadPatientsHistoryOfVisitsToDermatologist(Guid patientId);
+        IEnumerable<Appointment> ReadFutureExaminationAppointmentsFor(Guid patientId);
+        IEnumerable<Appointment> ReadFutureConsultationAppointmentsFor(Guid patientId);
+        IEnumerable<Appointment> ReadPatientsHistoryOfVisitingDermatologists(Guid patientId);
+        IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId);
+        IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDTO);
+        IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO);
 
         Report CreateReport(CreateReportDTO reportDTO);
-
         Report NotePatientDidNotShowUp(CreateReportDTO reportDTO);
-
-        IEnumerable<Appointment> ReadFuturePharmacistsAppointmentsFor(Guid patientId);
 
         IEnumerable<Account> ReadPharmacistsForAppointment(IEnumerable<Account> pharmacists, SearhSortParamsForAppointments searchParams);
 
-        Appointment CancelAppointmentWithPharmacist(Guid appointmentId);
-
         bool DidPatientHaveAppointmentWithMedicalStaff(Guid patientId, Guid medicalStaffId);
+        bool DidPatientShowUpForAppointment(Guid appointmentId);
 
-        Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment);
-        
-        IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId);
-        
-        IEnumerable<Appointment> ReadForPatient(Guid patientId);
-
-        IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId);
-
-        IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDto);
-
-        IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO);
-
+        IEnumerable<Appointment> SortAppointments(IEnumerable<Appointment> appointments, string criteria, bool isAsc);
         IEnumerable<Appointment> SortAppointmentsPageTo(IEnumerable<Appointment> appointments, string criteria, bool isAsc, PageDTO pageDTO);
 
-        bool DidPatientShowUpForAppointment(Guid appointmentId);
     }
 }

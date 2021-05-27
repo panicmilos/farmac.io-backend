@@ -69,16 +69,16 @@ namespace Farmacio_Services.Implementation
         public override Account Delete(Guid id)
         {
             var existingPharamcyAdmin = TryToRead(id);
-            var existingPharmacyUser = existingPharamcyAdmin.User as PharmacyAdmin;
+            var existingPharmacyAdminUser = existingPharamcyAdmin.User as PharmacyAdmin;
 
-            var numberOfAdminsInPharmacy = Read().Where(pharmacyAdmin =>
+            var numberOfAdminsInPharmacy = Read().Count(pharmacyAdmin =>
             {
                 if (pharmacyAdmin.User is PharmacyAdmin pharmacyAdminUser)
                 {
-                    return pharmacyAdminUser.PharmacyId == existingPharmacyUser.PharmacyId;
+                    return pharmacyAdminUser.PharmacyId == existingPharmacyAdminUser.PharmacyId;
                 }
                 return false;
-            }).Count();
+            });
 
             if (numberOfAdminsInPharmacy <= 1)
             {
