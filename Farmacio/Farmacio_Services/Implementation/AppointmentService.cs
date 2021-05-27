@@ -150,12 +150,12 @@ namespace Farmacio_Services.Implementation
             if (!TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, workTime.From, workTime.To))
                 throw new InvalidAppointmentDateTimeException(medicalStaffDontWorkMessage);
 
-            var overlap = ReadForMedicalStaffForUpdate(appointment.MedicalStaffId).FirstOrDefault(a =>
+            var overlap = ReadForMedicalStaffForUpdate(appointment.MedicalStaffId).Any(a =>
             {
                 return a.DateTime.Date == @from.Date &&
                     TimeIntervalUtils.TimeIntervalTimesOverlap(@from, to, a.DateTime, a.DateTime.AddMinutes(a.Duration));
             });
-            if (overlap != null)
+            if (overlap)
                 throw new InvalidAppointmentDateTimeException(medicalStaffIsBusyMessage);
         }
 
@@ -389,18 +389,16 @@ namespace Farmacio_Services.Implementation
             {
                 var pharmacist = pharmacistAccount.User as Pharmacist;
                 return pharmacist.WorkTime.From.TimeOfDay <= searchParams.ConsultationDateTime.TimeOfDay &&
-                searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration).TimeOfDay <= pharmacist.WorkTime.To.TimeOfDay;
+                    searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration).TimeOfDay <= pharmacist.WorkTime.To.TimeOfDay;
             })
             .Where(pharmacistAccount =>
             {
                 var pharmacist = pharmacistAccount.User as Pharmacist;
-                var overlapingAppointments = ReadForMedicalStaff(pharmacist.Id)
-                .Where(appointment =>
-                    appointment.MedicalStaffId == pharmacist.Id &&
+                var overlap = ReadForMedicalStaff(pharmacist.Id).Any(appointment =>
                     appointment.DateTime.Date == searchParams.ConsultationDateTime.Date &&
                     TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration),
-                    appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
-                return overlapingAppointments.Any();
+                                                                appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
+                return !overlap;
             });
         }
 
@@ -449,13 +447,13 @@ namespace Farmacio_Services.Implementation
 
         private void ValidateTimeForPatient(Guid patientId, DateTime dateTime, int duration)
         {
-            var overlap = ReadForPatientForUpdate(patientId).FirstOrDefault(a =>
+            var overlap = ReadForPatientForUpdate(patientId).Any(a =>
             {
                 return a.DateTime.Date == dateTime.Date &&
                     TimeIntervalUtils.TimeIntervalTimesOverlap(dateTime, dateTime.AddMinutes(duration),
                                                                 a.DateTime, a.DateTime.AddMinutes(a.Duration));
             });
-            if (overlap != null)
+            if (overlap)
                 throw new InvalidAppointmentDateTimeException("The given appointment overlaps with the already reserved appointment of the patient.");
         }
 
