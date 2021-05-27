@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Farmacio_Models.DTO
+﻿namespace Farmacio_Models.DTO
 {
     public class MedicalStaffFilterParamsDTO
     {

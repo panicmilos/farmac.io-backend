@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Farmacio_Models.Domain;
+﻿using Farmacio_Models.Domain;
+using System;
 
 namespace Farmacio_API.Contracts.Responses.Grades
 {

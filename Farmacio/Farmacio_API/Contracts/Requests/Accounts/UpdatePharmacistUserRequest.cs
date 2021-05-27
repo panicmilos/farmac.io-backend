@@ -1,6 +1,5 @@
-﻿using System;
-using Farmacio_API.Contracts.Requests.WorkTimes;
-using Farmacio_Models.Domain;
+﻿using Farmacio_API.Contracts.Requests.WorkTimes;
+using System;
 
 namespace Farmacio_API.Contracts.Requests.Accounts
 {

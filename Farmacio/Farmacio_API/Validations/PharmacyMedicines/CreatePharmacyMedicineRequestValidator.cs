@@ -1,5 +1,4 @@
-﻿using Farmacio_API.Contracts.Requests.Medicines;
-using Farmacio_API.Contracts.Requests.PharmacyMedicines;
+﻿using Farmacio_API.Contracts.Requests.PharmacyMedicines;
 using FluentValidation;
 
 namespace Farmacio_API.Validations.PharmacyMedicines

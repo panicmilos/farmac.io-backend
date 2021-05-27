@@ -164,7 +164,7 @@ namespace Farmacio_API.Controllers
 
             
             AuthorizationRuleSet.For(HttpContext)
-                .Rule(UserSpecific.For(appointment.PatientId ?? new Guid()))
+                .Rule(UserSpecific.For(appointment.PatientId ?? Guid.Empty))
                 .Authorize();
 
             return Ok(_appointmentService.CancelAppointmentWithDermatologist(appointmentId));
@@ -257,7 +257,7 @@ namespace Farmacio_API.Controllers
         public IActionResult CreatePharmacistAppointmenAsUser(CreateAppointmentRequest request)
         {
             AuthorizationRuleSet.For(HttpContext)
-                .Rule(UserSpecific.For(request.PatientId ?? new Guid()))
+                .Rule(UserSpecific.For(request.PatientId ?? Guid.Empty))
                 .Authorize();
             var appointment = _mapper.Map<CreateAppointmentDTO>(request);
             appointment.Price = null; // then service method will get price from the pharmacy
@@ -277,7 +277,7 @@ namespace Farmacio_API.Controllers
         {
             var appointment = _appointmentService.TryToRead(appointmentId);
             AuthorizationRuleSet.For(HttpContext)
-                .Rule(UserSpecific.For(appointment.PatientId ?? new Guid()))
+                .Rule(UserSpecific.For(appointment.PatientId ?? Guid.Empty))
                 .Authorize();
             return Ok(_appointmentService.CancelAppointmentWithPharmacist(appointmentId));
         }

@@ -14,15 +14,12 @@ namespace Farmacio_API.Controllers
     [Produces("application/json")]
     public class MedicalStaffController : ControllerBase
     {
-        private readonly IMedicalStaffService _medicalStaffService;
         private readonly IAbsenceRequestService _absenceRequestService;
         private readonly IMapper _mapper;
 
-        public MedicalStaffController(IMedicalStaffService medicalStaffService
-            , IAbsenceRequestService absenceRequestService
+        public MedicalStaffController(IAbsenceRequestService absenceRequestService
             , IMapper mapper)
         {
-            _medicalStaffService = medicalStaffService;
             _absenceRequestService = absenceRequestService;
             _mapper = mapper;
         }

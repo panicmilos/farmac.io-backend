@@ -1,5 +1,4 @@
-﻿using Farmacio_API.Contracts.Requests.Addresses;
-using Farmacio_API.Contracts.Requests.Appointments;
+﻿using Farmacio_API.Contracts.Requests.Appointments;
 using FluentValidation;
 
 namespace Farmacio_API.Validations.Appointments
