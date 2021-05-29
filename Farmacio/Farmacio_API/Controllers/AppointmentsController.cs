@@ -197,17 +197,17 @@ namespace Farmacio_API.Controllers
         }
 
         /// <summary>
-        /// Returns medical staff's appointments that are reserved but not reported.
+        /// Returns medical staff's appointments that are reserved but not reported for today.
         /// </summary>
         /// <response code="200">Returns appointments.</response>
         [Authorize(Roles = "Pharmacist, Dermatologist")]
         [HttpGet("my-appointments/{medicalStaffId}")]
-        public IActionResult GetAppointmentsForMedicalStaff(Guid medicalStaffId)
+        public IActionResult GetAppointmentsForReportPage(Guid medicalStaffId)
         {
             AuthorizationRuleSet.For(HttpContext)
                                .Rule(UserSpecific.For(medicalStaffId))
                                .Authorize();
-            return Ok(_appointmentService.ReadReservedButUnreportedForMedicalStaff(medicalStaffId));
+            return Ok(_appointmentService.ReadForReportPage(medicalStaffId));
         }
 
         /// <summary>
