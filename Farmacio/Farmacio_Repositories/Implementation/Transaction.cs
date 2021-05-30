@@ -1,4 +1,5 @@
-﻿using Farmacio_Repositories.Contracts;
+﻿using System;
+using Farmacio_Repositories.Contracts;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Farmacio_Repositories.Implementation
@@ -30,6 +31,7 @@ namespace Farmacio_Repositories.Implementation
         public void Dispose()
         {
             _transaction.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -161,9 +161,9 @@ namespace Farmacio_Services.Implementation
             reservations = reservations.Where(reservation =>
             {
                 var medicines = reservation.Medicines;
-                return medicines.Where(medicine => medicine.MedicineId == medicineId).FirstOrDefault() != null;
+                return medicines.FirstOrDefault(medicine => medicine.MedicineId == medicineId) != null;
             }).ToList();
-            return reservations.Count() > 0;
+            return reservations.Any();
         }
 
         public IEnumerable<Reservation> ReadFor(Guid patientId)

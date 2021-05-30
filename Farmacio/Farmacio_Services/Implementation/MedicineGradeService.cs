@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Farmacio_Services.Implementation
 {
@@ -116,7 +115,7 @@ namespace Farmacio_Services.Implementation
             var medicines = _medicineService.Read().ToList().Where(medicine => _reservationService.DidPatientReserveMedicine(medicine.Id, patientId)).ToList();
             foreach (var medicine in _medicineService.Read().ToList())
             {
-                if (medicines.Where(reservedMedicine => reservedMedicine.Id == medicine.Id).Count() == 0 && _eRecipeService.WasMedicinePrescribedToPatient(medicine.Id, patientId))
+                if (medicines.All(reservedMedicine => reservedMedicine.Id != medicine.Id) && _eRecipeService.WasMedicinePrescribedToPatient(medicine.Id, patientId))
                 {
                     medicines.Add(medicine);
                 }

@@ -1,7 +1,5 @@
 ﻿using Farmacio_Models.DTO;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Farmacio_Services.Implementation.Utils
 {

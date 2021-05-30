@@ -67,7 +67,7 @@ namespace Farmacio_Services.Implementation
         private void UpdateLoyaltyProgramForPatient(Account patientAccount)
         {
             var loyaltyPrograms = Read().OrderByDescending(loyaltyProgram => loyaltyProgram.MinPoints);
-            if (loyaltyPrograms.Count() == 0)
+            if (!loyaltyPrograms.Any())
             {
                 return;
             }

@@ -30,7 +30,7 @@ namespace Farmacio_Tests.IntegrationTests.ReservationServiceTests
         {
             var pharmacyOrderService = new CrudService<PharmacyOrder>(new Repository<PharmacyOrder>(context));
             var pharmacyPriceListService = new PharmacyPriceListService(new Repository<PharmacyPriceList>(context));
-            var pharmacyStockService = new PharmacyStockService(pharmacyPriceListService, pharmacyOrderService, new Repository<PharmacyMedicine>(context));
+            var pharmacyStockService = new PharmacyStockService(pharmacyOrderService, new Repository<PharmacyMedicine>(context));
 
             _templatesProvider = new Mock<ITemplatesProvider>();
             _emailDispatcher = new Mock<IEmailDispatcher>();
