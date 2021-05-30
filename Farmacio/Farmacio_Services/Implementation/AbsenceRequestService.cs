@@ -47,6 +47,14 @@ namespace Farmacio_Services.Implementation
             return PaginationUtils<AbsenceRequest>.Page(ReadFor(pharmacyId), pageDto);
         }
 
+        public bool IsMedicalStaffAbsent(Guid medicalStaffId, DateTime date)
+        {
+            return Read().Any(absenceRequest => absenceRequest.RequesterId == medicalStaffId
+                                                && absenceRequest.Status == AbsenceRequestStatus.Accepted
+                                                && date >= absenceRequest.FromDate
+                                                && date <= absenceRequest.ToDate);
+        }
+
         public AbsenceRequest AcceptAbsenceRequest(Guid absenceRequestId)
         {
             var absenceRequest = TryToRead(absenceRequestId);
