@@ -1,4 +1,5 @@
-﻿using Farmacio_Repositories.Contracts;
+﻿using System;
+using Farmacio_Repositories.Contracts;
 
 namespace Farmacio_Repositories.Implementation
 {
@@ -17,6 +18,7 @@ namespace Farmacio_Repositories.Implementation
         public void Dispose()
         {
             // This method is empty because it is dummy transaction.
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Farmacio_Services.Implementation
 {
     public class ComplaintAnswerService : CrudService<ComplaintAnswer>, IComplaintAnswerService
     {
-        private IComplaintAnswerRepository complaintAnswerRepository { get => _repository as IComplaintAnswerRepository; }
+        private IComplaintAnswerRepository ComplaintAnswerRepository => _repository as IComplaintAnswerRepository;
         private readonly IComplaintService<Complaint> _complaintService;
         private readonly ISystemAdminService _systemAdminService;
 
@@ -38,7 +38,7 @@ namespace Farmacio_Services.Implementation
                     throw new MissingEntityException("Given system admin doesn't exist in the system.");
                 }
 
-                if (complaintAnswerRepository.ReadAnswersFor(answer.ComplaintId).Any())
+                if (ComplaintAnswerRepository.ReadAnswersFor(answer.ComplaintId).Any())
                 {
                     throw new BadLogicException("Only one system admin can give an answer to complaint.");
                 }

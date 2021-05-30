@@ -47,11 +47,10 @@ namespace Farmacio_Services.Implementation
         public override Account Delete(Guid id)
         {
             var existingSupplierAccount = TryToRead(id);
-            var existingSupplierUser = existingSupplierAccount.User as Supplier;
 
-            var numberOfActiveSupplierOffers = _supplierOffersService.Read().Where(offer =>
+            var numberOfActiveSupplierOffers = _supplierOffersService.Read().Count(offer =>
                 offer.SupplierId == existingSupplierAccount.Id &&
-                offer.Status == OfferStatus.WaitingForAnswer).Count();
+                offer.Status == OfferStatus.WaitingForAnswer);
 
             if (numberOfActiveSupplierOffers > 0)
             {

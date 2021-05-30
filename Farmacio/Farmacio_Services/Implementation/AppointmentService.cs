@@ -439,18 +439,18 @@ namespace Farmacio_Services.Implementation
         public bool DidPatientHaveAppointmentWithMedicalStaff(Guid patientId, Guid medicalStaffId)
         {
             var patient = _patientService.TryToRead(patientId);
-            return ReadForMedicalStaff(medicalStaffId).Count(appointment => appointment.IsReserved
+            return ReadForMedicalStaff(medicalStaffId).Any(appointment => appointment.IsReserved
                 && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now && 
-                DidPatientShowUpForAppointment(appointment.Id)) > 0;
+                DidPatientShowUpForAppointment(appointment.Id));
         }
 
-        public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointment)
+        public Appointment CreateAnotherAppointmentByMedicalStaff(CreateAppointmentDTO appointmentDTO)
         {
-            var medicalAccount = _accountService.ReadByUserId(appointment.MedicalStaffId);
+            var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
             if (medicalAccount.Role == Role.Dermatologist)
-                return CreateDermatologistAppointment(appointment);
+                return CreateDermatologistAppointment(appointmentDTO);
             else if (medicalAccount.Role == Role.Pharmacist)
-                return CreatePharmacistAppointment(appointment);
+                return CreatePharmacistAppointment(appointmentDTO);
             return new Appointment();
         }
 

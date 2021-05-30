@@ -11,15 +11,12 @@ namespace Farmacio_Services.Implementation
 {
     public class PharmacyStockService : CrudService<PharmacyMedicine>, IPharmacyStockService
     {
-        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly ICrudService<PharmacyOrder> _pharmacyOrderService;
 
         public PharmacyStockService(
-            IPharmacyPriceListService pharmacyPriceListService,
             ICrudService<PharmacyOrder> pharmacyOrderService,
             IRepository<PharmacyMedicine> repository) : base(repository)
         {
-            _pharmacyPriceListService = pharmacyPriceListService;
             _pharmacyOrderService = pharmacyOrderService;
         }
 
@@ -56,7 +53,7 @@ namespace Farmacio_Services.Implementation
             var existingPharmacyMedicine = TryToRead(id);
 
             var isInActiveOrder = _pharmacyOrderService.Read()
-                .Where(order => order.IsProcessed == false && order.PharmacyId == existingPharmacyMedicine.PharmacyId)
+                .Where(order => !order.IsProcessed && order.PharmacyId == existingPharmacyMedicine.PharmacyId)
                 .ToList()
                 .Any(order => order.OrderedMedicines.FirstOrDefault(orderedMedicine => orderedMedicine.MedicineId == existingPharmacyMedicine.MedicineId) != null);
 
