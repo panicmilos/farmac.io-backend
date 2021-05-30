@@ -25,6 +25,7 @@ namespace Farmacio_Services.Implementation
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
         private readonly IERecipeService _eRecipeService;
+        private readonly IAbsenceRequestService _absenceRequestService;
 
         public AppointmentService(IAppointmentRepository repository
             , IPharmacyService pharmacyService, IAccountService accountService
@@ -34,7 +35,8 @@ namespace Farmacio_Services.Implementation
             , IEmailDispatcher emailDispatcher
             , ITemplatesProvider templateProvider
             , IReportService reportService
-            , IERecipeService eRecipeService) : base(repository)
+            , IERecipeService eRecipeService
+            , IAbsenceRequestService absenceRequestService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -46,6 +48,7 @@ namespace Farmacio_Services.Implementation
             _templatesProvider = templateProvider;
             _reportService = reportService;
             _eRecipeService = eRecipeService;
+            _absenceRequestService = absenceRequestService;
         }
 
         public IEnumerable<Appointment> ReadPageForDermatologistsInPharmacy(Guid pharmacyId, PageDTO pageDTO)
@@ -80,6 +83,8 @@ namespace Farmacio_Services.Implementation
             {
                 if (appointmentDTO.DateTime < DateTime.Now)
                     throw new BadLogicException("The given date and time are in the past.");
+                if (_absenceRequestService.IsMedicalStaffAbsent(appointmentDTO.MedicalStaffId, appointmentDTO.DateTime))
+                    throw new BadLogicException("Dermatologist is absent on the given date.");
 
                 var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
 
@@ -339,6 +344,8 @@ namespace Farmacio_Services.Implementation
             {
                 if (appointmentDTO.DateTime < DateTime.Now)
                     throw new BadLogicException("The given date and time are in the past.");
+                if (_absenceRequestService.IsMedicalStaffAbsent(appointmentDTO.MedicalStaffId, appointmentDTO.DateTime))
+                    throw new BadLogicException("Pharmacist is absent on the given date.");
 
                 var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
 
@@ -408,7 +415,9 @@ namespace Farmacio_Services.Implementation
                     TimeIntervalUtils.TimeIntervalTimesOverlap(searchParams.ConsultationDateTime, searchParams.ConsultationDateTime.AddMinutes(searchParams.Duration),
                                                                 appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
                 return !overlap;
-            });
+            })
+            .Where(pharmacistAccount => !_absenceRequestService.IsMedicalStaffAbsent(pharmacistAccount.UserId,
+                searchParams.ConsultationDateTime));
         }
 
         public IEnumerable<Appointment> ReadFutureConsultationAppointmentsFor(Guid patientId)
