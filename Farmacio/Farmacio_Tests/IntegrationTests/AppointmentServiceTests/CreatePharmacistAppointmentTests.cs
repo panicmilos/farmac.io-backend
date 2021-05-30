@@ -24,6 +24,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
         private readonly IDiscountService _discountService;
         private readonly Mock<ITemplatesProvider> _templatesProvider;
         private readonly Mock<IEmailDispatcher> _emailDispatcher;
+        private readonly Mock<IAbsenceRequestService> _absenceRequestService;
 
         public CreatePharmacistAppointmentTests()
         {
@@ -31,6 +32,9 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
             var accountRepository = new AccountRepository(context);
             _templatesProvider = new Mock<ITemplatesProvider>();
             _emailDispatcher = new Mock<IEmailDispatcher>();
+            _absenceRequestService = new Mock<IAbsenceRequestService>();
+            _absenceRequestService
+                .Setup(service => service.IsMedicalStaffAbsent(It.IsAny<Guid>(), It.IsAny<DateTime>())).Returns(false);
             var emailVerificationService = new EmailVerificationService(null, _emailDispatcher.Object, _templatesProvider.Object);
             _appointmentRepository = new AppointmentRepository(context);
             _pharmacyService = new PharmacyService(pharmacyPriceListService, null, new Repository<Pharmacy>(context));
@@ -40,7 +44,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
             var loyaltyProgramService = new LoyaltyProgramService(_patientService, new Repository<LoyaltyProgram>(context));
             _discountService = new DiscountService(loyaltyProgramService, promotionService);
             _appointmentService = new AppointmentService(_appointmentRepository, _pharmacyService, _accountService, null,
-                _patientService, _discountService, _emailDispatcher.Object, _templatesProvider.Object, null, null);
+                _patientService, _discountService, _emailDispatcher.Object, _templatesProvider.Object, null, null, _absenceRequestService.Object);
         }
 
         [Fact]
