@@ -33,6 +33,8 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
             _templatesProvider = new Mock<ITemplatesProvider>();
             _emailDispatcher = new Mock<IEmailDispatcher>();
             _absenceRequestService = new Mock<IAbsenceRequestService>();
+            var lazyAbsenceRequestService = new Lazy<IAbsenceRequestService>(_absenceRequestService.Object);
+
             _absenceRequestService
                 .Setup(service => service.IsMedicalStaffAbsent(It.IsAny<Guid>(), It.IsAny<DateTime>())).Returns(false);
             var emailVerificationService = new EmailVerificationService(null, _emailDispatcher.Object, _templatesProvider.Object);
@@ -44,7 +46,7 @@ namespace Farmacio_Tests.IntegrationTests.AppointmentServiceTests
             var loyaltyProgramService = new LoyaltyProgramService(_patientService, new Repository<LoyaltyProgram>(context));
             _discountService = new DiscountService(loyaltyProgramService, promotionService);
             _appointmentService = new AppointmentService(_appointmentRepository, _pharmacyService, _accountService, null,
-                _patientService, _discountService, _emailDispatcher.Object, _templatesProvider.Object, null, null, _absenceRequestService.Object);
+                _patientService, _discountService, _emailDispatcher.Object, _templatesProvider.Object, null, null, lazyAbsenceRequestService);
         }
 
         [Fact]

@@ -36,11 +36,14 @@ namespace Farmacio_Tests.UnitTests.AppointmentServiceTests
             _discountService = new Mock<IDiscountService>();
             _templatesProvider = new Mock<ITemplatesProvider>();
             _emailDispatcher = new Mock<IEmailDispatcher>();
+
             _absenceRequestService = new Mock<IAbsenceRequestService>();
+            var lazyAbsenceRequestService = new Lazy<IAbsenceRequestService>(_absenceRequestService.Object);
+
             _absenceRequestService
                 .Setup(service => service.IsMedicalStaffAbsent(It.IsAny<Guid>(), It.IsAny<DateTime>())).Returns(false);
             _appointmentService = new AppointmentService(_appointmentRepository.Object, _pharmacyService.Object, _accountService.Object, null,
-                _patientService.Object, _discountService.Object, _emailDispatcher.Object, _templatesProvider.Object, null, null, _absenceRequestService.Object);
+                _patientService.Object, _discountService.Object, _emailDispatcher.Object, _templatesProvider.Object, null, null, lazyAbsenceRequestService);
         }
 
         [Fact]
