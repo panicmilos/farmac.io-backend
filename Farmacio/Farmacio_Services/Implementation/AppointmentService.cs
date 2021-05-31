@@ -25,7 +25,7 @@ namespace Farmacio_Services.Implementation
         private readonly ITemplatesProvider _templatesProvider;
         private readonly IReportService _reportService;
         private readonly IERecipeService _eRecipeService;
-        private readonly IAbsenceRequestService _absenceRequestService;
+        private readonly Lazy<IAbsenceRequestService> _absenceRequestService;
 
         public AppointmentService(IAppointmentRepository repository
             , IPharmacyService pharmacyService, IAccountService accountService
@@ -36,7 +36,7 @@ namespace Farmacio_Services.Implementation
             , ITemplatesProvider templateProvider
             , IReportService reportService
             , IERecipeService eRecipeService
-            , IAbsenceRequestService absenceRequestService) : base(repository)
+            , Lazy<IAbsenceRequestService> absenceRequestService) : base(repository)
 
         {
             _pharmacyService = pharmacyService;
@@ -83,7 +83,7 @@ namespace Farmacio_Services.Implementation
             {
                 if (appointmentDTO.DateTime < DateTime.Now)
                     throw new BadLogicException("The given date and time are in the past.");
-                if (_absenceRequestService.IsMedicalStaffAbsent(appointmentDTO.MedicalStaffId, appointmentDTO.DateTime))
+                if (_absenceRequestService.Value.IsMedicalStaffAbsent(appointmentDTO.MedicalStaffId, appointmentDTO.DateTime))
                     throw new BadLogicException("Dermatologist is absent on the given date.");
 
                 var pharmacy = _pharmacyService.TryToRead(appointmentDTO.PharmacyId);
@@ -133,7 +133,8 @@ namespace Farmacio_Services.Implementation
                     var email = _templatesProvider.FromTemplate<Email>("Appointment",
                         new
                         {
-                            To = patient.Email, Name = patient.User.FirstName,
+                            To = patient.Email,
+                            Name = patient.User.FirstName,
                             Date = newAppointment.DateTime.ToString("dd-MM-yyyy HH:mm")
                         });
                     _emailDispatcher.Dispatch(email);
@@ -256,9 +257,9 @@ namespace Farmacio_Services.Implementation
         {
             if (_patientService.ReadByUserId(patientId) == null)
                 throw new MissingEntityException("The given patient does not exist in the system.");
-            
+
             return ReadForPatient(patientId).Where(appointment =>
-                appointment.IsReserved && appointment.DateTime < DateTime.Now && 
+                appointment.IsReserved && appointment.DateTime < DateTime.Now &&
                 appointment.MedicalStaff is Dermatologist);
         }
 
@@ -344,7 +345,7 @@ namespace Farmacio_Services.Implementation
             {
                 if (appointmentDTO.DateTime < DateTime.Now)
                     throw new BadLogicException("The given date and time are in the past.");
-                if (_absenceRequestService.IsMedicalStaffAbsent(appointmentDTO.MedicalStaffId, appointmentDTO.DateTime))
+                if (_absenceRequestService.Value.IsMedicalStaffAbsent(appointmentDTO.MedicalStaffId, appointmentDTO.DateTime))
                     throw new BadLogicException("Pharmacist is absent on the given date.");
 
                 var medicalAccount = _accountService.ReadByUserId(appointmentDTO.MedicalStaffId);
@@ -416,7 +417,7 @@ namespace Farmacio_Services.Implementation
                                                                 appointment.DateTime, appointment.DateTime.AddMinutes(appointment.Duration)));
                 return !overlap;
             })
-            .Where(pharmacistAccount => !_absenceRequestService.IsMedicalStaffAbsent(pharmacistAccount.UserId,
+            .Where(pharmacistAccount => !_absenceRequestService.Value.IsMedicalStaffAbsent(pharmacistAccount.UserId,
                 searchParams.ConsultationDateTime));
         }
 
@@ -449,7 +450,7 @@ namespace Farmacio_Services.Implementation
         {
             var patient = _patientService.TryToRead(patientId);
             return ReadForMedicalStaff(medicalStaffId).Any(appointment => appointment.IsReserved
-                && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now && 
+                && appointment.PatientId == patient.UserId && appointment.DateTime < DateTime.Now &&
                 DidPatientShowUpForAppointment(appointment.Id));
         }
 
@@ -497,9 +498,9 @@ namespace Farmacio_Services.Implementation
         {
             if (_patientService.ReadByUserId(patientId) == null)
                 throw new MissingEntityException("The given patient does not exist in the system.");
-            
+
             return ReadForPatient(patientId).Where(appointment =>
-                appointment.IsReserved && appointment.DateTime < DateTime.Now && 
+                appointment.IsReserved && appointment.DateTime < DateTime.Now &&
                 appointment.MedicalStaff is Pharmacist);
         }
 

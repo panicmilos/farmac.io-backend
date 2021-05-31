@@ -3,6 +3,7 @@ using Farmacio_Repositories.Implementation;
 using Farmacio_Services.Contracts;
 using Farmacio_Services.Implementation;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Farmacio_API.Installers
 {
@@ -79,6 +80,8 @@ namespace Farmacio_API.Installers
             _services.AddScoped(typeof(IAbsenceRequestService), typeof(AbsenceRequestService));
             _services.AddScoped(typeof(INotInStockService), typeof(NotInStockService));
             _services.AddScoped(typeof(IDiscountService), typeof(DiscountService));
+
+            _services.AddScoped(provider => new Lazy<IAbsenceRequestService>(provider.GetService<IAbsenceRequestService>));
         }
     }
 }
