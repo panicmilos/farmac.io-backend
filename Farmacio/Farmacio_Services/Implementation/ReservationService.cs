@@ -270,7 +270,7 @@ namespace Farmacio_Services.Implementation
                 base.Update(reservation);
                 transaction.Commit();
 
-                var patientAccount = _patientService.TryToRead(reservation.PatientId);
+                var patientAccount = _patientService.ReadByUserId(reservation.PatientId);
                 var email = _templatesProvider.FromTemplate<Email>("ReservationIssued", new
                 {
                     To = patientAccount.Email,
