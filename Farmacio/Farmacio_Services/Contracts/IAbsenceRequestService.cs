@@ -13,5 +13,6 @@ namespace Farmacio_Services.Contracts
         AbsenceRequest AcceptAbsenceRequest(Guid absenceRequestId);
         AbsenceRequest DeclineAbsenceRequest(Guid absenceRequestId, string reason);
         IEnumerable<AbsenceRequest> CreateAbsenceRequest(AbsenceRequestDTO absenceRequestDto);
+        IEnumerable<WorkCalendarEvent> ReadAcceptedAbsencesForCalendar(Guid medicalStaffId);
     }
 }

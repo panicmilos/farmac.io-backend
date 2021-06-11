@@ -20,7 +20,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadForPatient(Guid patientId);
         IEnumerable<Appointment> ReadForPatientForUpdate(Guid patientId);
 
-        IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId);
+        IEnumerable<WorkCalendarEvent> ReadAppointmentsForCalendar(Guid medicalStaffId);
 
         Appointment CreateDermatologistAppointment(CreateAppointmentDTO appointmentDTO);
         Appointment CreatePharmacistAppointment(CreateAppointmentDTO appointmentDTO);
@@ -34,7 +34,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<Appointment> ReadFutureConsultationAppointmentsFor(Guid patientId);
         IEnumerable<Appointment> ReadPatientsHistoryOfVisitingDermatologists(Guid patientId);
         IEnumerable<Appointment> ReadPatientsHistoryOfVisitingPharmacists(Guid patientId);
-        IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDTO);
+        IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDTO);
         IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingDermatologists(Guid patientId, PageDTO pageDTO);
 
         Report CreateReport(CreateReportDTO reportDTO);

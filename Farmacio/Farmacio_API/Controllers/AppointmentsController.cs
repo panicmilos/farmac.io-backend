@@ -358,7 +358,7 @@ namespace Farmacio_API.Controllers
                 .Rule(UserSpecific.For(patientId))
                 .Authorize();
 
-            return Ok(_appointmentService.ReadPagesOfPatientHistoryVisitingPharmacists(patientId, pageDTO));
+            return Ok(_appointmentService.ReadPageOfPatientHistoryVisitingPharmacists(patientId, pageDTO));
         }
 
         /// <summary>
