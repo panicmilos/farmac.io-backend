@@ -476,17 +476,18 @@ namespace Farmacio_Services.Implementation
                 throw new InvalidAppointmentDateTimeException("The given appointment overlaps with the already reserved appointment of the patient.");
         }
 
-        public IEnumerable<AppointmentAsEvent> ReadAppointmentsForCalendar(Guid medicalStaffId)
+        public IEnumerable<WorkCalendarEvent> ReadAppointmentsForCalendar(Guid medicalStaffId)
         {
-            return ReadForMedicalStaff(medicalStaffId).Select(appointment => new AppointmentAsEvent
+            return ReadForMedicalStaff(medicalStaffId).Select(appointment => new WorkCalendarEvent
             {
                 Id = appointment.Id,
                 Start = appointment.DateTime,
                 End = appointment.DateTime.AddMinutes(appointment.Duration),
                 Title = $"{appointment.Patient?.FirstName} {appointment.Patient?.LastName}",
                 PharmacyName = appointment.Pharmacy.Name,
-                IsReported = appointment.ReportId != null
-            });
+                IsReported = appointment.ReportId != null,
+                IsAppointment = true
+            }).Concat(_absenceRequestService.Value.ReadAcceptedAbsencesForCalendar(medicalStaffId));
         }
 
         public IEnumerable<Appointment> ReadForPatient(Guid patientId)
@@ -504,7 +505,7 @@ namespace Farmacio_Services.Implementation
                 appointment.MedicalStaff is Pharmacist);
         }
 
-        public IEnumerable<Appointment> ReadPagesOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDTO)
+        public IEnumerable<Appointment> ReadPageOfPatientHistoryVisitingPharmacists(Guid patientId, PageDTO pageDTO)
         {
             return PaginationUtils<Appointment>.Page(ReadPatientsHistoryOfVisitingPharmacists(patientId), pageDTO);
         }

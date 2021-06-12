@@ -155,5 +155,21 @@ namespace Farmacio_Services.Implementation
                 PharmacyId = pharmacyId,
                 Status = AbsenceRequestStatus.WaitingForAnswer
             };
+
+        public IEnumerable<WorkCalendarEvent> ReadAcceptedAbsencesForCalendar(Guid medicalStaffId)
+        {
+            return Read()
+                .Where(absenceRequest => absenceRequest.RequesterId == medicalStaffId
+                       && absenceRequest.Status == AbsenceRequestStatus.Accepted)
+                .ToList().Select(absenceRequest => new WorkCalendarEvent
+                {
+                    Id = absenceRequest.Id,
+                    Start = absenceRequest.FromDate,
+                    End = absenceRequest.ToDate,
+                    Title = absenceRequest.Type.ToString(),
+                    PharmacyName = absenceRequest.Pharmacy.Name,
+                    IsAppointment = false
+                });
+        }
     }
 }
