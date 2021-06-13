@@ -114,6 +114,16 @@
         "Recipients": [ "{{to}}" ],
         "Body": "<p>Dear {{name}},</p><p>You have picked up your reservation with id {{id}}.</p>"
       }
+    },
+    {
+      "type": "Email",
+      "name": "ComplaintAnswer",
+      "template": {
+        "Subject": "Answer to your complaint on Farmac.io",
+        "From": "panic.milos99@gmail.com",
+        "Recipients": [ "{{to}}" ],
+        "Body": "<p>Dear {{patient}},</p><p>System admin {{admin}} answered to you complaint for {{about}} :</p><p>{{answer}}</p>"
+      }
     }
   ]
 }

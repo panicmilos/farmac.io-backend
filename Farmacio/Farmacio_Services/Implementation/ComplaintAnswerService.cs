@@ -1,4 +1,6 @@
-﻿using Farmacio_Models.Domain;
+﻿using EmailService.Constracts;
+using EmailService.Models;
+using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Repositories.Contracts;
 using Farmacio_Services.Contracts;
@@ -15,16 +17,25 @@ namespace Farmacio_Services.Implementation
         private IComplaintAnswerRepository ComplaintAnswerRepository => _repository as IComplaintAnswerRepository;
         private readonly IComplaintService<Complaint> _complaintService;
         private readonly ISystemAdminService _systemAdminService;
+        private readonly IPatientService _patientService;
+        private readonly IEmailDispatcher _emailDispatcher;
+        private readonly ITemplatesProvider _templatesProvider;
 
         public ComplaintAnswerService(
             IComplaintService<Complaint> complaintService,
             ISystemAdminService systemAdminService,
-            IComplaintAnswerRepository repository
+            IComplaintAnswerRepository repository,
+            IPatientService patientService,
+            IEmailDispatcher emailDispatcher,
+            ITemplatesProvider templatesProvider
         ) :
             base(repository)
         {
             _complaintService = complaintService;
             _systemAdminService = systemAdminService;
+            _patientService = patientService;
+            _emailDispatcher = emailDispatcher;
+            _templatesProvider = templatesProvider;
         }
 
         public override ComplaintAnswer Create(ComplaintAnswer answer)
@@ -32,11 +43,13 @@ namespace Farmacio_Services.Implementation
             using var transaction = _repository.OpenTransaction();
             try
             {
-                _complaintService.TryToRead(answer.ComplaintId);
-                if (_systemAdminService.ReadByUserId(answer.WriterId) == null)
+                var complaint = _complaintService.TryToRead(answer.ComplaintId);
+                var writterAccount = _systemAdminService.ReadByUserId(answer.WriterId);
+                if (writterAccount == null)
                 {
                     throw new MissingEntityException("Given system admin doesn't exist in the system.");
                 }
+                var writter = writterAccount.User as SystemAdmin;
 
                 if (ComplaintAnswerRepository.ReadAnswersFor(answer.ComplaintId).Any())
                 {
@@ -44,6 +57,17 @@ namespace Farmacio_Services.Implementation
                 }
 
                 var createdAnswer = base.Create(answer);
+
+                var email = _templatesProvider.FromTemplate<Email>("ComplaintAnswer", new
+                {
+                    To = _patientService.ReadByUserId(complaint.WriterId).Email,
+                    Patient = complaint.Writer.FirstName,
+                    Admin = $"{writter.FirstName} {writter.LastName}",
+                    About = complaint.For(),
+                    Answer = createdAnswer.Text
+                });
+                _emailDispatcher.Dispatch(email);
+
                 transaction.Commit();
 
                 return createdAnswer;
