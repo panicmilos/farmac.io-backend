@@ -185,24 +185,22 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<SmallReservationDTO> ReadPatientReservations(Guid patientId)
         {
-            var reservations = Read().ToList();
-            var patientReservations = new List<SmallReservationDTO>();
-            foreach (var reservation in reservations)
+            var patient = _patientService.ReadByUserId(patientId);
+            if (patient == null)
             {
-                if (reservation.State == ReservationState.Reserved && reservation.PatientId == patientId && reservation.CreatedAt < DateTime.Now)
-                {
-                    var price = reservation.Medicines.ToList().Sum(medicine => medicine.Quantity * medicine.Price);
-                    patientReservations.Add(new SmallReservationDTO
-                    {
-                        ReservationId = reservation.Id,
-                        UniqueId = reservation.UniqueId,
-                        PickupDeadline = reservation.PickupDeadline,
-                        Price = price,
-                        PharmacyId = reservation.PharmacyId
-                    });
-                }
+                throw new MissingEntityException("The given patient does not exist in the system.");
             }
-            return patientReservations;
+
+            return Read().ToList().Where(reservation =>
+                reservation.State == ReservationState.Reserved && reservation.PatientId == patientId && reservation.PickupDeadline > DateTime.Now)
+                .Select(reservation => new SmallReservationDTO
+                {
+                    ReservationId = reservation.Id,
+                    UniqueId = reservation.UniqueId,
+                    PickupDeadline = reservation.PickupDeadline,
+                    Price = reservation.Medicines.ToList().Sum(medicine => medicine.Quantity * medicine.Price),
+                    PharmacyId = reservation.PharmacyId
+                });
         }
 
         private string GetUniqueId()
@@ -270,7 +268,7 @@ namespace Farmacio_Services.Implementation
                 base.Update(reservation);
                 transaction.Commit();
 
-                var patientAccount = _patientService.ReadByUserId(reservation.PatientId);
+                var patientAccount = _patientService.TryToRead(reservation.PatientId);
                 var email = _templatesProvider.FromTemplate<Email>("ReservationIssued", new
                 {
                     To = patientAccount.Email,
@@ -286,6 +284,25 @@ namespace Farmacio_Services.Implementation
                 transaction.Rollback();
                 throw new BadLogicException("Something bad happened. Please try again.");
             }
+        }
+
+        public IEnumerable<SmallReservationDTO> ReadPatientPastReservations(Guid patientId)
+        {
+            var patient = _patientService.ReadByUserId(patientId);
+            if (patient == null)
+            {
+                throw new MissingEntityException("The given patient does not exist in the system.");
+            }
+
+            return Read().ToList().Where(reservation => reservation.State == ReservationState.Done && reservation.PatientId == patientId)
+                .Select(reservation => new SmallReservationDTO
+                {
+                    ReservationId = reservation.Id,
+                    UniqueId = reservation.UniqueId,
+                    PickupDeadline = reservation.PickupDeadline,
+                    Price = reservation.Medicines.ToList().Sum(medicine => medicine.Quantity * medicine.Price),
+                    PharmacyId = reservation.PharmacyId
+                });
         }
     }
 }

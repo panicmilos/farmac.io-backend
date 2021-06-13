@@ -26,5 +26,7 @@ namespace Farmacio_Services.Contracts
         Reservation MarkReservationAsDone(Guid reservationId);
 
         Reservation CreateReservation(Reservation reservation, bool checkIsMedicineForRecipe);
+
+        IEnumerable<SmallReservationDTO> ReadPatientPastReservations(Guid patientId);
     }
 }
