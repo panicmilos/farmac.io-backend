@@ -29,7 +29,7 @@ namespace Farmacio_Services.Implementation
             foreach (var pharmacy in base.Read().ToList())
             {
                 var medicineInStock = _pharmacyStockService.ReadForPharmacy(pharmacy.Id, medicineId);
-                if (medicineInStock == null)
+                if (medicineInStock == null || medicineInStock.Quantity == 0)
                     continue;
 
                 var medicinePrice = GetMedicinePriceInPharmacy(medicineId, pharmacy.Id);
