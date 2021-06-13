@@ -6,5 +6,7 @@ namespace Farmacio_Services.Contracts
     public interface ILoyaltyProgramService : ICrudService<LoyaltyProgram>
     {
         int ReadDiscountFor(Guid patientId);
+
+        Account UpdateLoyaltyProgramFor(Account patientAccount);
     }
 }

@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
+using Farmacio_API.Authorization;
+using Farmacio_API.Contracts.Requests.Appointments;
 using Farmacio_Models.Domain;
 using Farmacio_Models.DTO;
 using Farmacio_Services.Contracts;
 using GlobalExceptionHandler.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using Farmacio_API.Authorization;
-using Farmacio_API.Contracts.Requests.Appointments;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Farmacio_API.Controllers
 {
@@ -19,12 +19,18 @@ namespace Farmacio_API.Controllers
     {
         private readonly IAppointmentService _appointmentService;
         private readonly ILoyaltyPointsService _loyaltyPointsService;
+        private readonly ILoyaltyProgramService _loyaltyProgramService;
         private readonly IMapper _mapper;
 
-        public AppointmentsController(IAppointmentService appointmentService, ILoyaltyPointsService loyaltyPointsService, IMapper mapper)
+        public AppointmentsController(
+            IAppointmentService appointmentService,
+            ILoyaltyPointsService loyaltyPointsService,
+            ILoyaltyProgramService loyaltyProgramService,
+            IMapper mapper)
         {
             _appointmentService = appointmentService;
             _loyaltyPointsService = loyaltyPointsService;
+            _loyaltyProgramService = loyaltyProgramService;
             _mapper = mapper;
         }
 
@@ -162,7 +168,6 @@ namespace Farmacio_API.Controllers
         {
             var appointment = _appointmentService.TryToRead(appointmentId);
 
-            
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(UserSpecific.For(appointment.PatientId ?? Guid.Empty))
                 .Authorize();
@@ -191,7 +196,8 @@ namespace Farmacio_API.Controllers
 
             var createdReport = _appointmentService.CreateReport(reportDTO);
 
-            _loyaltyPointsService.GivePointsFor(appointment);
+            var patientAccount = _loyaltyPointsService.GivePointsFor(appointment);
+            _loyaltyProgramService.UpdateLoyaltyProgramFor(patientAccount);
 
             return Ok(createdReport);
         }
@@ -343,7 +349,6 @@ namespace Farmacio_API.Controllers
             var appointments = _appointmentService.ReadPatientsHistoryOfVisitingPharmacists(patientId);
             return Ok(_appointmentService.SortAppointments(appointments, criteria, isAsc));
         }
-
 
         /// <summary>
         /// Returns patients history of visits to a pharmacists for n-th page.

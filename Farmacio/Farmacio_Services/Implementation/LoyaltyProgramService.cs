@@ -61,20 +61,20 @@ namespace Farmacio_Services.Implementation
 
         private void UpdateLoyaltyProgramForAllPatients()
         {
-            _patientService.Read().ToList().ForEach(UpdateLoyaltyProgramForPatient);
+            _patientService.Read().ToList().ForEach(patientAccount => UpdateLoyaltyProgramFor(patientAccount));
         }
 
-        private void UpdateLoyaltyProgramForPatient(Account patientAccount)
+        public Account UpdateLoyaltyProgramFor(Account patientAccount)
         {
             var loyaltyPrograms = Read().OrderByDescending(loyaltyProgram => loyaltyProgram.MinPoints);
             if (!loyaltyPrograms.Any())
             {
-                return;
+                return patientAccount;
             }
 
             var patient = patientAccount.User as Patient;
             var appropriateLoyaltyProgram = loyaltyPrograms.FirstOrDefault(loyaltyProgram => patient.Points >= loyaltyProgram.MinPoints);
-            _patientService.UpdateLoyaltyProgram(patientAccount.Id, appropriateLoyaltyProgram?.Id ?? null);
+            return _patientService.UpdateLoyaltyProgram(patientAccount.Id, appropriateLoyaltyProgram?.Id ?? null);
         }
 
         private bool IsMinimumPointsUnique(int minPoints)
