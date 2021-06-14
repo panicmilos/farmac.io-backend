@@ -372,7 +372,7 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Sorted appointments.</response>
         [Authorize(Roles = "Patient")]
         [HttpGet("history-visit-pharmacists/{patientId}/sort/page-to")]
-        public IActionResult SortHistoryOfVisitingPharmacistsByPageTo(Guid patientId, string criteria, bool isAsc, PageDTO pageDTO)
+        public IActionResult SortHistoryOfVisitingPharmacistsByPageTo(Guid patientId, string criteria, bool isAsc, [FromQuery] PageDTO pageDTO)
         {
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(UserSpecific.For(patientId))
