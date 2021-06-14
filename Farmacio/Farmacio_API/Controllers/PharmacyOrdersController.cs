@@ -37,6 +37,7 @@ namespace Farmacio_API.Controllers
         {
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Or(AllDataAllowed.For(Role.Supplier))
                 .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.TryToRead(pharmacyOrderId));
@@ -53,6 +54,7 @@ namespace Farmacio_API.Controllers
         {
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Or(AllDataAllowed.For(Role.Supplier))
                 .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.ReadFor(pharmacyId, isProcessed));
@@ -69,6 +71,7 @@ namespace Farmacio_API.Controllers
         {
             AuthorizationRuleSet.For(HttpContext)
                 .Rule(IsPharmacyAdmin.Of(pharmacyId))
+                .Or(AllDataAllowed.For(Role.Supplier))
                 .Authorize();
             _pharmacyService.TryToRead(pharmacyId);
             return Ok(_pharmacyOrderService.ReadPageFor(pharmacyId, isProcessed, new PageDTO
@@ -77,7 +80,7 @@ namespace Farmacio_API.Controllers
                 Size = size
             }));
         }
-        
+
         /// <summary>
         /// Create a pharmacy order.
         /// </summary>
@@ -111,7 +114,7 @@ namespace Farmacio_API.Controllers
                 .Authorize();
             var pharmacyOrder = _mapper.Map<PharmacyOrder>(pharmacyOrderRequest);
             var existingPharmacyOrder = _pharmacyOrderService.TryToRead(pharmacyOrder.Id);
-            if(existingPharmacyOrder.PharmacyId != pharmacyId)
+            if (existingPharmacyOrder.PharmacyId != pharmacyId)
                 throw new UnauthorizedAccessException("The given pharmacy order does not belong to the provided pharmacy.");
             pharmacyOrder.PharmacyId = pharmacyId;
 

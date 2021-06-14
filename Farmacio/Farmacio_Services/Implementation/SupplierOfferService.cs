@@ -102,12 +102,12 @@ namespace Farmacio_Services.Implementation
                 var updatedOffer = Update(offer);
                 order.IsProcessed = true;
                 _pharmacyOrderService.Update(order);
-                
+
                 transaction.Commit();
 
                 var supplier = _supplierService.TryToRead(offer.SupplierId);
                 var offerAcceptedEmail = _templatesProvider.FromTemplate<Email>("OfferAccepted",
-                    new {To = supplier.Email, Name = supplier.User.FirstName});
+                    new { To = supplier.Email, Name = supplier.User.FirstName });
                 _emailDispatcher.Dispatch(offerAcceptedEmail);
 
                 return updatedOffer;
@@ -172,6 +172,11 @@ namespace Farmacio_Services.Implementation
                 if (order.OffersDeadline < DateTime.Now)
                 {
                     throw new BadLogicException("You cannot give offer after offers deadline.");
+                }
+
+                if (order.IsProcessed)
+                {
+                    throw new BadLogicException("Pharmacy order has already been processed.");
                 }
 
                 if (offer.DeliveryDeadline <= 0)
