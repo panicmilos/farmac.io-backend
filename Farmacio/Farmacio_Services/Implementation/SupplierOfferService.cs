@@ -99,7 +99,7 @@ namespace Farmacio_Services.Implementation
                 });
 
                 offer.Status = OfferStatus.Accepted;
-                var updatedOffer = Update(offer);
+                var updatedOffer = base.Update(offer);
                 order.IsProcessed = true;
                 _pharmacyOrderService.Update(order);
 
@@ -123,7 +123,8 @@ namespace Farmacio_Services.Implementation
         {
             ReturnMedicinesToStock(otherOffer);
             otherOffer.Status = OfferStatus.Refused;
-            Update(otherOffer);
+            
+            base.Update(otherOffer);
         }
 
         public SupplierOffer CancelOffer(Guid offerId)

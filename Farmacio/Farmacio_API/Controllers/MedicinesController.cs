@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Farmacio_API.Controllers
 {
@@ -21,6 +22,7 @@ namespace Farmacio_API.Controllers
         private readonly IMedicinePdfService _medicinePdfService;
         private readonly IPatientAllergyService _patientAllergyService;
         private readonly IERecipeService _eRecipeService;
+        private readonly IPharmacyPriceListService _pharmacyPriceListService;
         private readonly IMapper _mapper;
 
         public MedicinesController(IMedicineService medicineService,
@@ -28,6 +30,7 @@ namespace Farmacio_API.Controllers
             IMedicinePdfService medicinePdfService,
             IPatientAllergyService patientAllergyService,
             IERecipeService eRecipeService,
+            IPharmacyPriceListService pharmacyPriceListService,
             IMapper mapper)
         {
             _medicineService = medicineService;
@@ -35,6 +38,7 @@ namespace Farmacio_API.Controllers
             _medicinePdfService = medicinePdfService;
             _patientAllergyService = patientAllergyService;
             _eRecipeService = eRecipeService;
+            _pharmacyPriceListService = pharmacyPriceListService;
             _mapper = mapper;
         }
 
@@ -188,7 +192,7 @@ namespace Farmacio_API.Controllers
         [HttpGet("in-pharmacy/{pharmacyId}/names")]
         public IActionResult ReadMedicineNames(Guid pharmacyId)
         {
-            return Ok(_medicineService.ReadMedicineNames(pharmacyId));
+            return Ok(_pharmacyPriceListService.ReadNamesOfMedicinesIn(pharmacyId));
         }
 
         /// <summary>

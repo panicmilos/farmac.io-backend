@@ -32,7 +32,7 @@ namespace Farmacio_Services.Implementation
 
         public IEnumerable<PharmacyMedicine> ReadForPharmacyInStock(Guid pharmacyId)
         {
-            return ReadForPharmacy(pharmacyId).Where(pharmacyMedicine => pharmacyMedicine.Quantity != 0);
+            return ReadForPharmacy(pharmacyId);
         }
 
         public IEnumerable<PharmacyMedicine> SearchForPharmacyInStock(Guid pharmacyId, string name)

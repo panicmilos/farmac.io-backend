@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Farmacio_Models.Domain;
 using Farmacio_Repositories.Contracts;
@@ -9,7 +10,7 @@ namespace Farmacio_Services.Implementation
 {
     public class PharmacyPriceListService : CrudService<PharmacyPriceList>, IPharmacyPriceListService
     {
-        public PharmacyPriceListService(IRepository<PharmacyPriceList> repository) 
+        public PharmacyPriceListService(IRepository<PharmacyPriceList> repository)
             : base(repository)
         {
         }
@@ -18,13 +19,13 @@ namespace Farmacio_Services.Implementation
         {
             return Read().ToList().FirstOrDefault(pl => pl.PharmacyId == pharmacyId);
         }
-        
+
         public PharmacyPriceList ReadWithMostRecentPricesFor(Guid pharmacyId)
         {
             var priceList = Read().ToList().FirstOrDefault(pl => pl.PharmacyId == pharmacyId);
             if (priceList == null)
                 return null;
-            var allMedicinePrices = priceList.MedicinePriceList.ToList(); 
+            var allMedicinePrices = priceList.MedicinePriceList.ToList();
             priceList.MedicinePriceList = allMedicinePrices.Where(medicinePrice =>
             {
                 return medicinePrice.ActiveFrom == allMedicinePrices
@@ -40,7 +41,7 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Pharmacy price list for pharmacy not found.");
             return pharmacyPriceList;
         }
-        
+
         public PharmacyPriceList TryToReadWithMostRecentPricesFor(Guid pharmacyId)
         {
             var pharmacyPriceList = ReadWithMostRecentPricesFor(pharmacyId);
@@ -51,13 +52,13 @@ namespace Farmacio_Services.Implementation
 
         public override PharmacyPriceList Create(PharmacyPriceList pharmacyPriceList)
         {
-            if(ReadForPharmacy(pharmacyPriceList.PharmacyId) != null)
+            if (ReadForPharmacy(pharmacyPriceList.PharmacyId) != null)
                 throw new BadLogicException("Pharmacy price list for the given pharmacy already exists.");
             pharmacyPriceList.MedicinePriceList.ForEach(medicinePrice =>
             {
                 medicinePrice.ActiveFrom = DateTime.Now;
             });
-            
+
             return base.Create(pharmacyPriceList);
         }
 
@@ -72,8 +73,13 @@ namespace Farmacio_Services.Implementation
             existingPharmacyPriceList.ConsultationPrice = pharmacyPriceList.ConsultationPrice;
             existingPharmacyPriceList.ExaminationPrice = pharmacyPriceList.ExaminationPrice;
             existingPharmacyPriceList.MedicinePriceList.AddRange(pharmacyPriceList.MedicinePriceList);
-            
+
             return base.Update(existingPharmacyPriceList);
+        }
+
+        public IEnumerable<string> ReadNamesOfMedicinesIn(Guid pharmacyId)
+        {
+            return ReadForPharmacy(pharmacyId).MedicinePriceList.Select(m => m.Medicine.Name).Distinct();
         }
     }
 }
