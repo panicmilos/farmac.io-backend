@@ -38,7 +38,8 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<PharmacyMedicine> SearchForPharmacyInStock(Guid pharmacyId, string name)
         {
             return ReadForPharmacyInStock(pharmacyId)
-                .Where(pharmacyMedicine => name == null || pharmacyMedicine.Medicine.Name.Contains(name));
+                .Where(pharmacyMedicine =>
+                    name == null || pharmacyMedicine.Medicine.Name.ToLower().Contains(name.ToLower()));
         }
 
         public override PharmacyMedicine Create(PharmacyMedicine pharmacyMedicine)
