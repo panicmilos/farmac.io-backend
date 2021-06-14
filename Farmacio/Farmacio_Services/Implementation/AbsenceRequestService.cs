@@ -58,32 +58,36 @@ namespace Farmacio_Services.Implementation
         public AbsenceRequest AcceptAbsenceRequest(Guid absenceRequestId)
         {
             var absenceRequest = TryToRead(absenceRequestId);
-            if(absenceRequest.Status != AbsenceRequestStatus.WaitingForAnswer)
+            if (absenceRequest.Status != AbsenceRequestStatus.WaitingForAnswer)
                 throw new BadLogicException("Absence request has already been handled.");
 
             _appointmentService.ReadForMedicalStaffInPharmacy(absenceRequest.RequesterId, absenceRequest.PharmacyId)
                 .ToList()
                 .ForEach(appointment =>
                 {
+                    if (appointment.DateTime.Date < absenceRequest.FromDate.Date || appointment.DateTime.Date > absenceRequest.ToDate.Date)
+                        return;
+
+                    _appointmentService.Delete(appointment.Id);
+
                     if (!appointment.IsReserved || appointment.PatientId == null) return;
-                    
+
                     var patientAccount = _patientService.ReadByUserId(appointment.PatientId.Value);
                     var appointmentCanceledEmail = _templatesProvider.FromTemplate<Email>("AppointmentCanceled",
                         new
                         {
-                            To = patientAccount.Email, Name = patientAccount.User.FirstName,
+                            To = patientAccount.Email,
+                            Name = patientAccount.User.FirstName,
                             Date = appointment.DateTime
                         });
                     _emailDispatcher.Dispatch(appointmentCanceledEmail);
-
-                    _appointmentService.Delete(appointment.Id);
                 });
-            
+
             var medicalStaffAccount = _medicalStaffService.ReadByUserId(absenceRequest.Requester.Id);
             var absenceRequestAcceptedEmail = _templatesProvider.FromTemplate<Email>("AbsenceRequestAccepted",
                 new
                 {
-                    To = medicalStaffAccount.Email, 
+                    To = medicalStaffAccount.Email,
                     Name = medicalStaffAccount.User.FirstName,
                     absenceRequest.FromDate,
                     absenceRequest.ToDate,
@@ -98,14 +102,14 @@ namespace Farmacio_Services.Implementation
         public AbsenceRequest DeclineAbsenceRequest(Guid absenceRequestId, string reason)
         {
             var absenceRequest = TryToRead(absenceRequestId);
-            if(absenceRequest.Status != AbsenceRequestStatus.WaitingForAnswer)
+            if (absenceRequest.Status != AbsenceRequestStatus.WaitingForAnswer)
                 throw new BadLogicException("Absence request has already been handled.");
-            
+
             var medicalStaffAccount = _medicalStaffService.ReadByUserId(absenceRequest.Requester.Id);
             var absenceRequestDeclinedEmail = _templatesProvider.FromTemplate<Email>("AbsenceRequestDeclined",
                 new
                 {
-                    To = medicalStaffAccount.Email, 
+                    To = medicalStaffAccount.Email,
                     Name = medicalStaffAccount.User.FirstName,
                     absenceRequest.FromDate,
                     absenceRequest.ToDate,
@@ -113,7 +117,7 @@ namespace Farmacio_Services.Implementation
                     PharmacyName = absenceRequest.Pharmacy.Name
                 });
             _emailDispatcher.Dispatch(absenceRequestDeclinedEmail);
-            
+
             absenceRequest.Status = AbsenceRequestStatus.Refused;
             absenceRequest.Answer = reason;
             return base.Update(absenceRequest);
@@ -124,9 +128,9 @@ namespace Farmacio_Services.Implementation
             var medicalAccount = _accountService.ReadByUserId(absenceRequestDto.RequesterId);
             if (medicalAccount == null)
                 throw new MissingEntityException("The given requester does not exist in the system.");
-            if(absenceRequestDto.FromDate < DateTime.Now)
+            if (absenceRequestDto.FromDate < DateTime.Now)
                 throw new BadLogicException("From date is in the past.");
-            if(absenceRequestDto.FromDate > absenceRequestDto.ToDate)
+            if (absenceRequestDto.FromDate > absenceRequestDto.ToDate)
                 throw new BadLogicException("To date is before from date.");
 
             var absenceRequests = medicalAccount.Role == Role.Dermatologist
