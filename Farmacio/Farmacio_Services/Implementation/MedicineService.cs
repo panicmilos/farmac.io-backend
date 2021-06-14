@@ -59,6 +59,7 @@ namespace Farmacio_Services.Implementation
                 throw new MissingEntityException("Replacement medicine does not exist in the system.");
             }
 
+            base.Create(medicine);
             ingredients.ForEach(ingredient => { ingredient.MedicineId = medicine.Id; _ingredientService.Create(ingredient); });
             replacements.ForEach(replacement => { replacement.MedicineId = medicine.Id; _replacementService.Create(replacement); });
 
