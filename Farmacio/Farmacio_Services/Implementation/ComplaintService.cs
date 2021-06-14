@@ -21,6 +21,17 @@ namespace Farmacio_Services.Implementation
             return Read().Where(complaint => complaint.WriterId == writerId).ToList();
         }
 
+        public IEnumerable<T> ReadPagesToComplaints(PageDTO page, bool showAll)
+        {
+            if (showAll)
+            {
+                return ReadAllPagesTo(page);
+            }
+
+            var notAnsweredComplaints = Read().ToList().Where(complaint => !complaint.Answers.Any());
+            return PaginationUtils<T>.PagesTo(notAnsweredComplaints, page);
+        }
+
         public IEnumerable<T> ReadPagesToOfComplaintsBy(Guid writerId, PageDTO page)
         {
             return PaginationUtils<T>.PagesTo(ReadBy(writerId), page);

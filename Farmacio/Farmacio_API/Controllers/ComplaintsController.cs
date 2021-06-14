@@ -56,9 +56,9 @@ namespace Farmacio_API.Controllers
         /// <response code="200">Returns pages of complaints.</response>
         [Authorize(Roles = "SystemAdmin")]
         [HttpGet("pages-to")]
-        public IActionResult ReadComplaintsPagesTo([FromQuery] PageDTO page)
+        public IActionResult ReadComplaintsPagesTo(bool showAll, [FromQuery] PageDTO page)
         {
-            return Ok(_complaintService.ReadAllPagesTo(page));
+            return Ok(_complaintService.ReadPagesToComplaints(page, showAll));
         }
 
         /// <summary>

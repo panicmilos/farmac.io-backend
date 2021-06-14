@@ -10,5 +10,7 @@ namespace Farmacio_Services.Contracts
         IEnumerable<T> ReadBy(Guid writerId);
 
         IEnumerable<T> ReadPagesToOfComplaintsBy(Guid writerId, PageDTO page);
+
+        IEnumerable<T> ReadPagesToComplaints(PageDTO page, bool showAll);
     }
 }
