@@ -59,6 +59,17 @@ namespace Farmacio_API.Controllers
         }
 
         [Authorize(Roles = "Patient")]
+        [HttpGet("pastReservations/{patientId}")]
+        public IEnumerable<SmallReservationDTO> GetPatientsPastReservations(Guid patientId)
+        {
+            AuthorizationRuleSet.For(HttpContext)
+                .Rule(UserSpecific.For(patientId))
+                .Authorize();
+
+            return _reservationService.ReadPatientPastReservations(patientId);
+        }
+
+        [Authorize(Roles = "Patient")]
         [HttpDelete("cancel/{reservationId}")]
         public IActionResult CancelMedicineReservation(Guid reservationId)
         {
