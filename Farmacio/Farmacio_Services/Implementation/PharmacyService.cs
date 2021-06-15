@@ -125,8 +125,9 @@ namespace Farmacio_Services.Implementation
         {
             var (name, streetAndCity, sortCriteria, isAscending, gradeFrom, gradeTo, distanceFrom, distanceTo, userLat, userLon) = searchParams;
             var pharmacies = ReadForHomePage().Where(pharmacy => string.IsNullOrEmpty(name) || pharmacy.Name.ToLower().Contains(name.ToLower()))
-                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.City.ToLower()))
-                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()))
+                .Where(pharmacy => string.IsNullOrEmpty(streetAndCity) || streetAndCity.ToLower().Contains(pharmacy.Address.StreetName.ToLower()) ||
+                streetAndCity.ToLower().Contains(pharmacy.Address.City.ToLower()) || pharmacy.Address.StreetName.ToLower().Contains(streetAndCity) ||
+                pharmacy.Address.City.ToLower().Contains(streetAndCity))
                 .Where(pharmacy => pharmacy.AverageGrade >= gradeFrom && pharmacy.AverageGrade <= gradeTo);
 
             if (distanceFrom != 0 && distanceTo != 0 && LatLngUtils.IsLatValid(userLat) && LatLngUtils.IsLngValid(userLon))
