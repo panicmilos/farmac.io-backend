@@ -18,7 +18,7 @@ namespace Farmacio_Services.Implementation
         private readonly IPharmacyService _pharmacyService;
         private readonly IEmailDispatcher _emailDispatcher;
         private readonly ITemplatesProvider _templatesProvider;
-        
+
         public PromotionService(IPharmacyService pharmacyService, IEmailDispatcher emailDispatcher,
             ITemplatesProvider templatesProvider, IRepository<Promotion> repository
             , IPatientFollowingsService patientFollowingsService) : base(repository)
@@ -34,16 +34,16 @@ namespace Farmacio_Services.Implementation
             ValidatePromotion(promotion);
 
             var createdPromotion = base.Create(promotion);
-            
+
             _patientFollowingsService
-                .ReadFollowersFor(promotion.PharmacyId)
+                .ReadFollowersFor(createdPromotion.PharmacyId)
                 .ToList().ForEach(account =>
                 {
                     var offerAcceptedEmail = _templatesProvider.FromTemplate<Email>("PromotionCreated",
-                        new {To = account.Email, Name = account.User.FirstName});
+                        new { To = account.Email, Name = account.User.FirstName, Phname = createdPromotion.Pharmacy.Name, Discount = createdPromotion.Discount });
                     _emailDispatcher.Dispatch(offerAcceptedEmail);
                 });
-            
+
             return createdPromotion;
         }
 

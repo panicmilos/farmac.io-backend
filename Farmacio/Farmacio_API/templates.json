@@ -102,7 +102,7 @@
         "Subject": "Promotion has been created on Farmac.io",
         "From": "panic.milos99@gmail.com",
         "Recipients": [ "{{to}}" ],
-        "Body": "<p>Dear {{name}},</p><p>Promotion has been created in the pharmacy that you're subscribed to.</p>"
+        "Body": "<p>Dear {{name}},</p><p>Promotion of {{discount}}% has been created in the {{phname}} that you're subscribed to.</p>"
       }
     },
     {
