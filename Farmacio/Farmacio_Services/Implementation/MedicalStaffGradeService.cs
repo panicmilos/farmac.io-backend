@@ -22,7 +22,7 @@ namespace Farmacio_Services.Implementation
             , IMedicalStaffService medicalStaffService
             , IAppointmentService appointmentService
             , IDermatologistService dermatologistService
-            , IPharmacistService pharmacistService):
+            , IPharmacistService pharmacistService) :
             base(repository)
         {
             _patientService = patientService;
@@ -34,7 +34,8 @@ namespace Farmacio_Services.Implementation
 
         public bool DidPatientGradeMedicalStaff(Guid patientId, Guid medicalStaffId)
         {
-            var grades = Read().Where(grade => {
+            var grades = Read().Where(grade =>
+            {
                 var medicalStaffGrade = grade as MedicalStaffGrade;
                 return medicalStaffGrade?.PatientId == patientId && medicalStaffGrade?.MedicalStaffId == medicalStaffId;
             });
@@ -52,8 +53,9 @@ namespace Farmacio_Services.Implementation
             }).FirstOrDefault() as MedicalStaffGrade;
         }
 
-        public Grade GradeMedicalStaff(MedicalStaffGrade grade)
+        public override Grade Create(Grade medicalStaffGrade)
         {
+            var grade = medicalStaffGrade as MedicalStaffGrade;
             var medicalStaff = _medicalStaffService.ReadByUserId(grade.MedicalStaffId);
             if (medicalStaff == null)
             {
@@ -89,6 +91,7 @@ namespace Farmacio_Services.Implementation
         {
             return _dermatologistService.Read().Where(dermatologist => DidPatientGradeMedicalStaff(patientId, dermatologist.UserId)).ToList();
         }
+
         public IEnumerable<Account> ReadPharmacistsThatPatientCanRate(Guid patientId)
         {
             return _pharmacistService.Read().Where(pharmacists => _appointmentService.DidPatientHaveAppointmentWithMedicalStaff(patientId, pharmacists.UserId) &&
