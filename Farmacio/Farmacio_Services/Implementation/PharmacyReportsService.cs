@@ -21,7 +21,7 @@ namespace Farmacio_Services.Implementation
         public IEnumerable<PharmacyReportRecordDTO> GenerateExaminationsReportFor(Guid pharmacyId, TimePeriodDTO timePeriod)
         {
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
-            var appointmentsForPharmacyInTimePeriod = AppointmentsForPharmacyInTimePeriod(pharmacyId, timePeriod, true);
+            var appointmentsForPharmacyInTimePeriod = AppointmentsForPharmacyInTimePeriod(pharmacyId, timePeriod, false);
 
             return appointmentsForPharmacyInTimePeriod.OrderBy(appointment => appointment.DateTime)
                 .GroupBy(appointment => isPeriodLongerThanAMonth ? appointment.DateTime.Month : appointment.DateTime.Day)
@@ -60,7 +60,7 @@ namespace Farmacio_Services.Implementation
                 .Select(group => new PharmacyReportRecordDTO
                 {
                     Group = group.Key.ToString(),
-                    Value = group.Sum(appointment => appointment.Price)
+                    Value = group.Sum(appointment => appointment.IsReserved ? appointment.Price : 0)
                 })
                 .ToList();
 
@@ -95,7 +95,7 @@ namespace Farmacio_Services.Implementation
             var appointmentsForPharmacyInTimePeriod =
                 (dermatologistsOnly ? _appointmentService.ReadForDermatologistsInPharmacy(pharmacyId)
                     : _appointmentService.ReadForPharmacy(pharmacyId))
-                .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= timePeriod.To &&
+                .Where(appointment => appointment.DateTime >= timePeriod.From && appointment.DateTime <= new DateTime(Math.Min(timePeriod.To.Ticks, DateTime.Now.Ticks)) &&
                 _appointmentService.DidPatientShowUpForAppointment(appointment.Id))
                 .ToList();
 
@@ -121,7 +121,7 @@ namespace Farmacio_Services.Implementation
             var isPeriodLongerThanAMonth = timePeriod.From.Month != timePeriod.To.Month;
             var doneReservationsForPharmacyInTimePeriod = _reservationService.ReadFrom(pharmacyId)
                 .Where(reservation =>
-                    reservation.CreatedAt >= timePeriod.From && reservation.CreatedAt <= timePeriod.To)
+                    reservation.CreatedAt >= timePeriod.From && reservation.CreatedAt <= new DateTime(Math.Min(timePeriod.To.Ticks, DateTime.Now.Ticks)))
                 .ToList();
 
             // Fill empty days or months
